@@ -81,6 +81,23 @@ pre, code, kbd, samp {
 }
 
 /*-------------------------------------------------------------
+                       General
+------------------------------------------------------------ */
+
+body {
+    font-family: "helvetica neue", helvetica, arial, sans-serif;
+    font-weight:200;
+    color: #999999;
+}
+
+a {
+    text-decoration: none;
+    color: #999999;
+    -webkit-transition: color .2s linear, text-shadow .2s linear;
+    -moz-transition: color .2s linear, text-shadow .2s linear;
+}
+
+/*-------------------------------------------------------------
                        Layout
 ------------------------------------------------------------ */
 
@@ -90,47 +107,103 @@ html {
 
 body {
     border-top: 6px solid #afdae8;
-    color: 999999;
-    font-family: "Raleway", "helvetica neue", helvetica, arial, sans-serif;
     min-width: 600px;
 }
 
 #content {
     padding: 25% 0 0 100px;
-    width: 500px;
+    width: 550px;
     margin-bottom: 60px;
 }
 
+/*-------------------------------------------------------------
+                       Header
+------------------------------------------------------------ */
+
 header {
-    text-transform: uppercase;
-    color: #e1e1e1;
-    font-size: 24px;
-    line-height: 36px;
+    color: #bbbbbb;
+    font-size: 22px;
+    line-height: 45px;
     border-bottom: 1.5px solid #f7f7f7;
     -webkit-transition: color 0.5s linear, border 0.7s linear;
     -moz-transition: color 0.5s linear, border 0.7s linear;
 }
 
 html:hover header {
-    color: #999999;
+    color: #777777;
     border-bottom: 1.5px solid #afdae8;
 }
 
 header p em {
-    -webkit-transition: text-shadow .2s linear, -webkit-text-stroke .2s linear;
-    -moz-transition: text-shadow .2s linear, -moz-text-stroke .2s linear;
+    -webkit-transition: text-shadow .2s linear;
+    -moz-transition: text-shadow .2s linear;
 }
 header p em:hover {
     text-shadow: #e3e9ef 0 1px 20px;
     color: #074b5b;
-    -webkit-text-stroke: .5px #074b5b;
-    -moz-text-stroke: .5px #074b5b;
 }
 
-h1 em {
-    font-size: 28px;
+h1 {
+    padding-top: 5px;
+    font-family: "Raleway";
+    font-size: 44px;
     color: #074b5b;
     -webkit-text-stroke: .5px #074b5b;
     -moz-text-stroke: .5px #074b5b;
+    -webkit-transition: text-shadow .2s linear;
+    -moz-transition: text-shadow .2s linear;
 }
+
+html:hover header h1 {
+    text-shadow: #aaaaaa 0 1px 5px;
+}
+
+
+/*-------------------------------------------------------------
+                       Content
+------------------------------------------------------------ */
+
+html:hover a {
+    color: #074b5b;
+}
+
+a:hover {
+    text-shadow: #888888 0 1px 10px;
+}
+
+#about {
+    text-transform: uppercase;
+    margin-top: 14px;
+    font-size: 14px;
+    color: #aaaaaa;
+}
+
+#socialmedia {
+    margin-top: 14px;
+}
+
+#socialmedia ul li{
+    display: inline;
+}
+
+#socialmedia ul li a{
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    text-indent: -9999px;
+    background: url(badges.png) no-repeat;
+}
+
+#socialmedia ul li.github a {
+    background-position: -25px top;
+}
+
+#socialmedia ul li a:hover {
+    background: url(badges2.png) no-repeat;
+}
+
+#socialmedia ul li.github a:hover {
+    background-position: -25px top;
+}
+
 
