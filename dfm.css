@@ -224,9 +224,18 @@ a:hover {
         width: 100%;
         margin-bottom: 60px;
     }
+    html:hover header, html:hover a, html:hover header h1 {}
     
+    h1 {
+        padding-top: 5px;
+        font-family: "Raleway";
+        font-size: 36px;
+        color: #074b5b;
+    }
     
-  /* Uncomment if you don't want iOS and WinMobile to mobile-optimize the text for you: j.mp/textsizeadjust */
-  /* html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } */
+    header {
+        color: #777777;
+        border-bottom: 1.5px solid #afdae8;
+    }
 }
 
