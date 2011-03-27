@@ -214,7 +214,7 @@ a:hover {
    consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
 @media screen and (max-device-width: 480px) {
     html {
-        width: 100%;
+        width: 480px;
     }
     body {
         border-top: 0px solid #afdae8;
