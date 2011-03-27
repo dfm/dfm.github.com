@@ -213,7 +213,12 @@ a:hover {
 /* Grade-A Mobile Browsers (Opera Mobile, Mobile Safari, Android Chrome)
    consider this: www.cloudfour.com/css-media-query-for-mobile-is-fools-gold/ */
 @media screen and (max-device-width: 480px) {
-    
+    html {
+        width: 100%;
+    }
+    body {
+        width: 100%;
+    }
     #content {
         padding: 10px 0 0 10px;
         width: 100%;
