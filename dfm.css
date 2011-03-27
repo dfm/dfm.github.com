@@ -217,15 +217,17 @@ a:hover {
         width: 100%;
     }
     body {
+        border-top: 0px solid #afdae8;
         width: 100%;
     }
     #content {
-        padding: 10px 0 0 10px;
+        border-top: 6px solid #afdae8;
         width: 100%;
         margin-bottom: 60px;
     }
-    html:hover header, html:hover a, html:hover header h1 {}
     
+/*html:hover header, html:hover a, html:hover header h1 {} */
+
     h1 {
         padding-top: 5px;
         font-family: "Raleway";
