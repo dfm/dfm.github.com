@@ -215,12 +215,11 @@ a:hover {
 @media screen and (max-device-width: 480px) {
     body {
         border-top: 0px solid #afdae8;
-        width: 100%;
     }
     #content {
         border-top: 6px solid #afdae8;
-        padding: 0,0,0,0;
-        width: 100%;
+        padding: 0px,0px,0px,0px;
+        width: 480px;
         margin-bottom: 60px;
     }
     
