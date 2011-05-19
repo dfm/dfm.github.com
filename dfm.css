@@ -173,8 +173,17 @@ a:hover {
 #about {
     text-transform: uppercase;
     margin-top: 14px;
+    padding-bottom: 14px;
     font-size: 14px;
     color: #aaaaaa;
+    border-bottom: 1.5px solid #f7f7f7;
+    -webkit-transition: color 0.5s linear, border 0.7s linear;
+    -moz-transition: color 0.5s linear, border 0.7s linear;
+}
+
+html:hover #about {
+    color: #777777;
+    border-bottom: 1.5px solid #afdae8;
 }
 
 #socialmedia {
