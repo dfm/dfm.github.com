@@ -1,0 +1,201 @@
+/*-------------------------------------------------------------
+      Reset, font normalization and base styles from
+      https://github.com/paulirish/html5-boilerplate
+------------------------------------------------------------ */
+
+/* 
+    (1) html5doctor.com Reset Stylesheet
+        (Eric Meyer's Reset Reloaded + HTML5 baseline)
+    
+    v1.6.1 2010-09-17 | Authors: Eric Meyer & Richard Clark
+    html5doctor.com/html-5-reset-stylesheet/
+*/
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+blockquote, q { quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after { content: ''; content: none; }
+
+ins { background-color: #ff9; color: #000; text-decoration: none; }
+
+mark { background-color: #ff9; color: #000; font-style: italic; font-weight: bold; }
+
+del { text-decoration: line-through; }
+
+abbr[title], dfn[title] { border-bottom: 1px dotted; cursor: help; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+input, select { vertical-align: middle; }
+
+
+/*
+    Font normalization inspired by YUI Library's fonts.css
+        developer.yahoo.com/yui/
+    
+    Note: hack retained to preserve specificity
+*/
+
+body { font:13px/1.231 sans-serif; *font-size:small; }
+select, input, textarea, button { font:99% sans-serif; }
+
+/*
+    Normalize monospace sizing:
+        en.wikipedia.org/wiki/MediaWiki_talk:Common.css/
+            Archive_11#Teletype_style_fix_for_Chrome
+*/
+
+pre, code, kbd, samp {
+    font-family: monospace, sans-serif;
+}
+
+/*-------------------------------------------------------------
+                       DFM's site
+------------------------------------------------------------ */
+
+body {
+    font-size: 13px;
+    line-height: 18px;
+    font-family: "helvetica neue", helvetica, arial, sans-serif;
+    font-weight:200;
+    color: #777777;
+}
+
+a {
+    color: steelblue;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #7b98b0;
+}
+
+a:hover {
+    color: #137CD4;
+}
+
+html {
+    background-color: #f7f7f7;
+}
+
+#site {
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 60px;
+    width: 550px;
+}
+
+header {
+    padding-bottom: 14px;
+}
+
+header h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+header #about {
+    font-size: 14px;
+    color: #aaaaaa;
+}
+
+footer {
+    margin-top: 14px;
+    padding-top: 5px;
+    font-size: 12px;
+    line-height: 18px;
+    border-top: 1px solid steelblue;
+}
+
+#contact {
+    
+}
+
+#contact li {
+    display: block;
+    float: left;
+    margin-right: 18px;
+}
+
+h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.posts li {
+    display: block;
+}
+
+.posts li span {
+    color: #aaaaaa;
+}
+
+#related {
+    margin-top: 14px;
+}
+
+#post h1 {
+    font-size: 24px;
+    padding-bottom:5px;
+    margin-bottom:14px;
+    border-bottom: 1px solid steelblue;
+}
+
+#post p {
+    margin-bottom: 14px;
+}
+
+#post p em {
+    font-style: italic;
+}
+
+#post p img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#gohome {
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 18px;
+}
+
+#gohome a {
+    font-size 64px;
+    color: #999999;
+}
+

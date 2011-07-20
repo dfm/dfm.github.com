@@ -1,58 +1,31 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Dan Foreman-Mackey @ NYU</title>
-        
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-        
-        <link href="http://fonts.googleapis.com/css?family=Raleway:100" rel="stylesheet" type="text/css">
-        <link href="dfm.css" rel="stylesheet" type="text/css">
-    </head>
-    <body>
-        <section id="content">
-            <header>
-                <p>
-                    Hi.  My name is 
-                </p>
-                <h1>
-                    Dan Foreman-Mackey.
-                </h1>
-                <p>
-                    I'm a graduate student in the
-                    <a href="http://cosmo.nyu.edu/"
-                        title="Center for Cosmology and Particle Physics">CCPP</a>
-                    at
-                    <a href="http://physics.nyu.edu/"
-                        title="Physics">NYU</a>.
-                </p>
-            </header>
-            <section id="about">
-                <p>
-                    I work with
-                    <a href="http://hoggresearch.blogspot.com/" title="Cool blog.">David W. Hogg</a>
-                    on inference problems in Galaxy Dynamics.
-                </p>
-            </section>
-            <section id="socialmedia">
-                <p>
-                    <ul>
-                        <li class="github"><a href="https://github.com/dfm" title="Beautiful code!">github</a></li>
-                        <li class="tumblr"><a href="http://dtfm.tumblr.com" title="Do I ever update it?">Tumblr</a></li>
-                    </ul>
-                </p>
-            </section>
-        </section>
-        
-        <script type="text/javascript">
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-22909046-1']);
-            _gaq.push(['_trackPageview']);
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
-        </script>
+---
+layout: default
+title: Dan Foreman-Mackey
+---
 
-    </body>
-</html>
+<header>
+    <h1>
+        Dan Foreman-Mackey
+    </h1>
+    <p id="about">
+        I work with 
+        <a href="http://hoggresearch.blogspot.com/"
+            title="Cool blog.">David W. Hogg</a>
+        on inference problems in Galaxy Dynamics.
+    </p>
+</header>
+
+<section id="home">
+    <h2>
+        Blog
+    </h2>
+    <ul class="posts">
+        {% for post in site.posts %}
+            <li>
+                <span>{{ post.date | date_to_string }}</span>
+                -
+                <a href="{{ post.url }}">{{ post.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
