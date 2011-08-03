@@ -33,3 +33,15 @@ export PS1="${SCREENTITLE}[\u@\h \W]\$ "
 First, it checks whether or not you're in screen then it sets your command prompt accordingly. The thing that you'll want to change is in the last line. I like my standard command prompt to be ==<code>[\u@\h \W]\$</code>== but you should change this to whatever you want (but don't forget the @$@ at the end!).
 
 
+==<!-- ADD YOUR COMMENT HERE --><script>
+var comments = [
+/* begin template --- copy these lines then use any valid html in your comment */
+{'github_user': 'template', 'date': new Date(2011,8,3), 'comment': "\
+This is an example comment.<br />\
+Don't forget to escape your newlines!\
+"},
+/* end template */
+]
+</script><!-- ADD YOUR COMMENT HERE -->==
+
+

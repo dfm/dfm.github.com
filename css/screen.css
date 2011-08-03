@@ -166,6 +166,66 @@ h2 {
     margin-top: 14px;
 }
 
+#comments li.comment {
+    display: block;
+}
+
+#comments li span.date {
+    color: #aaaaaa;
+}
+
+#comments li span.comment_container {
+    display: block;
+    padding-left: 25px;
+    width: 525px; /* 550 - padding-left */
+    margin-bottom: 5px;
+}
+
+#comment_warning {
+    display: block;
+    width: 550px;
+    text-align: center;
+    display: none;
+}
+
+#comment_warning div {
+    background:#dddddd;
+    padding: 8px;
+    border:1px solid black;
+}
+
+#comment_warning div p {
+    font-weight: bold;
+    margin-bottom: 10px;
+    display:block;
+}
+
+a.button {
+    color:#ffffff !important;
+    font-weight: bold;
+    display:inline-block;
+    text-align:center;
+    margin-bottom:3px;
+    padding:8px 15px 8px 15px;
+    /* CSS3 Properties */
+    text-shadow:-1px -1px 1px #000;
+    border-radius:10px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    background:#4bacbc;
+    background:-webkit-gradient(linear, left top, left bottom, from(#085a9f), to(#074579));
+    background:-moz-linear-gradient(top,  #085a9f,  #074579);
+    border:1px solid black;
+}
+a.button:hover {
+    background:#1f6d81;
+    background:-webkit-gradient(linear, left top, left bottom, from(#137CD4), to(#085a9f));
+    background:-moz-linear-gradient(top,  #137CD4,  #085a9f);
+    box-shadow:0 0 10px #210634;
+    -webkit-box-shadow:0 0 10px #210634;
+    -moz-box-shadow:0 0 10px #210634;
+}
+
 #post h1 {
     font-size: 24px;
     padding-bottom:5px;

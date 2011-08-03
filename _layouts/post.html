@@ -20,3 +20,22 @@ layout: default
     </ul>
 </div>
 
+<div id="related">
+    <h2>Comments</h2>
+    <script type="text/javascript" charset="utf-8" src="/jquery.min.js"></script>    
+    <script type="text/javascript" charset="utf-8" src="/comments.js"></script>
+    <div id="post_a_comment"><a href="javascript:window.post_a_comment();">Post a comment.</a></div>
+    <div id="comment_warning">
+        <div>
+            <p>Warning: this will create a fork of this page using GitHub.</p>
+            <script type="text/javascript" charset="utf-8">
+                var pageurl = "{{ page.url }}";
+                pageurl = pageurl.replace(/\//g,"-");
+                pageurl = pageurl.replace(/.html/,".textile");
+                document.write('<a href="https://github.com/dfm/dfm.github.com/edit/master/_posts/' + pageurl.substring(1) + '" class="button">I\'m OK with this</a>');
+            </script>                
+            <a href="#" class="button">More info</a>
+        </div>
+    </div>
+</div>
+
