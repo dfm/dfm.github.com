@@ -41,6 +41,9 @@ This is an example comment.<br />\
 Don't forget to escape your newlines!\
 "},
 /* end template */
+{'github_user': 'dfm-test', 'date': new Date(2011,8,3), 'comment': "\
+Isn't this cool?\
+"},
 ]
 </script><!-- ADD YOUR COMMENT HERE -->==
 
