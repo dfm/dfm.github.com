@@ -43,6 +43,9 @@ var comments = [
             'date': new Date(2011,8,5),
          'comment': "This is what a comment looks like!<br />\
                      Let me know what you think..."},
+    {'github_user': 'jonathansick',
+            'date': new Date(2011,8,6),
+         'comment': "If spam-bots start figuring out how to make comments... that'll be the day..."},
 ]
 </script><!-- ADD YOUR COMMENT HERE -->==
 
