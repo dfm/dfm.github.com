@@ -118,7 +118,7 @@ html {
 }
 
 header {
-    padding-bottom: 14px;
+    padding-bottom: 5px;
 }
 
 header h1 {
@@ -150,6 +150,7 @@ footer {
 }
 
 h2 {
+    margin-top: 10px;
     font-size: 18px;
     margin-bottom: 5px;
 }
