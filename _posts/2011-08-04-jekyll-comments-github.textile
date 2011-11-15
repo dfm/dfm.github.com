@@ -46,6 +46,11 @@ var comments = [
     {'github_user': 'jonathansick',
             'date': new Date(2011,8,6),
          'comment': "If spam-bots start figuring out how to make comments... that'll be the day..."},
+    {'github_user': 'jakemannix',
+            'date': new Date(2011,11,14),
+         'comment': "Given the relative difficulty of making comments like this, I'm\
+                    pretty sure that this will be the most spam-free blog in the blogosphere.  It may\
+                    also be the most <em>comment</em>-free blog as well, but that's O.K.!  Nice work."},
 ]
 </script><!-- ADD YOUR COMMENT HERE -->==
 
