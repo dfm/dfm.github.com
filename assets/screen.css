@@ -1,0 +1,203 @@
+
+/* Font styles */
+body {
+    background-color: white;
+    color: #333;
+    font-family: "abril-text", serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 24px;
+    text-rendering: optimizelegibility;
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+    color: #1d1d25;
+    font-family: "Yanone Kaffeesatz", sans-serif;
+    font-size: 24pt;
+    font-weight: normal;
+}
+
+h1 a {
+    color: inherit !important;
+}
+
+h2 {
+    margin: 15px 0;
+    padding: 0;
+    color: #1d1d25;
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 20px;
+    font-weight: 200;
+}
+
+.header-tagline {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 10pt;
+    font-weight: 200;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+a {
+    color: #67ad00;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #7fd600;
+}
+
+/* Bio styles */
+
+.bio {
+    font-style: italic;
+    line-height: 24px;
+}
+
+/* Project styles */
+
+.project {
+    line-height: 32px;
+}
+
+.project-name {
+    display: inline-block;
+    float: left;
+    width: 190px;
+    margin: 0 5px;
+    padding: 0;
+    text-align: right;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.project-desc {
+    display: inline-block;
+    float: left;
+    width: 590px;
+    margin: 0 5px;
+}
+
+/* Blog summary styles */
+
+.blog-entry {
+    clear: both;
+}
+
+.blog-date {
+    display: inline-block;
+    float: left;
+    width: 190px;
+    margin: 0 5px;
+    padding: 0;
+    text-align: right;
+    line-height: 24px;
+    font-size: 11px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.blog-desc {
+    display: inline-block;
+    float: left;
+    width: 590px;
+    margin: 0 5px 15px 5px;
+    font-style: italic;
+    color: #888;
+    line-height: 24px;
+}
+
+.blog-title {
+    font-weight: bold;
+}
+
+/* The post */
+
+.post-title {
+    float: left;
+    width: 190px;
+    width: 190px;
+    margin: 12px 5px;
+    padding: 0;
+    text-align: right;
+}
+
+.post-title .title {
+    color: #1d1d25;
+    font-family: "Yanone Kaffeesatz", sans-serif;
+    font-size: 21px;
+    font-weight: normal;
+}
+
+.post-date {
+    line-height: 24px;
+    font-size: 11px;
+    font-weight: bold;
+    font-style: italic;
+    color: #888;
+}
+
+/* Skeleton */
+
+.container {
+    width: 800px;
+    margin: 0 auto;
+}
+
+header {
+    margin-top: 50px;
+}
+
+.header-left {
+    float: left;
+    width: 190px;
+    margin: 0 5px;
+    text-align: right;
+}
+
+.header-right {
+    float: left;
+    width: 590px;
+    margin: 0 5px;
+    padding-top: 45px;
+}
+
+section {
+    clear: both;
+    padding-top: 25px;
+}
+
+.section-title {
+    margin-left: 205px;
+}
+
+.section-right {
+    width: 590px;
+    margin: 0 5px 0 205px;
+}
+
+footer {
+    clear: both;
+    width: 590px;
+    margin: 0 5px 0 205px;
+    padding: 40px 0;
+
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
+}
+
+footer p {
+    padding: 0;
+    margin: 0;
+    margin-bottom: 5px;
+}
+

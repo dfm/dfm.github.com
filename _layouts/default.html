@@ -1,44 +1,46 @@
-<!DOCTYPE html>
 <html>
-    <head>
-        <title>{{ page.title }}</title>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-        <meta name="author" content="Dan Foreman-Mackey" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
 
-        <link href="http://feeds.feedburner.com/dfm" rel="alternate"
-            title="Dan Foreman-Mackey" type="application/atom+xml" />
+    <script type="text/javascript" src="//use.typekit.com/phg8fgl.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
-        <link href='http://fonts.googleapis.com/css?family=Limelight&v2'
-            rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
-        <link rel="stylesheet" href="/css/screen.css" type="text/css">
-    </head>
-    <body>
-        <div id="site">
+    <link href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700" rel="stylesheet" type="text/css">
+    <link href="/assets/normalize.css" rel="stylesheet" type="text/css">
+    <link href="/assets/screen.css" rel="stylesheet" type="text/css">
+    <link href="/assets/syntax.css" rel="stylesheet" type="text/css">
 
-            {{ content }}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <img src="/assets/avatar.png" border="0">
+            </div>
+            <div class="header-right">
+                <h1><a href="/">Dan Foreman-Mackey</a></h1>
+                <p class="header-tagline">
+                    I write code for good &amp; astrophysics.
+                </p>
+            </div>
+        </header>
 
-            <footer>
-                <ul id="contact">
-                    <li>Dan Foreman-Mackey<br />
-                        <a href="http://cosmo.nyu.edu/"
-                            title="Center for Cosmology and Particle Physics">CCPP</a>
-                        at <a href="http://physics.nyu.edu/"
-                            title="Physics">NYU</a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/dfm"
-                            title="Beautiful code!">github.com/dfm</a>
-                        <br />
-                        <a href="http://twitter.com/__dfm__">@__dfm__</a>
-                    </li>
-                    <li>
-                        <a href="/cv.pdf">C.V.</a>
-                    </li>
-                </ul>
-            </footer>
-        </div>
+        {{ content }}
+
+        <footer>
+            <p>
+                I'm on <a href="https://github.com/dfm">GitHub</a> &amp;
+                <a href="http://twitter.com/__dfm__">Twitter</a>.
+            </p>
+            <p>
+                Unless otherwise noted, all content by Dan Foreman-Mackey.
+                Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+            </p>
+        </footer>
+
+    </div>
 
         <a href="http://github.com/dfm">
             <img style="position: fixed; top: 0; right: 0; border: 0;"
@@ -57,5 +59,6 @@
             })();
         </script>
 
-    </body>
+</body>
 </html>
+

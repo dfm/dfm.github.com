@@ -1,0 +1,76 @@
+---
+layout: default
+---
+
+<section id="about">
+    <div class="section-right offset">
+        <p class="bio">
+            I'm a graduate student at NYU working on astronomical
+            data analysis under the supervision of
+            <a href="http://hoggresearch.blogspot.com">David W. Hogg</a>.
+            When I'm not writing code, I'm probably climbing some
+            rocks somewhere.
+        </p>
+    </div>
+</section>
+
+
+<section id="projects">
+    <div class="section-title">
+        <h2>Projects</h2>
+    </div>
+    <div class="section-body">
+        <ul>
+            <li class="project">
+                <span class="project-name">
+                    <a href="http://danfm.ca/emcee">emcee</a>
+                </span>
+                <span class="project-desc">
+                    Kick-ass MCMC sampling in Python. See
+                    <a href="http://arxiv.org/abs/1202.3665">the paper</a>.
+                </span>
+            </li>
+            <li class="project">
+                <span class="project-name">
+                    <a href="http://github.com/dfm/Stripe82">Stripe 82</a>
+                </span>
+                <span class="project-desc">
+                    Recalibration of Stripe 82 in search of extremely
+                    faint RR Lyrae variable stars.
+                </span>
+            </li>
+            <li class="project">
+                <span class="project-name">
+                    <a href="http://danfm.ca/ads_search">ADS Search</a>
+                </span>
+                <span class="project-desc">
+                    A web service for intuitive searching of the NASA
+                    Astrophysics Data System.
+                </span>
+            </li>
+        </ul>
+    </div>
+</section>
+
+
+<section id="blog">
+    <div class="section-title">
+        <h2>Writing</h2>
+    </div>
+    <div class="section-body">
+        <ul>
+            {% for post in site.posts %}
+            <li class="blog-entry">
+                <span class="blog-date">
+                    {{ post.date | date: "%B %d, %Y" }}
+                </span>
+                <span class="blog-desc">
+                    <a href="{{ post.url }}" class="blog-title">{{ post.title }}</a> &mdash;
+                    {{ post.excerpt }}
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+

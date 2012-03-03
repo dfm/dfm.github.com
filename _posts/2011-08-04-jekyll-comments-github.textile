@@ -1,7 +1,10 @@
 ---
 layout: post
-title: How I decided to allow comments on my Jekyll blog using GitHub forks
+title: Jekyll blog comments for nerds
+excerpt: How to use GitHub forks for commenting on Jekyll blogs.
 ---
+
+_This has been temporarily disabled while I update the layout. Sorry!_
 
 I like GitHub a lot. That's why I host many of my projects on it and even my blog.  In that spirit, I decided to code up a (mildly convoluted) way of posting comments on my "static Jekyll blog":https://github.com/mojombo/jekyll/ using GitHub forks.
 
@@ -30,28 +33,4 @@ Then,
 3. and finally, submit the pull request.
 
 It's not elegant but it _is_ a novelty! Let me know what you think in the comments section below.
-
-==<!-- ADD YOUR COMMENT HERE --><script>
-var comments = [
-/* begin template --- copy these lines then use any valid html in your comment */
-    {'github_user': 'template',
-            'date': new Date(2011,8,3),
-         'comment': "This is an example comment.<br />\
-                     Don't forget to escape your newlines!"},
-/* end template */
-    {'github_user': 'dfm',
-            'date': new Date(2011,8,5),
-         'comment': "This is what a comment looks like!<br />\
-                     Let me know what you think..."},
-    {'github_user': 'jonathansick',
-            'date': new Date(2011,8,6),
-         'comment': "If spam-bots start figuring out how to make comments... that'll be the day..."},
-    {'github_user': 'jakemannix',
-            'date': new Date(2011,11,14),
-         'comment': "Given the relative difficulty of making comments like this, I'm\
-                    pretty sure that this will be the most spam-free blog in the blogosphere.  It may\
-                    also be the most <em>comment</em>-free blog as well, but that's O.K.!  Nice work."},
-]
-</script><!-- ADD YOUR COMMENT HERE -->==
-
 

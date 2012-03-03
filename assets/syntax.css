@@ -1,11 +1,12 @@
 /*
  * https://github.com/mojombo/mojombo.github.com/blob/master/css/syntax.css
  */
-.highlight  { 
-    background: #ffffff;
-    padding: 5px;
-    margin: 10px;
-    border: 1px solid black;
+.highlight  {
+    padding: 0 10px;
+    margin: 0 10px;
+    border-left: 3px solid #ddd;
+    font-size: 12px;
+    line-height: 14px;
 }
 .highlight .lineno { color: #aaaaaa; font-size: 70%; }
 .highlight .c { color: #999988; font-style: italic } /* Comment */

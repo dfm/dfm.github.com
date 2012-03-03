@@ -1,41 +1,15 @@
 ---
 layout: default
 ---
-<div id="gohome">
-    <a href="/">&lt;&lt; Home</a>
-</div>
-<div id="post">
-<h1>{{ page.title }}</h1>
-{{ content }}
-</div>
 
-<div id="related">
-    <h2>Related Posts</h2>
-    <ul class="posts">
-        {% for post in site.related_posts limit:3 %}
-            <li><span>{{ post.date | date_to_string }}</span>
-            -
-            <a href="{{ post.url }}">{{ post.title }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
-
-<div id="related">
-    <h2>Comments</h2>
-    <script type="text/javascript" charset="utf-8" src="/jquery.min.js"></script>    
-    <script type="text/javascript" charset="utf-8" src="/comments.js"></script>
-    <div id="post_a_comment"><a href="javascript:window.post_a_comment();">Post a comment.</a></div>
-    <div id="comment_warning">
-        <div>
-            <p>Warning: this will create a fork of this page using GitHub.</p>
-            <script type="text/javascript" charset="utf-8">
-                var pageurl = "{{ page.url }}";
-                pageurl = pageurl.replace(/\//g,"-");
-                pageurl = pageurl.replace(/.html/,".textile");
-                document.write('<a href="https://github.com/dfm/dfm.github.com/edit/master/_posts/' + pageurl.substring(1) + '" class="button">I\'m OK with this</a>');
-            </script>                
-            <a href="/2011/08/04/jekyll-comments-github.html" class="button">More info</a>
-        </div>
+<section id="post">
+    <div class="post-title">
+        <span class="title">{{ page.title }}</span><br>
+        <span class="post-date">{{ page.date | date: "%B %d, %Y" }}</span>
     </div>
-</div>
+    <div class="section-right">
+        {{ content }}
+    </div>
+</section>
+
 

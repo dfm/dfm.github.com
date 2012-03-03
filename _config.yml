@@ -1,3 +1,4 @@
 pygments: true
 safe: true
+permalink: /posts/:title
 
