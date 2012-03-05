@@ -12,4 +12,21 @@ layout: default
     </div>
 </section>
 
+<section id="comments-section">
+    <div class="section-title">
+        <h2>Comments</h2>
+    </div>
+    <div id="comment-placeholder" class="section-body"></div>
+    <div id="leave-comment" class="clearfix section-right">
+        <a id="comment-btn" class="btn" href="#" data-date="{{ page.date | date: "%Y-%m-%d" }}" data-title="{{ page.url }}">
+            Leave a Comment
+        </a><br>
+        <small><strong>Note</strong>: you must be signed into your <a href="https://github.com">GitHub</a>
+            account to leave a comment.
+            <a href="/posts/jekyll-comments-github">Why?</a></small>
+    </div>
+</section>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+<script src="/assets/comments.js"></script>
 

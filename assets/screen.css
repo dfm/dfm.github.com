@@ -32,6 +32,11 @@ h2 {
     font-weight: 200;
 }
 
+small {
+    font-size: 11px;
+    color: #888;
+}
+
 .header-tagline {
     margin: 0;
     padding: 0;
@@ -53,6 +58,41 @@ a {
 
 a:hover {
     color: #7fd600;
+}
+
+.btn {
+    color: #1d1d25;
+    padding: 5px 10px;
+    border: 1px solid #888;
+    border-bottom-color: #666;
+    text-shadow: 0 1px 1px rgba(255,255,255,.3);
+    text-align: center;
+
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+
+    background-color: #67ad00;
+    background-image: -moz-linear-gradient(top, #7fd600, #67ad00);
+    background-image: -ms-linear-gradient(top, #7fd600, #67ad00);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#7fd600), to(#67ad00));
+    background-image: -webkit-linear-gradient(top, #7fd600, #67ad00);
+    background-image: -o-linear-gradient(top, #7fd600, #67ad00);
+    background-image: linear-gradient(top, #7fd600, #67ad00);
+    background-repeat: repeat-x;
+    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",#7fd600, #67ad00));
+
+    -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+}
+
+.btn:hover {
+    color: #1d1d25;
+    text-shadow: 0 1px 1px rgba(255,255,255,.75);
+    -webkit-box-shadow: inset 0 1px 5px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.05);
+       -moz-box-shadow: inset 0 1px 5px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: inset 0 1px 5px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.05);
 }
 
 /* Bio styles */
@@ -145,6 +185,43 @@ a:hover {
     color: #888;
 }
 
+/* Comments */
+
+.comment-date {
+    display: inline-block;
+    float: left;
+    width: 190px;
+    margin: 0 5px;
+    padding: 0;
+    text-align: right;
+    line-height: 24px;
+    font-size: 11px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.comment-body {
+    display: inline-block;
+    float: left;
+    width: 590px;
+    margin: 0 5px 15px 5px;
+    line-height: 24px;
+}
+
+.comment-body a {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.comment {
+    padding: 0;
+    margin: 0;
+}
+
+#leave-comment {
+    padding-top: 25px;
+}
+
 /* Skeleton */
 
 .container {
@@ -182,6 +259,10 @@ section {
 .section-right {
     width: 590px;
     margin: 0 5px 0 205px;
+}
+
+.clearfix {
+    clear: both !important;
 }
 
 footer {
