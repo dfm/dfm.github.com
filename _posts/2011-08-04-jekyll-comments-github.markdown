@@ -18,7 +18,7 @@ submit it as a pull request.
 
 At the very end of the document, you'll find a line that looks like:
 
-{% highlight markdown %}
+{% highlight text %}
 * github-username - January 1, 2012 - Your comment...
 {% endhighlight %}
 
