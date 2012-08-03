@@ -39,3 +39,5 @@ comments section below.
   making comments like this, I'm pretty sure that this will be the most
   spam-free blog in the blogosphere.  It may also be the most
   _comment_-free blog as well, but that's O.K.!  Nice work.
+* davidwhogg - 2012-08-03 - I think you should require
+  [ISO 8601](http://en.wikipedia.org/wiki/ISO_8601) date formatting.
