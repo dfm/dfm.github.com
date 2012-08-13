@@ -432,4 +432,37 @@ or [tweet at me](https://twitter.com/__dfm__).
 
 ## Comments
 
+* jrwren - August 13, 2012 - For things like this, I think I'd rather use ctypes.
+spending a little time with: http://docs.python.org/library/ctypes having never used it before, I came up with this:
+
+Makefile
+
+{% highlight Makefile %}
+libchi2.so: chi2.o
+        gcc -shared -Wl,-soname,libchi2.so.1 -o libchi2.so.1.0.0 chi2.o -lc
+
+chi2.o: chi2.c
+        gcc -fPIC -g -c -Wall chi2.c
+{% endhighlight %}
+
+chi2.c is exactly like your chi2.c, just the chi2 C function implementation. Turns out, I don't even need chi2.h.
+
+{% highlight python %}
+#!/usr/bin/env python
+
+from ctypes import *
+
+libchi2 = cdll.LoadLibrary("libchi2.so.1.0.0")
+
+ThreeDoubles = c_double * 3 
+m = c_double(2.0)
+b = c_double(1.0)
+x = ThreeDoubles( -1.0, 4.2, 30.6)
+y = ThreeDoubles( -1.5, 8.0, 63.0)
+y_err = ThreeDoubles( 1.0, 1.5, 0.6)
+libchi2.chi2.restype = c_double
+result = libchi2.chi2(m, b, x, y, y_err, 3)
+print result
+<% endhighlight %}
+
 * github-username - January 1, 2012 - Copy this line and make your comment...
