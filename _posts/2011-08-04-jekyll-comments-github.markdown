@@ -42,3 +42,4 @@ comments section below.
 * davidwhogg - 2012-08-03 - I think you should require
   [ISO 8601](http://en.wikipedia.org/wiki/ISO_8601) date formatting.
 * ninehills - August 10, 2012 - Better than disqus!
+* branduren - October 14, 2012 - Neatly done :)
