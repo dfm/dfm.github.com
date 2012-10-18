@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>XKCD plots in d3</title>
+
+    <script src="http://d3js.org/d3.v2.min.js?2.10.0"></script>
+    <script src="xkcd.js"></script>
+
+<style>
+
+@font-face {
+    font-family: "xkcd";
+    src: url('http://antiyawn.com/uploads/Humor-Sans.ttf');
+}
+
+body {
+    font-family: "xkcd", sans-serif;
+    font-size: 16px;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: steelblue;
+}
+
+a:hover {
+    color: #0E5C9E;
+}
+
+.container {
+    width: 700px;
+    margin: 20px auto;
+}
+
+p {
+    margin: 10px 0 20px;
+    font-size: 20px;
+    line-height: 1.5em;
+}
+
+#footer {
+    font-size: 12px;
+    color: #888;
+}
+
+#plt {
+    margin: 50px auto;
+}
+
+text.title {
+    font-size: 20px;
+}
+
+path {
+    fill: none;
+    stroke-width: 2.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+path.axis {
+    stroke: black;
+}
+
+path.bgline {
+    stroke: white;
+    stroke-width: 6px;
+}
+
+</style>
+
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>XKCD-style plots in Javascript using D3</h1>
+
+        <p>
+        Inspired by <a href="http://jakevdp.github.com/blog/2012/10/07/xkcd-style-plots-in-matplotlib/">this
+        blog post</a> and Mike Bostock's comment on <a href="http://news.ycombinator.com/item?id=4597977">this
+        HN thread</a>, I decided to make an XKCD-style plot in Javascript using <a href="http://d3js.org">D3</a>
+        with a <a href="http://bl.ocks.org/3310323">custom interpolation function</a>. I also tried to use
+        the <a href="http://bost.ocks.org/mike/chart/">"reusable chart" paradigm</a>.
+        </p>
+
+        <p>
+        You should really check out <a href="https://gist.github.com/3914862">the source</a>.
+        </p>
+
+        <p>
+        Here's an example...
+        </p>
+
+    </div>
+
+    <div id="plt" class="container"></div>
+
+    <div id="footer">
+
+        <div class="container">
+            Copyright 2012 <a href="http://dan.iel.fm">Dan Foreman-Mackey</a>.
+        </div>
+
+    </div>
+
+    <script>
+
+        // Generate some data.
+        function f1 (x) {
+            return Math.exp(-0.5 * (x - 1) * (x - 1)) * Math.sin(x + 0.2) + 0.05;
+        }
+
+        function f2 (x) {
+            return 0.5 * Math.cos(x - 0.5) + 0.1;
+        }
+
+        var xmin = -1.0,
+            xmax = 7,
+            N = 100,
+            data = d3.range(xmin, xmax, (xmax - xmin) / N).map(function (d) {
+                return {x: d, y: f1(d)};
+            })
+            data2 = d3.range(xmin, xmax, (xmax - xmin) / N).map(function (d) {
+                return {x: d, y: f2(d)};
+            });
+
+        var plot = xkcdplot();
+        plot("#plt");
+        plot.plot(data);
+        plot.plot(data2, {stroke: "red"});
+        plot.xlim([-1.5, 7.5]).draw();
+
+    </script>
+
+</body>
+</html>
