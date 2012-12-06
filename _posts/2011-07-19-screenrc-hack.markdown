@@ -47,9 +47,5 @@ this to whatever you want (but don't forget the `$` at the end!).
 
 * HugoBuddel - November 13, 2012 - Very nice, thanks! For some forgotten
 reason I had this in my `.screenrc` that I had to remove:
-{% highlight bash %}
-sterm 'xterm-256color'
-{% endhighlight %}
-
+`sterm 'xterm-256color'`
 * github-username - January 1, 2012 - Your comment...
-
