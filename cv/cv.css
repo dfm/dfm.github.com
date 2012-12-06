@@ -97,6 +97,7 @@ section ul li span {
     width: 90px;
     margin-right: 20px;
     text-align: right;
+    float: left;
 }
 
 .position {
@@ -107,11 +108,18 @@ section ul li span {
     font-weight: 600;
 }
 
+.title {
+    display: block;
+    float: left;
+    width: 680px;
+}
+
 .meta {
     display: block;
     margin-left: 120px;
     font-size: 12px;
     line-height: 15px;
+    clear: both;
 }
 
 .code-name {
