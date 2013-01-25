@@ -43,3 +43,4 @@ comments section below.
   [ISO 8601](http://en.wikipedia.org/wiki/ISO_8601) date formatting.
 * ninehills - August 10, 2012 - Better than disqus!
 * branduren - October 14, 2012 - Neatly done :)
+* crdx - January 1, 2013 - This is quite cool. Not convenient at all, but cool nonetheless.
