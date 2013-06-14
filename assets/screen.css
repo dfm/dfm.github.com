@@ -31,6 +31,16 @@ h2 {
     font-weight: 200;
 }
 
+h3 {
+    margin: 18px 0 6px;
+    padding: 0;
+    color: #9d9d85;
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
 small {
     font-size: 11px;
     color: #888;
@@ -106,7 +116,18 @@ a:hover {
 /* Project styles */
 
 .project {
-    line-height: 32px;
+    line-height: 24px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.project:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
 }
 
 .project-name {
