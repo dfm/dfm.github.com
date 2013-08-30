@@ -6,6 +6,7 @@ $(function() {
     var ncomments = 0;
     var items = obj.find("li").each(function(i, obj) {
         var groups = /(.*?) \- (.*?) \- (.*)/i.exec($(obj).html());
+        if (typeof groups == "undefined" || groups == null) return;
         if ($.trim(groups[1]) != "github-username") {
             var s = "<span class=\"comment-date\">"+groups[2]+"</span> ";
             s += "<span class=\"comment-body\"><a href=\"https://github.com/"+groups[1]+"\">"+groups[1]+"</a> said:";

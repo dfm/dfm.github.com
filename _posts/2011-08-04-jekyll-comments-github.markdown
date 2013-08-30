@@ -44,4 +44,4 @@ comments section below.
 * ninehills - August 10, 2012 - Better than disqus!
 * branduren - October 14, 2012 - Neatly done :)
 * crdx - January 1, 2013 - This is quite cool. Not convenient at all, but cool nonetheless.
-* ruvido - ok agreed it is cool and super nerd... but it's not really usable... (but hate disqus)
+* ruvido - 2013-01-29 - ok agreed it is cool and super nerd... but it's not really usable... (but hate disqus)
