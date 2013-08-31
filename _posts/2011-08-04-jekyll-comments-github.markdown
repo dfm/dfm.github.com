@@ -48,4 +48,4 @@ comments section below.
 * [skopp](http://skopp.github.io) - August 30, 2043 - Cool Idea, however, don't you think it's be easier to bind a post to a gist, then stream the comments via OAuth. 
    Or maybe we need to go back to basics - WAYYY back. Think simple. We don't no stinkin' APIs. We don't need no education... 
    <h4> HEY! TEACHER!! </h4>
-   Leave tnose kids alone.
+   Leave those kids alone.
