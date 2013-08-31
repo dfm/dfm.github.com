@@ -45,3 +45,7 @@ comments section below.
 * branduren - October 14, 2012 - Neatly done :)
 * crdx - January 1, 2013 - This is quite cool. Not convenient at all, but cool nonetheless.
 * ruvido - 2013-01-29 - ok agreed it is cool and super nerd... but it's not really usable... (but hate disqus)
+* [skopp](http://skopp.github.io) - August 30, 2043 - Cool Idea, however, don't you think it's be easier to bind a post to a gist, then stream the comments via OAuth. 
+   Or maybe we need to go back to basics - WAYYY back. Think simple. We don't no stinkin' APIs. We don't need no education... 
+   <h4> HEY! TEACHER!! </h4>
+   Leave tnose kids alone.
