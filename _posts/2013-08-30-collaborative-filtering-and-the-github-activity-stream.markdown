@@ -134,8 +134,8 @@ For example, as far as I can tell, the information about the user who
 performed the action is stored in the attribute `actor` but sometimes this is
 a string (the user's GitHub username) and sometimes it's a dictionary with the
 username saved as `.login`.
-Either way, here's a fairly robust that takes in a single even object and
-returns the user and repository involved:
+Either way, here's a fairly robust function that takes in a single event
+object and returns the user and repository involved:
 
 {% highlight python %}
 sentinel = (None, None)
@@ -149,7 +149,7 @@ def parse_event(event):
     # Skip events that don't involve a repository.
     evttype = event.get("type")
     if evttype in (None, "GistEvent", "FollowEvent", "MemberEvent",
-                    "TeamAddEvent"):
+                   "TeamAddEvent"):
         return sentinel
 
     # Deal with inconsistencies in the data formats.
@@ -189,6 +189,80 @@ def parse_event(event):
 {% endhighlight %}
 
 ## Building a user-repository social graph
+
+So we now have functions to download event data and parse the events.
+Let's put this all together.
+In this section, we're going to download a bunch of events and save all of the
+interactions as a graph.
+
+> **Redis as a graph database:**
+> My friend [Micha](http://micha.gd) swears by [Redis](http://redis.io) for
+> just about any problem and he first introduced me to the idea of using it as
+> a graph database.
+> Redis is an in-memory key-value store that is ridiculously fast.
+> The main reason why I use Redis so often is that the "value" part of the
+> whole key-value thing can have all sorts of awesome data structures.
+> In particular, Redis ships with a [sorted set data
+> type](http://redis.io/commands#sorted_set) that is perfect for
+> implementing a graph database.
+> The nodes in the graph are represented by keys in the data store and then
+> edges are implemented as sorted sets where the score indicates the
+> strength of the edge.
+> Note that this makes it easy to build both directed or undirected graphs.
+> In this framework, it's easy to query the database for the top _N_ most
+> (or least) connected neighbors—using the
+> [ZREVRANGE](http://redis.io/commands/zrevrange) command—which is the main
+> type of query that we'll need for now.
+
+For our social graph of GitHub activity, we'll have nodes representing users
+designated by keys of the form `ghsg:user:{username}` and nodes representing
+repositories with keys of the form `ghsg:repo:{owner}/{repository}`.
+User nodes will be connected to repository nodes and vice versa with edge
+weights given by the total number of interactions between the user and the
+repository.
+It would be possible (and possibly very interesting) to implement a better
+weight model that takes into account different types of events and decays with
+time (à la [Forget-Table](https://github.com/mynameisfiber/forgettable)) but
+I wanted to keep things simple for this example.
+
+To run this next script, you'll need a `redis-server` listening to the
+default port on `localhost` and the
+[redis-py](https://github.com/andymccurdy/redis-py) Python bindings to the
+Redis API.
+
+{% highlight python %}
+import redis
+
+# Connect to the Redis server.
+rdb = redis.Redis()
+
+# Get a Redis pipeline.
+pipe = rdb.pipeline()
+
+# Loop forever.
+while True:
+    # Download some events and loop over them.
+    for event in get_random_events():
+        # Parse the event and skip it if it doesn't include an interaction.
+        actor, reponame = parse_event(event)
+        if actor is None or reponame is None:
+            continue
+
+        # Update the graph weights.
+        pipe.zincrby("ghsg:user:{0}".format(actor), reponame, 1)
+        pipe.zincrby("ghsg:repo:{0}".format(reponame), actor, 1)
+        pipe.execute()
+{% endhighlight %}
+
+All you need to do now is save this script (and the above functions) to a file
+(or just download a working version from [this
+gist](https://gist.github.com/dfm/6468317)) and run it for a few hours to
+gather some data to work with.
+You might want to use the code from [the
+gist](https://gist.github.com/dfm/6468317) because it runs several threads in
+parallel.
+If you decide to implement your own parallel version, make sure that you're
+careful with your random number generators.
 
 ## Repository recommendations
 
