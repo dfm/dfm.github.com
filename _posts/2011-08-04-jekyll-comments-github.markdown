@@ -49,3 +49,4 @@ comments section below.
    Or maybe we need to go back to basics - WAYYY back. Think simple. We don't no stinkin' APIs. We don't need no education... 
    <h4> HEY! TEACHER!! </h4>
    Leave those kids alone.
+* petesoder - April 12, 2014 - This is cool ... we've been prototyping a publishing system for hackers using using Git/markdown for http://hakkalabs.co, so found it interesting that someone else is thinkging about this. 
