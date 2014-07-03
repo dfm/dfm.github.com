@@ -1,5 +1,152 @@
----
-layout: index
-title: Dan Foreman-Mackey
----
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
+    <title></title>
+
+<link rel="stylesheet" href="css/normalize.css" type="text/css" />
+<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+
+<style>
+
+html, body {
+    height: 100%;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+}
+
+#nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 16px;
+}
+
+#nav-left {
+    float: left;
+    padding: 20px 0 20px 30px;
+    font-weight: bold;
+    position: absolute;
+}
+
+#nav-right {
+    float: right;
+    padding: 0 25px;
+}
+
+#nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#nav li {
+    display: inline-block;
+    margin: 0;
+    padding: 20px 15px;
+}
+
+#nav li.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.full-page {
+    width: 100%;
+    height: 100%;
+    /* min-height: 500px; */
+}
+
+#top {
+    background: #000;
+    background-image: url('images/top1.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: 100% auto;
+}
+
+@media (max-aspect-ratio: 4/3) {
+    #top {
+        background-size: auto 100%;
+    }
+}
+
+.vertical-align {
+    float: left;
+    height: 50%;
+    width: 100%;
+    margin-bottom: -50px;
+}
+
+#top-body {
+    background-color: rgba(0, 0, 0, 0.5);
+    clear: both;
+    height: 100px;
+    width: 300px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 22px;
+}
+
+#top-body a {
+    color: #fff;
+    padding: 0 15px;
+    line-height: 135px;
+}
+
+#about {
+    background: #000;
+    background-image: url('images/me.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center bottom;
+}
+
+#research {
+    background: red;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="nav">
+    <div id="nav-left">
+        Dan Foreman-Mackey
+    </div>
+    <div id="nav-right">
+        <ul>
+            <li class="active">About</li>
+            <li>Research</li>
+            <li>Projects</li>
+            <li>Contact</li>
+        </ul>
+    </div>
+</div>
+
+<section id="top" class="full-page">
+
+    <div class="vertical-align"></div>
+    <div id="top-body">
+        <a href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a>
+        <a href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a>
+        <a href="http://arxiv.org/find/all/1/OR+au:foreman_mackey+all:+EXACT+foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a>
+    </div>
+
+</section>
+
+<section id="about" class="full-page">
+
+</section>
+
+<section id="research" class="full-page">
+
+</section>
+
+</body>
+</html>
