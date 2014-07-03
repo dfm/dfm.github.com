@@ -1,116 +1,12 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-
-    <title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Dan Foreman-Mackey</title>
 
 <link rel="stylesheet" href="css/normalize.css" type="text/css" />
 <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
-
-<style>
-
-html, body {
-    height: 100%;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
-}
-
-#nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 16px;
-}
-
-#nav-left {
-    float: left;
-    padding: 20px 0 20px 30px;
-    font-weight: bold;
-    position: absolute;
-}
-
-#nav-right {
-    float: right;
-    padding: 0 25px;
-}
-
-#nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-#nav li {
-    display: inline-block;
-    margin: 0;
-    padding: 20px 15px;
-}
-
-#nav li.active {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.full-page {
-    width: 100%;
-    height: 100%;
-    /* min-height: 500px; */
-}
-
-#top {
-    background: #000;
-    background-image: url('images/top1.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-    background-size: 100% auto;
-}
-
-@media (max-aspect-ratio: 4/3) {
-    #top {
-        background-size: auto 100%;
-    }
-}
-
-.vertical-align {
-    float: left;
-    height: 50%;
-    width: 100%;
-    margin-bottom: -50px;
-}
-
-#top-body {
-    background-color: rgba(0, 0, 0, 0.5);
-    clear: both;
-    height: 100px;
-    width: 300px;
-    margin: 0 auto;
-    text-align: center;
-    font-size: 22px;
-}
-
-#top-body a {
-    color: #fff;
-    padding: 0 15px;
-    line-height: 135px;
-}
-
-#about {
-    background: #000;
-    background-image: url('images/me.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center bottom;
-}
-
-#research {
-    background: red;
-}
-
-</style>
+<link rel="stylesheet" href="css/dfm.css" type="text/css" />
 
 </head>
 <body>
@@ -131,20 +27,62 @@ html, body {
 
 <section id="top" class="full-page">
 
-    <div class="vertical-align"></div>
-    <div id="top-body">
-        <a href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a>
-        <a href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a>
-        <a href="http://arxiv.org/find/all/1/OR+au:foreman_mackey+all:+EXACT+foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a>
+    <!-- <div id="top-social"> -->
+    <!--     <div> -->
+    <!--         <a target="_blank" href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a> -->
+    <!--         <a target="_blank" href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a> -->
+    <!--         <a target="_blank" href="http://arxiv.org/find/all/1/au:foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a> -->
+    <!--     </div> -->
+    <!-- </div> -->
+
+    <div id="top-social" class="body">
+        <div class="body-inner">
+            <div class="body-content">
+                <div>
+                    <a target="_blank" href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a>
+                    <a target="_blank" href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a>
+                    <a target="_blank" href="http://arxiv.org/find/all/1/au:foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a>
+                </div>
+                <div>
+                    I write code for good &amp; astrophysics.
+                </div>
+            </div>
+        </div>
     </div>
 
+    <div class="page-scroll">
+        <a href="#about" class="btn btn-circle">
+            <i class="fa fa-angle-double-down fa-2x"></i>
+        </a>
+    </div>
 </section>
 
 <section id="about" class="full-page">
 
+    <div class="body">
+        <div class="body-inner">
+            <div class="body-content">
+                I'm a graduate student at NYU working on next generation astronomical data analysis under the supervision of David W. Hogg. When I'm not writing code, I'm probably climbing rocks somewhere. Take a look at my C.V. or scroll down to read about some of the projects that I'm working on.
+            </div>
+        </div>
+    </div>
+
+    <div class="page-scroll">
+        <a href="#research" class="btn btn-circle">
+            <i class="fa fa-angle-double-down fa-2x"></i>
+        </a>
+    </div>
 </section>
 
 <section id="research" class="full-page">
+
+</section>
+
+<section id="projects" class="full-page">
+
+</section>
+
+<section id="contact" class="full-page">
 
 </section>
 
