@@ -98,10 +98,14 @@ html, body {
     padding: 20px 0;
 }
 
+#top-social-text {
+    margin: 0 0 10px;
+}
+
 #top-social a {
-    font-size: 22px;
+    font-size: 10px;
     color: rgba(255, 255, 255, 0.9);
-    padding: 0 20px;
+    padding: 0 5px;
 }
 
 #top-social a:hover {
