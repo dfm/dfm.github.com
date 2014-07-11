@@ -1,47 +1,112 @@
+@import url(https://fonts.googleapis.com/css?family=Buenard:400,700);
+
+/*
+ *  BASIC STYLES
+ */
+
 html, body {
     height: 100%;
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-family: "Buenard", Georgia, Cambria, "Times New Roman", Times, serif;
+    letter-spacing: 0.01rem;
+    font-weight: 200;
+    font-style: normal;
+    color: rgba(0, 0, 0, 0.8);
 }
 
-#nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 16px;
-    z-index: 10000000;
+a {
+    background: transparent;
+    background-size: 2px 2px;
+    background-position: 0 24px;
+    text-decoration: none;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, rgba(0,0,0,0.8) 75%);
+    background-repeat: repeat-x;
+    color: inherit;
 }
 
-#nav-left {
-    float: left;
-    padding: 20px 0 20px 30px;
-    font-weight: bold;
-    position: absolute;
+h2 {
+    font-family: "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 36px;
+    line-height: 1.2;
+    margin-bottom: 13px;
 }
 
-#nav-right {
-    float: right;
-    padding: 0 25px;
+h3 {
+    font-family: "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 28px;
+    line-height: 1.2;
+    margin-bottom: 10px;
 }
 
-#nav ul {
+p {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 22px;
+    line-height: 1.6;
+    margin: 0;
+    margin-bottom: 30px;
+}
+
+ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-#nav li {
-    display: inline-block;
+li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 22px;
+    line-height: 1.6;
     margin: 0;
-    padding: 20px 15px;
+    margin-bottom: 30px;
 }
 
-#nav li.active {
-    background-color: rgba(255, 255, 255, 0.2);
+section {
+    display: block;
 }
+
+.container {
+    width: 800px;
+    margin: 0 auto;
+}
+
+@media (max-width: 850px) {
+    .container {
+        width: 600px;
+    }
+}
+
+@media (max-width: 650px) {
+    .container {
+        width: 400px;
+    }
+}
+
+@media (max-width: 450px) {
+    .container {
+        width: 88.88%;
+    }
+}
+
+hr {
+    display: block;
+    width: 14%;
+    margin: 50px auto 40px auto;
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,0.15);
+    box-sizing: content-box;
+    height: 0;
+}
+
+/*
+ *  FULL PAGE BACKGROUND IMAGE
+ */
 
 .full-page {
     position: relative;
@@ -50,17 +115,13 @@ html, body {
     /* min-height: 500px; */
 }
 
-.shim {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    opacity: 0.5;
-}
+/*
+ *  SCROLLING WIDGET
+ */
 
 .page-scroll {
     position: absolute;
-    bottom: 10%;
+    bottom: 30px;
     width: 100%;
     text-align: center;
 }
@@ -68,11 +129,39 @@ html, body {
 .page-scroll a {
     color: rgba(255, 255, 255, 0.3);
     padding: 0 20px;
+    background-image: none;
 }
 
 .page-scroll a:hover {
     color: rgba(255, 255, 255, 0.8);
 }
+
+/*
+ *  HACKISHLY CENTERED BLOCK
+ */
+
+.centered {
+    display: table;
+    height: 100%;
+    margin: 0 auto;
+    font-size: 20px;
+    line-height: 1.7;
+    font-style: italic;
+    color: #fff;
+}
+
+.centered-inner {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.centered-content {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/*
+ *  CUSTOM STYLES
+ */
 
 #top {
     background: #000;
@@ -94,12 +183,14 @@ html, body {
     width: 400px;
 }
 
-#top-social .body-content {
+#top-social .centered-content {
     padding: 20px 0;
 }
 
 #top-social-text {
     margin: 0 0 10px;
+    font-size: 36px;
+    font-weight: 700;
 }
 
 #top-social a {
@@ -113,42 +204,109 @@ html, body {
 }
 
 #about {
-    background: #000;
-    background-image: url('../images/me.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center bottom;
+    padding-top: 50px;
 }
 
-.body {
-    display: table;
-    height: 100%;
+#about img {
+    float: left;
+    width: 125px;
+    padding: 13px 20px 0 0;
+}
 
-    width: 600px;
-    margin: 0 auto;
-    font-size: 20px;
-    line-height: 1.7;
+#about p {
     font-style: italic;
+    font-size: 26px;
+}
+
+#about a {
+    background-position: 0 29px;
+}
+
+
+#research .title {
+    font-weight: 700;
+    font-size: 24px;
+    background-position: 0 26px;
+    line-height: 1;
+}
+
+#research .authors {
+    display: block;
+    font-style: italic;
+    line-height: 1.3;
+    margin: 9px 0;
+}
+
+.projects {
+    margin-bottom: 20px;
+}
+
+.projects li {
+    margin-bottom: 10px;
+}
+
+.project {
+    font-weight: 700;
+}
+
+
+#bottom {
+    background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
+    padding: 0;
+    margin: 0;
+    line-height: 1.7;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 75px;
 }
 
-.body-inner {
-    display: table-cell;
-    vertical-align: middle;
+#bottom a {
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0) 75%, rgba(255,255,255,0.8) 75%);
+    background-position: 0 16px;
 }
 
-.body-content {
-    background-color: rgba(0, 0, 0, 0.5);
+#bottom ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-#research {
-    background: red;
+#bottom li {
+    font-weight: 400;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 1.7;
+    margin: 0;
 }
 
-#projects {
-    background: #fff;
+#bottom li.title {
+    font-size: 26px;
+    font-weight: 700;
+    font-style: italic;
 }
 
-#contact {
-    background: #000;
+#bottom i {
+    padding-right: 4px;
+}
+
+#bottom .copyright {
+    font-size: 14px;
+    padding: 30px 0 0;
+    margin: 0;
+    font-style: italic;
+}
+
+#bottom .copyright a {
+    background-position: 0 14px;
+}
+
+#bottom hr {
+    display: block;
+    width: 14%;
+    margin: 15px auto 13px;
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    box-sizing: content-box;
+    height: 0;
 }
