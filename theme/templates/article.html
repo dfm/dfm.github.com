@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block head %}
+
+  {{ super() }}
+
+  {% for keyword in article.keywords %}
+    <meta name="keywords" contents="{{keyword}}" />
+  {% endfor %}
+
+  {% for description in article.description %}
+    <meta name="description" contents="{{description}}" />
+  {% endfor %}
+
+  {% for tag in article.tags %}
+    <meta name="tags" contents="{{tag}}" />
+  {% endfor %}
+
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1>{{ article.title }}</h1>
+
+        <section>
+            {{ article.content }}
+        </section>
+    </div>
+
+{% endblock %}

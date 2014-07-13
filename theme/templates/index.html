@@ -1,15 +1,5 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Dan Foreman-Mackey</title>
-
-<link rel="stylesheet" href="css/normalize.css" type="text/css" />
-<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
-<link rel="stylesheet" href="css/dfm.css" type="text/css" />
-
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
 
 <div id="top" class="full-page">
 
@@ -39,7 +29,7 @@
 
     <section id="about">
 
-        <img src="images/avatar-vert.png" alt="me" />
+        <img src="{{ SITEURL }}/theme/images/avatar-vert.png" alt="me" />
 
         <p>I'm a graduate student at NYU working on next generation
         astronomical data analysis under the supervision of <a
@@ -54,7 +44,7 @@
 
     <section id="research">
 
-        <h2>Research</h2>
+        <h1>Research</h1>
 
         <p>
 
@@ -70,7 +60,7 @@
 
         </p>
 
-        <h3>Selected Papers</h3>
+        <h2>Selected Papers</h2>
 
         <ul>
 
@@ -131,7 +121,7 @@ Below is a list of some recent interesting papers that I've worked on but
 
         </ul>
 
-        <h3 id="software">Software</h3>
+        <h2 id="software">Software</h2>
 
 <p>Most of my job involves writing scientific software. All of it lives on
 <a href="https://github.com/dfm">my GitHub account</a> and
@@ -176,7 +166,7 @@ Pixel-perfect probabilistic graphical models using matplotlib.
 
     <section id="projects">
 
-        <h2>Projects</h2>
+        <h1>Projects</h1>
 <p>
 Outside of work, I also make silly things on the internet.
 Here are some of them:
@@ -221,30 +211,30 @@ using <a href="http://d3js.org">D3.js</a>.
 </li>
 
 </ul>
+</section>
+
+    <hr>
+
+    <section id="writing">
+
+        <h1>Writing</h1>
+
+<ul class="projects">
+{% for article in articles_page.object_list %}
+<li>
+<a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark" title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a> &mdash;
+{{ article.summary | striptags }}
+</li>
+{% endfor %}
+</ul>
 
 </section>
 
 </div>
 
-<div id="bottom">
-<div class="container">
-        <ul>
-            <li class="title">Dan Foreman-Mackey</li>
-            <hr>
-            <li><i class="fa fa-envelope"></i> <a href="mailto:danfm@nyu.edu">danfm@nyu.edu</a></li>
-            <li><i class="fa fa-twitter"></i> <a href="https://twitter.com/exoplaneteer">@exoplaneteer</a></li>
-            <li><i class="fa fa-phone"></i> <a href="tel:917-327-3473">917-327-3473</a></li>
-        </ul>
+{% endblock content %}
 
-        <hr>
-
-        <p class="copyright">
-        Top photo taken in <a href="http://en.wikipedia.org/wiki/Heidelberg">Heidelberg</a> by <a href="http://ruthang.us">Ruth Angus</a>. Used without permission.<br>
-        All content copyright 2014 Dan Foreman-Mackey unless otherwise noted.
-        Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
-        </p>
-    </div>
-</div>
-
-</body>
-</html>
+{% block bottomtext %}
+Top photo taken in <a href="http://en.wikipedia.org/wiki/Heidelberg">Heidelberg</a> by <a href="http://ruthang.us">Ruth Angus</a>. Used without permission.
+<br>
+{% endblock %}

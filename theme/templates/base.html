@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Dan Foreman-Mackey</title>
+
+<link rel="stylesheet" href="{{ SITEURL }}/theme/css/normalize.css" type="text/css" />
+<link rel="stylesheet" href="{{ SITEURL }}/theme/css/font-awesome.min.css" type="text/css" />
+<link rel="stylesheet" href="{{ SITEURL }}/theme/css/dfm.css" type="text/css" />
+<link rel="stylesheet" href="{{ SITEURL }}/theme/css/code.css" type="text/css" />
+
+{% block head %}{% endblock %}
+
+</head>
+<body>
+
+{% block content %}{% endblock %}
+
+<div id="bottom">
+<div class="container">
+        <ul>
+            <li class="title">Dan Foreman-Mackey</li>
+            <hr>
+            <li><i class="fa fa-envelope"></i> <a href="mailto:danfm@nyu.edu">danfm@nyu.edu</a></li>
+            <li><i class="fa fa-twitter"></i> <a href="https://twitter.com/exoplaneteer">@exoplaneteer</a></li>
+            <li><i class="fa fa-phone"></i> <a href="tel:917-327-3473">917-327-3473</a></li>
+        </ul>
+
+        <hr>
+
+        <p class="copyright">
+        {% block bottomtext %}{% endblock %}
+        All content copyright 2014 Dan Foreman-Mackey unless otherwise noted.
+        Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

@@ -3,3 +3,6 @@ _site
 build
 Gemfile.lock
 *.pxm
+*.pid
+output
+cache
