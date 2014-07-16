@@ -71,6 +71,15 @@ li {
     margin-bottom: 30px;
 }
 
+blockquote {
+    display: block;
+    margin: 1em;
+}
+
+blockquote p {
+    font-style: italic;
+}
+
 section {
     display: block;
 }
