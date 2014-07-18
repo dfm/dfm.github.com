@@ -180,7 +180,6 @@ hr {
     background: #000;
     background-image: url('../images/top1.png');
     background-repeat: no-repeat;
-    background-attachment: fixed;
     background-position: center;
     background-size: 100% auto;
 }
@@ -299,6 +298,10 @@ hr {
     font-style: italic;
 }
 
+#bottom li.title a {
+    background-image: none;
+}
+
 #bottom i {
     padding-right: 4px;
 }
@@ -322,4 +325,27 @@ hr {
     border-top: 1px solid rgba(255,255,255,0.15);
     box-sizing: content-box;
     height: 0;
+}
+
+#topbar .container {
+    padding: 30px 0;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    line-height: 36px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+#topbar {
+    margin: 0 0 60px;
+}
+
+#topbar a {
+    background-image: none;
+}
+
+.avatar {
+    width:  36px;
+    height: 36px;
+    vertical-align: top;
+    margin: 0 15px 0 0 ;
 }
