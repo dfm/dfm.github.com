@@ -4,4 +4,4 @@ build
 Gemfile.lock
 output
 cache
-theme
+dfm_theme
