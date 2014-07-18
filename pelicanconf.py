@@ -18,7 +18,7 @@ FEED_ALL_ATOM = None
 CATEGORY_FEED_ATOM = None
 TRANSLATION_FEED_ATOM = None
 
-THEME = "theme"
+THEME = "dfm_theme"
 
 ARTICLE_URL = "posts/{slug}/"
 ARTICLE_SAVE_AS = "posts/{slug}/index.html"
