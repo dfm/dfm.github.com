@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Dan Foreman-Mackey</title><link href="http://dan.iel.fm/" rel="alternate"></link><link href="http://dan.iel.fm/feeds/dan-foreman-mackey.atom.xml" rel="self"></link><id>http://dan.iel.fm/</id><updated>2012-08-03T00:00:00-04:00</updated><entry><title>Python modules in C</title><link href="http://dan.iel.fm/posts/python-c-extensions/" rel="alternate"></link><updated>2012-08-03T00:00:00-04:00</updated><author><name>Dan Foreman-Mackey</name></author><id>tag:dan.iel.fm,2012-08-03:posts/python-c-extensions/</id><summary type="html">&lt;p&gt;Writing your own C extensions to Python can seem like a pretty daunting task
+when you first get started. If you take a look at the &lt;a href="http://docs.python.org/c-api/"&gt;Python/C API
+docs&lt;/a&gt; the details of reference counting and compilation are enough to
+make you go crazy. This is the main reason why &lt;a href="http://www.cython.org/"&gt;so&lt;/a&gt; &lt;a href="http://www.swig.org/"&gt;many&lt;/a&gt;
+&lt;a href="http://docs.python.org/library/ctypes.html"&gt;options&lt;/a&gt; exist for wrapping or compiling C code into Python without
+ever directly interacting with the API. That being said, I often find that
+all that I need to do is wrap a &lt;em&gt;single&lt;/em&gt; C function that accepts a few
+doubles and returns another double. In this case, it seems crazy to generate
+the thousands of lines of C code required by automatic methods like Cython
+and SWIG. You might argue that these aesthetic issues don't provide
+sufficient reason for diving into the rabbit hole that the C API seems to
+be—and maybe you'd be right—but I'm a stubborn coder and I don't mind
+getting my hands a little dirty so I went for it. This was a few years ago
+and since then, I've developed a template module that suits my needs
+perfectly and it seems to make the extension writing process relatively
+painless so I thought that I'd share what I've learned here.&lt;/p&gt;
+&lt;p&gt;I'm not going to claim that what I say here is a general introduction to
+writing C extensions because I don't feel qualified to do that but it
+should be a sufficient tutorial for a scientific programmer (read: grad
+student) to get started and write a fully functional module for their
+research. In particular, this tutorial will be most useful for someone
+who already has a chunk of code written in C and just wants to be able to
+call a few of those functions directly from within Python. Several people
+have specifically asked me about how to do this when they have legacy
+data analysis code that they would like to use with my Markov chain
+Monte Carlo package &lt;a href="http://danfm.ca/emcee"&gt;emcee&lt;/a&gt;. In that context,
+the C code is expected to return the likelihood of some data given some
+model parameters passed as doubles to the C function. This is the same
+format that would be needed if you just wanted to find the minimum
+chi-squared (or maximum likelihood) solution to a problem using something
+like
+&lt;a href="http://docs.scipy.org/doc/scipy/reference/optimize.html"&gt;scipy.optimize&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;The Objective&lt;/h2&gt;
+&lt;p&gt;To be concrete, let's consider a specific example: fitting a line
+(parameterized by a slope &lt;em&gt;m&lt;/em&gt; and y intercept &lt;em&gt;b&lt;/em&gt;) to some &lt;em&gt;N&lt;/em&gt; noisy data
+points \( \{ x_n, y_n, \sigma_n \} \). In this case, the
+chi-squared function is given by:&lt;/p&gt;
+&lt;p&gt;
+\(
+    \displaystyle{\chi^2 (m, b) = \sum_{n = 1} ^N \frac{[y_n -
+        (m \, x_n + b)]^2}{\sigma_n^2}} \quad .
+\)
+&lt;/p&gt;
+
+&lt;p&gt;It's probably overkill to write this function in C but it'll do for our
+purposes today. In C, the file &lt;code&gt;chi2.c&lt;/code&gt; containing our function should look
+something like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;quot;chi2.h&amp;quot;&lt;/span&gt;
+
+&lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="nf"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;diff&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;diff&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+        &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;diff&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;diff&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the corresponding header file &lt;code&gt;chi2.h&lt;/code&gt; is simply:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="nf"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, our goal is to wrap this function so that we can call it from directly
+within Python.&lt;/p&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;The Wrapper&lt;/h2&gt;
+&lt;p&gt;The code needed to write the wrapper module is another C file containing
+a few special Python functions. Conventionally, the names of C extensions
+begin with an underscore so let's call our module &lt;code&gt;_chi2&lt;/code&gt; and write it in
+a file &lt;code&gt;_chi2.c&lt;/code&gt; (not to be confused with the &lt;code&gt;chi2.c&lt;/code&gt; file that we wrote
+just a minute ago).&lt;/p&gt;
+&lt;p&gt;In order to be able to access the C functions and types in the Python API,
+the first thing that we need to do is import the Python header. I also
+expect that we'll want to interact with &lt;code&gt;numpy&lt;/code&gt; arrays and our &lt;code&gt;chi2&lt;/code&gt;
+function as well so let's import those headers too:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#include &amp;lt;Python.h&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;#include &amp;lt;numpy/arrayobject.h&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;#include &amp;quot;chi2.h&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, we should write the
+&lt;a href="http://www.python.org/dev/peps/pep-0257/"&gt;docstrings&lt;/a&gt; for our module and
+the function that we're wrapping:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;module_docstring&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;This module provides an interface for calculating chi-squared using C.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="n"&gt;chi2_docstring&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;Calculate the chi-squared of some data given a model.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and declare the function:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nf"&gt;chi2_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is the first time that we're seeing anything Python-specific. The
+type &lt;code&gt;PyObject&lt;/code&gt; refers to all Python types. Any communication between the
+Python interpreter and your C code will be done by passing &lt;code&gt;PyObject&lt;/code&gt;s so
+any function that you want to be able to call from Python must return one.
+Under the hood, &lt;code&gt;PyObject&lt;/code&gt; is just a &lt;code&gt;struct&lt;/code&gt; with a reference count and a
+pointer to the data contained within the object. This can be as simple as
+a &lt;code&gt;double&lt;/code&gt; or &lt;code&gt;int&lt;/code&gt; or as complicated as a fully functional Python class.
+Remember: &lt;a href="http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html"&gt;everything is an object&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The name that I've given to the function (&lt;code&gt;chi2_chi2&lt;/code&gt;) is also a matter of
+convention. From Python, we're going to call the function with the command
+&lt;code&gt;_chi2.chi2&lt;/code&gt; where &lt;code&gt;_chi2&lt;/code&gt; is the name of the module and &lt;code&gt;chi2&lt;/code&gt; is the name
+of the function. Since C doesn't have any concept of namespaces, the
+convention is to name your C functions with the form
+&lt;code&gt;{module_name}_{function_name}&lt;/code&gt; and my preference is to leave out the
+leading underscore but it doesn't really matter either way.&lt;/p&gt;
+&lt;p&gt;The arguments for the function are pretty standard fare. In our case the
+&lt;code&gt;self&lt;/code&gt; object points to the module and the &lt;code&gt;args&lt;/code&gt; object is a Python tuple
+of input arguments—we'll see how to parse them soon. It is also possible
+to accept keyword arguments by including a third &lt;code&gt;PyObject&lt;/code&gt; in the calling
+specification but let's not get into that here.&lt;/p&gt;
+&lt;p&gt;Now, we'll specify what the members of this module will be. In this case
+there is only going to be one function (called &lt;code&gt;chi2&lt;/code&gt;) so the "method
+definition" looks like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyMethodDef&lt;/span&gt; &lt;span class="n"&gt;module_methods&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;chi2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;chi2_chi2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;METH_VARARGS&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;chi2_docstring&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;More functions can be added by adding more lines like the second one. This
+second line contains all the info that the interpreter needs to link a Python
+call to the correct C function and call it in the right way. The
+first string is the name of the function as it will be called from Python,
+the second object is the C function to link to and the last argument is the
+docstring for the function. The third argument &lt;code&gt;METH_VARARGS&lt;/code&gt; means that the
+function only accepts positional arguments. If you wanted to support
+keyword arguments, you would need to change this to &lt;a href="http://docs.python.org/extending/extending.html#the-module-s-method-table-and-initialization-function"&gt;&lt;code&gt;METH_VARARGS |
+METH_KEYWORDS&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The final step in initializing your new C module is to write an &lt;code&gt;init{name}&lt;/code&gt;
+function. This function &lt;strong&gt;must&lt;/strong&gt; be called &lt;code&gt;init_chi2&lt;/code&gt; where &lt;code&gt;_chi2&lt;/code&gt; is
+(of course) the name of the module.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;PyMODINIT_FUNC&lt;/span&gt; &lt;span class="nx"&gt;init_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Py_InitModule3&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_chi2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;module_methods&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;module_docstring&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Load `numpy` functionality. */&lt;/span&gt;
+    &lt;span class="nx"&gt;import_array&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Everything that's going on here should be fairly self explanatory by this
+point but it's important to note that if you want to use any of the
+functionality defined by &lt;code&gt;numpy&lt;/code&gt;, you need to include the call to
+&lt;code&gt;import_array()&lt;/code&gt; (a function defined in the &lt;code&gt;numpy/arrayobject.h&lt;/code&gt; header).&lt;/p&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;The Interface&lt;/h2&gt;
+&lt;p&gt;Up to this point, we've written only about 25 lines of C code to set up
+a C extension module. All of these steps will be common between any modules
+that you write but as we continue, the details become somewhat less general
+because I will focus on building a wrapper for scientific code.&lt;/p&gt;
+&lt;p&gt;Now, it's time to write the &lt;code&gt;chi2_chi2&lt;/code&gt; function that we declared above.
+In this example, the &lt;code&gt;args&lt;/code&gt; tuple will contain two &lt;code&gt;double&lt;/code&gt;s (the slope
+and y-intercept of our model) and three &lt;code&gt;numpy&lt;/code&gt; arrays for the &lt;em&gt;x&lt;/em&gt;, &lt;em&gt;y&lt;/em&gt;
+and uncertainties that constitute the "data" that we're trying to model.
+Let's just throw down the whole function here and then dissect it line-by-line
+below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kr"&gt;static&lt;/span&gt; &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;chi2_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Parse the input tuple */&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;PyArg_ParseTuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;ddOOO&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                         &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Interpret the input objects as numpy arrays. */&lt;/span&gt;
+    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                            &lt;span class="nx"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* If that didn&amp;#39;t work, throw an exception. */&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;y_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;yerr_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* How many data points are there? */&lt;/span&gt;
+    &lt;span class="kr"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DIM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Get pointers to the data as C-types. */&lt;/span&gt;
+    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;x&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;yerr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Call the external C function to compute the chi-squared. */&lt;/span&gt;
+    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Clean up. */&lt;/span&gt;
+    &lt;span class="nx"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;PyErr_SetString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;PyExc_RuntimeError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                    &lt;span class="s2"&gt;&amp;quot;Chi-squared returned an impossible value.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/* Build the output tuple */&lt;/span&gt;
+    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Py_BuildValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;d&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;ret&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I know that that was a lot in one go so let's break things down a little bit.
+The first thing that we did was parse the input tuple using the
+&lt;code&gt;PyArg_ParseTuple&lt;/code&gt; function. This function takes the tuple, a format and
+the list of pointers to the objects that you want to take the input values.
+This format should be familiar if you've ever used something like the
+&lt;code&gt;sscanf&lt;/code&gt; function in C but the format characters are &lt;a href="http://docs.python.org/c-api/arg.html"&gt;a little
+different&lt;/a&gt;. In our example, &lt;code&gt;d&lt;/code&gt;
+indicates that the argument should be cast as a C &lt;code&gt;double&lt;/code&gt; and &lt;code&gt;O&lt;/code&gt; is
+just a catchall for &lt;code&gt;PyObject&lt;/code&gt;s. There isn't a specific format character
+for &lt;code&gt;numpy&lt;/code&gt; arrays so we have to parse them as raw &lt;code&gt;PyObject&lt;/code&gt;s and then
+interpret them afterwards. If &lt;code&gt;PyArg_ParseTuple&lt;/code&gt; fails, it will return
+&lt;code&gt;NULL&lt;/code&gt; which is the C-API technique for propagating exceptions. That means
+that we should also return &lt;code&gt;NULL&lt;/code&gt; immediately if parsing the tuple fails.&lt;/p&gt;
+&lt;p&gt;The next few lines (12-25) show how to load &lt;code&gt;numpy&lt;/code&gt; arrays from the raw
+objects. The
+&lt;a href="http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html#PyArray_FROM_OTF"&gt;&lt;code&gt;PyArray_FROM_OTF&lt;/code&gt;&lt;/a&gt;
+function is a fairly general method for converting an arbitrary Python
+object into a well-behaved &lt;code&gt;numpy&lt;/code&gt; array that can be used in a standard
+C function. It is important to note that this creation mechanism only
+returns a copy of the object if necessary. Instead, the function normally
+only returns a pointer to the input object if it was already a &lt;code&gt;numpy&lt;/code&gt;
+array satisfying various requirements that we won't discuss in detail here.
+The flags &lt;code&gt;NPY_DOUBLE&lt;/code&gt; and &lt;code&gt;NPY_IN_ARRAY&lt;/code&gt; ensure that the returned array
+object will be represented as contiguous arrays of C &lt;code&gt;double&lt;/code&gt;s. There are
+some other options available for different types, orderings and permissions
+but most of the time, this is probably what you'll need and the other
+options are described in &lt;a href="http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html#PyArray_FROM_OTF"&gt;the
+documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Reference Counting&lt;/strong&gt;: Memory management in Python works by keeping
+track of the number of "references" to a particular object and then
+deallocating the memory of that object when that count reaches zero.
+You can read more about the details of this system
+&lt;a href="http://docs.python.org/extending/extending.html#reference-counts"&gt;elsewhere&lt;/a&gt;
+but for now, you need to keep in mind that when you return a &lt;code&gt;PyObject&lt;/code&gt;
+from a function you might want to run &lt;code&gt;Py_INCREF&lt;/code&gt; on it to
+increment the reference count and when you create a new object within
+you function that you don't want to return, you should run &lt;code&gt;Py_DECREF&lt;/code&gt; on
+it before the function returns (even if the execution failed) so that you
+don't end up with a memory leak. The &lt;a href="http://docs.python.org/extending/extending.html#ownership-rules"&gt;documentation explaining this
+system&lt;/a&gt;
+makes the important comment that it is part of each function's "interface
+specification" whether or not it increases the reference count of an
+object before it returns or not. With this in mind, you need to keep
+careful track of which functions do what or the memory usage can become
+a little ugly.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;In our example, the objects returned by &lt;code&gt;PyArg_ParseTuple&lt;/code&gt; do not have
+their reference count incremented (the calling function still "owns" them)
+so you don't need to decrement the reference count of the &lt;code&gt;*_obj&lt;/code&gt; objects
+before returning. Conversely, &lt;code&gt;PyArray_FROM_OTF&lt;/code&gt; does return an object with
+a +1 reference count. This means that you &lt;strong&gt;must&lt;/strong&gt; call &lt;code&gt;Py_DECREF&lt;/code&gt; with
+the &lt;code&gt;*_array&lt;/code&gt; objects as the first argument before returning from this
+function. If &lt;code&gt;PyArray_FROM_OTF&lt;/code&gt; can't coerce the input object into a
+form digestible as a &lt;code&gt;numpy&lt;/code&gt; array, it will return &lt;code&gt;NULL&lt;/code&gt; so that's why
+on lines 19-21, I actually use &lt;code&gt;Py_XDECREF&lt;/code&gt;. &lt;code&gt;Py_XDECREF&lt;/code&gt; checks
+to make sure that the object isn't a &lt;code&gt;NULL&lt;/code&gt; pointer before trying to
+decrease the reference count whereas &lt;code&gt;Py_DECREF&lt;/code&gt;
+will explode if you try to call it on &lt;code&gt;NULL&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If we successfully reach line 25 then all of the input arguments were
+as expected and we have the input &lt;code&gt;numpy&lt;/code&gt; arrays arranged the way we want
+them to be. Now we can get on to the fun stuff. For simplicity,
+on line 26, I'm assuming that we received a 1D array (but I could check this
+using the &lt;a href="http://docs.scipy.org/doc/numpy/reference/c-api.array.html#PyArray_NDIM"&gt;&lt;code&gt;PyArray_NDIM&lt;/code&gt;&lt;/a&gt;
+function) and getting the length of the array. Then, I'm getting pointers
+to the actual C array (which will be formatted properly as an array of
+&lt;code&gt;double&lt;/code&gt;s because of the flags that we used in &lt;code&gt;PyArray_FROM_OTF&lt;/code&gt; above).
+Then, on line 34, we can finally call the C function that we wanted to wrap
+in the first place.&lt;/p&gt;
+&lt;p&gt;The conditional on line 41 in the example is probably unnecessary because
+the &lt;code&gt;chi2&lt;/code&gt; function (by definition) will always return a non-negative value
+but I wanted to include it anyways because it demonstrates how you would
+throw an exception if something went wrong in the execution of the C code.
+The Python interpreter has a global variable that contains a pointer to the
+most recent exception that has been thrown. Then if a function returns &lt;code&gt;NULL&lt;/code&gt;
+it starts an upwards cascade where each function either catches the exception
+using a &lt;code&gt;try-except&lt;/code&gt; statement or also returns &lt;code&gt;NULL&lt;/code&gt;. When the interpreter
+receives a &lt;code&gt;NULL&lt;/code&gt; return value, it stops execution of the current code and
+shows a representation of the value of the global &lt;code&gt;Exception&lt;/code&gt; variable and
+the traceback. On line 42, if &lt;code&gt;chi2&lt;/code&gt; returned a number less than zero,
+the global &lt;code&gt;Exception&lt;/code&gt; is being set to have the type &lt;code&gt;RuntimeError&lt;/code&gt; and
+the description: "Chi-squared returned an impossible value." Then, by
+returning &lt;code&gt;NULL&lt;/code&gt; we're indicating that something went wrong.&lt;/p&gt;
+&lt;p&gt;Finally, if &lt;code&gt;value&lt;/code&gt; was non-negative (it'd better be), we can use
+&lt;a href="http://docs.python.org/c-api/arg.html#Py_BuildValue"&gt;&lt;code&gt;Py_BuildValue&lt;/code&gt;&lt;/a&gt; to
+create the output tuple. If &lt;code&gt;Py_ParseTuple&lt;/code&gt; has a syntax similar to
+&lt;code&gt;sscanf&lt;/code&gt; then &lt;code&gt;Py_BuildValue&lt;/code&gt; is the analog of &lt;code&gt;sprintf&lt;/code&gt; with the same
+format characters as &lt;code&gt;Py_ParseTuple&lt;/code&gt;. Here, we don't need to &lt;code&gt;Py_INCREF&lt;/code&gt;
+the return object because &lt;code&gt;Py_BuildValue&lt;/code&gt; does that for us but if you
+generated the output in a different way, you might have to.&lt;/p&gt;
+&lt;p&gt;That's it for the code required for our module. It might seem like a lot of
+work but you'll notice that we've only written about 120 lines of code and
+the vast majority of these lines will be exactly the same in every module
+that you need to write.&lt;/p&gt;
+&lt;hr&gt;
+
+&lt;h2&gt;Building&lt;/h2&gt;
+&lt;p&gt;The last thing that we need to talk about is how you might compile and
+link this module so that it can actually be called from Python. The best
+way to do this is to use the built-in Python &lt;a href="http://docs.python.org/distutils/index.html"&gt;distribution
+utilities&lt;/a&gt;. Traditionally,
+the build script is called &lt;code&gt;setup.py&lt;/code&gt; and for our example, the file
+is actually extremely simple:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;core&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Extension&lt;/span&gt;
+&lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;misc_util&lt;/span&gt;
+
+&lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="n"&gt;ext_modules&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extension&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_chi2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_chi2.c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;chi2.c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])],&lt;/span&gt;
+    &lt;span class="n"&gt;include_dirs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;misc_util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_numpy_include_dirs&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and you can call it using the command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt; &lt;span class="n"&gt;build_ext&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;inplace&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;which will compile and link you source code and create a shared object
+called &lt;code&gt;_chi2.so&lt;/code&gt; in the same directory. Then, from Python, you can do
+the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;_chi2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;print&lt;/span&gt; &lt;span class="n"&gt;_chi2&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;4.2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;30.6&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;                            &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;8.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;63.0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;                            &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.6&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="mf"&gt;2.89888888889&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;hr&gt;
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Hopefully, after going through this tutorial, you should be able to write
+your own C-extension module especially if it is just a single C function
+that you want to wrap. In general, I find that most of my time is spent
+copy-and-pasting when I'm writing a C extension and once you get the hang
+of it it shouldn't take too much effort to incorporate code like this into
+projects that you're working on. Since so much of this structure is the same
+across projects, it would be awesome if someone wanted to make an interactive
+tool for auto-generating skeleton code but I haven't seen anything like this
+yet.&lt;/p&gt;
+&lt;p&gt;To see all the source code for this tutorial in one place, you can
+check out &lt;a href="https://gist.github.com/3247796"&gt;the gist&lt;/a&gt; or clone the
+repository using &lt;code&gt;git&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;git&lt;/span&gt; &lt;span class="n"&gt;clone&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//gist.github.com/3247796.git c_ext&lt;/span&gt;
+&lt;span class="n"&gt;cd&lt;/span&gt; &lt;span class="n"&gt;c_ext&lt;/span&gt;
+&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt; &lt;span class="n"&gt;build_ext&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;inplace&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you have any comments, suggestions or questions, &lt;a href="https://github.com/dfm/dfm.github.com/edit/master/_posts/2012-08-01-python-c-extensions.markdown"&gt;fork this
+page&lt;/a&gt;
+or &lt;a href="https://twitter.com/__dfm__"&gt;tweet at me&lt;/a&gt;.&lt;/p&gt;</summary></entry></feed>
