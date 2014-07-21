@@ -7,28 +7,33 @@
 
 <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
 <link rel="stylesheet" href="../../theme/css/font-awesome.min.css" type="text/css" />
-<link rel="stylesheet" href="../../theme/css/dfm.css" type="text/css" />
+<link rel="stylesheet" href="../../theme/css/base.css" type="text/css" />
 <link rel="stylesheet" href="../../theme/css/code.css" type="text/css" />
 
-
-  
-
+    
 
 
 
+
+    <link rel="stylesheet" href="../../theme/css/article.css" type="text/css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
 
 </head>
 <body>
 
+    <div class="container">
+        <div id="topbar">
+            <a href="../..">dan foreman-mackey</a>
 
-    <div id="topbar">
-        <div class="container">
-            <a href="../..">
-            <img src="../../theme/images/avatar.png" class="avatar"><span>dan foreman-mackey</span></a>
+            <ul>
+                <li><a href="../..#about">About</a></li>
+                <li><a href="../..#research">Research</a></li>
+                <li><a href="../..#software">Code</a></li>
+            </ul>
         </div>
     </div>
+
+    <div id="topimage" style="background-image: url('/images/chi2.jpg')"></div>
 
     <div class="container">
 
@@ -67,8 +72,6 @@ format that would be needed if you just wanted to find the minimum
 chi-squared (or maximum likelihood) solution to a problem using something
 like
 <a href="http://docs.scipy.org/doc/scipy/reference/optimize.html">scipy.optimize</a>.</p>
-<hr>
-
 <h2>The Objective</h2>
 <p>To be concrete, let's consider a specific example: fitting a line
 (parameterized by a slope <em>m</em> and y intercept <em>b</em>) to some <em>N</em> noisy data
@@ -107,8 +110,6 @@ something like:</p>
 
 <p>Now, our goal is to wrap this function so that we can call it from directly
 within Python.</p>
-<hr>
-
 <h2>The Wrapper</h2>
 <p>The code needed to write the wrapper module is another C file containing
 a few special Python functions. Conventionally, the names of C extensions
@@ -119,9 +120,9 @@ just a minute ago).</p>
 the first thing that we need to do is import the Python header. I also
 expect that we'll want to interact with <code>numpy</code> arrays and our <code>chi2</code>
 function as well so let's import those headers too:</p>
-<div class="highlight"><pre><span class="c">#include &lt;Python.h&gt;</span>
-<span class="c">#include &lt;numpy/arrayobject.h&gt;</span>
-<span class="c">#include &quot;chi2.h&quot;</span>
+<div class="highlight"><pre><span class="cp">#include &lt;Python.h&gt;</span>
+<span class="cp">#include &lt;numpy/arrayobject.h&gt;</span>
+<span class="cp">#include &quot;chi2.h&quot;</span>
 </pre></div>
 
 
@@ -182,14 +183,14 @@ METH_KEYWORDS</code></a>.</p>
 <p>The final step in initializing your new C module is to write an <code>init{name}</code>
 function. This function <strong>must</strong> be called <code>init_chi2</code> where <code>_chi2</code> is
 (of course) the name of the module.</p>
-<div class="highlight"><pre><span class="nx">PyMODINIT_FUNC</span> <span class="nx">init_chi2</span><span class="p">(</span><span class="k">void</span><span class="p">)</span>
+<div class="highlight"><pre><span class="n">PyMODINIT_FUNC</span> <span class="nf">init_chi2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">m</span> <span class="o">=</span> <span class="nx">Py_InitModule3</span><span class="p">(</span><span class="s2">&quot;_chi2&quot;</span><span class="p">,</span> <span class="nx">module_methods</span><span class="p">,</span> <span class="nx">module_docstring</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">m</span> <span class="o">==</span> <span class="nx">NULL</span><span class="p">)</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span> <span class="o">=</span> <span class="n">Py_InitModule3</span><span class="p">(</span><span class="s">&quot;_chi2&quot;</span><span class="p">,</span> <span class="n">module_methods</span><span class="p">,</span> <span class="n">module_docstring</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
         <span class="k">return</span><span class="p">;</span>
 
     <span class="cm">/* Load `numpy` functionality. */</span>
-    <span class="nx">import_array</span><span class="p">();</span>
+    <span class="n">import_array</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -198,8 +199,6 @@ function. This function <strong>must</strong> be called <code>init_chi2</code> w
 point but it's important to note that if you want to use any of the
 functionality defined by <code>numpy</code>, you need to include the call to
 <code>import_array()</code> (a function defined in the <code>numpy/arrayobject.h</code> header).</p>
-<hr>
-
 <h2>The Interface</h2>
 <p>Up to this point, we've written only about 25 lines of C code to set up
 a C extension module. All of these steps will be common between any modules
@@ -211,55 +210,55 @@ and y-intercept of our model) and three <code>numpy</code> arrays for the <em>x<
 and uncertainties that constitute the "data" that we're trying to model.
 Let's just throw down the whole function here and then dissect it line-by-line
 below:</p>
-<div class="highlight"><pre><span class="kr">static</span> <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">chi2_chi2</span><span class="p">(</span><span class="nx">PyObject</span> <span class="o">*</span><span class="nx">self</span><span class="p">,</span> <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">args</span><span class="p">)</span>
+<div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="kr">double</span> <span class="nx">m</span><span class="p">,</span> <span class="nx">b</span><span class="p">;</span>
-    <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">x_obj</span><span class="p">,</span> <span class="o">*</span><span class="nx">y_obj</span><span class="p">,</span> <span class="o">*</span><span class="nx">yerr_obj</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">x_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">y_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">yerr_obj</span><span class="p">;</span>
 
     <span class="cm">/* Parse the input tuple */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">PyArg_ParseTuple</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="s2">&quot;ddOOO&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">m</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">x_obj</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">y_obj</span><span class="p">,</span>
-                                         <span class="o">&amp;</span><span class="nx">yerr_obj</span><span class="p">))</span>
-        <span class="k">return</span> <span class="nx">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;ddOOO&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x_obj</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y_obj</span><span class="p">,</span>
+                                        <span class="o">&amp;</span><span class="n">yerr_obj</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 
     <span class="cm">/* Interpret the input objects as numpy arrays. */</span>
-    <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">x_array</span> <span class="o">=</span> <span class="nx">PyArray_FROM_OTF</span><span class="p">(</span><span class="nx">x_obj</span><span class="p">,</span> <span class="nx">NPY_DOUBLE</span><span class="p">,</span> <span class="nx">NPY_IN_ARRAY</span><span class="p">);</span>
-    <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">y_array</span> <span class="o">=</span> <span class="nx">PyArray_FROM_OTF</span><span class="p">(</span><span class="nx">y_obj</span><span class="p">,</span> <span class="nx">NPY_DOUBLE</span><span class="p">,</span> <span class="nx">NPY_IN_ARRAY</span><span class="p">);</span>
-    <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">yerr_array</span> <span class="o">=</span> <span class="nx">PyArray_FROM_OTF</span><span class="p">(</span><span class="nx">yerr_obj</span><span class="p">,</span> <span class="nx">NPY_DOUBLE</span><span class="p">,</span>
-                                            <span class="nx">NPY_IN_ARRAY</span><span class="p">);</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">x_array</span> <span class="o">=</span> <span class="n">PyArray_FROM_OTF</span><span class="p">(</span><span class="n">x_obj</span><span class="p">,</span> <span class="n">NPY_DOUBLE</span><span class="p">,</span> <span class="n">NPY_IN_ARRAY</span><span class="p">);</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">y_array</span> <span class="o">=</span> <span class="n">PyArray_FROM_OTF</span><span class="p">(</span><span class="n">y_obj</span><span class="p">,</span> <span class="n">NPY_DOUBLE</span><span class="p">,</span> <span class="n">NPY_IN_ARRAY</span><span class="p">);</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">yerr_array</span> <span class="o">=</span> <span class="n">PyArray_FROM_OTF</span><span class="p">(</span><span class="n">yerr_obj</span><span class="p">,</span> <span class="n">NPY_DOUBLE</span><span class="p">,</span>
+                                            <span class="n">NPY_IN_ARRAY</span><span class="p">);</span>
 
     <span class="cm">/* If that didn&#39;t work, throw an exception. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">x_array</span> <span class="o">==</span> <span class="nx">NULL</span> <span class="o">||</span> <span class="nx">y_array</span> <span class="o">==</span> <span class="nx">NULL</span> <span class="o">||</span> <span class="nx">yerr_array</span> <span class="o">==</span> <span class="nx">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">Py_XDECREF</span><span class="p">(</span><span class="nx">x_array</span><span class="p">);</span>
-        <span class="nx">Py_XDECREF</span><span class="p">(</span><span class="nx">y_array</span><span class="p">);</span>
-        <span class="nx">Py_XDECREF</span><span class="p">(</span><span class="nx">yerr_array</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x_array</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">y_array</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">yerr_array</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">x_array</span><span class="p">);</span>
+        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">y_array</span><span class="p">);</span>
+        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">yerr_array</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="cm">/* How many data points are there? */</span>
-    <span class="kr">int</span> <span class="nx">N</span> <span class="o">=</span> <span class="p">(</span><span class="kr">int</span><span class="p">)</span><span class="nx">PyArray_DIM</span><span class="p">(</span><span class="nx">x_array</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">PyArray_DIM</span><span class="p">(</span><span class="n">x_array</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 
     <span class="cm">/* Get pointers to the data as C-types. */</span>
-    <span class="kr">double</span> <span class="o">*</span><span class="nx">x</span>    <span class="o">=</span> <span class="p">(</span><span class="kr">double</span><span class="o">*</span><span class="p">)</span><span class="nx">PyArray_DATA</span><span class="p">(</span><span class="nx">x_array</span><span class="p">);</span>
-    <span class="kr">double</span> <span class="o">*</span><span class="nx">y</span>    <span class="o">=</span> <span class="p">(</span><span class="kr">double</span><span class="o">*</span><span class="p">)</span><span class="nx">PyArray_DATA</span><span class="p">(</span><span class="nx">y_array</span><span class="p">);</span>
-    <span class="kr">double</span> <span class="o">*</span><span class="nx">yerr</span> <span class="o">=</span> <span class="p">(</span><span class="kr">double</span><span class="o">*</span><span class="p">)</span><span class="nx">PyArray_DATA</span><span class="p">(</span><span class="nx">yerr_array</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">x</span>    <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">PyArray_DATA</span><span class="p">(</span><span class="n">x_array</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">y</span>    <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">PyArray_DATA</span><span class="p">(</span><span class="n">y_array</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">PyArray_DATA</span><span class="p">(</span><span class="n">yerr_array</span><span class="p">);</span>
 
     <span class="cm">/* Call the external C function to compute the chi-squared. */</span>
-    <span class="kr">double</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">chi2</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">yerr</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="n">value</span> <span class="o">=</span> <span class="n">chi2</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
 
     <span class="cm">/* Clean up. */</span>
-    <span class="nx">Py_DECREF</span><span class="p">(</span><span class="nx">x_array</span><span class="p">);</span>
-    <span class="nx">Py_DECREF</span><span class="p">(</span><span class="nx">y_array</span><span class="p">);</span>
-    <span class="nx">Py_DECREF</span><span class="p">(</span><span class="nx">yerr_array</span><span class="p">);</span>
+    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">x_array</span><span class="p">);</span>
+    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">y_array</span><span class="p">);</span>
+    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">yerr_array</span><span class="p">);</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">value</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">PyErr_SetString</span><span class="p">(</span><span class="nx">PyExc_RuntimeError</span><span class="p">,</span>
-                    <span class="s2">&quot;Chi-squared returned an impossible value.&quot;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">NULL</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_RuntimeError</span><span class="p">,</span>
+                    <span class="s">&quot;Chi-squared returned an impossible value.&quot;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="cm">/* Build the output tuple */</span>
-    <span class="nx">PyObject</span> <span class="o">*</span><span class="nx">ret</span> <span class="o">=</span> <span class="nx">Py_BuildValue</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">ret</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">ret</span> <span class="o">=</span> <span class="n">Py_BuildValue</span><span class="p">(</span><span class="s">&quot;d&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -358,8 +357,6 @@ generated the output in a different way, you might have to.</p>
 work but you'll notice that we've only written about 120 lines of code and
 the vast majority of these lines will be exactly the same in every module
 that you need to write.</p>
-<hr>
-
 <h2>Building</h2>
 <p>The last thing that we need to talk about is how you might compile and
 link this module so that it can actually be called from Python. The best
@@ -367,33 +364,31 @@ way to do this is to use the built-in Python <a href="http://docs.python.org/dis
 utilities</a>. Traditionally,
 the build script is called <code>setup.py</code> and for our example, the file
 is actually extremely simple:</p>
-<div class="highlight"><pre><span class="n">from</span> <span class="n">distutils</span><span class="p">.</span><span class="n">core</span> <span class="n">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
-<span class="n">import</span> <span class="n">numpy</span><span class="p">.</span><span class="n">distutils</span><span class="p">.</span><span class="n">misc_util</span>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<span class="kn">import</span> <span class="nn">numpy.distutils.misc_util</span>
 
 <span class="n">setup</span><span class="p">(</span>
     <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s">&quot;_chi2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;_chi2.c&quot;</span><span class="p">,</span> <span class="s">&quot;chi2.c&quot;</span><span class="p">])],</span>
-    <span class="n">include_dirs</span><span class="o">=</span><span class="n">numpy</span><span class="p">.</span><span class="n">distutils</span><span class="p">.</span><span class="n">misc_util</span><span class="p">.</span><span class="n">get_numpy_include_dirs</span><span class="p">(),</span>
+    <span class="n">include_dirs</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">distutils</span><span class="o">.</span><span class="n">misc_util</span><span class="o">.</span><span class="n">get_numpy_include_dirs</span><span class="p">(),</span>
 <span class="p">)</span>
 </pre></div>
 
 
 <p>and you can call it using the command:</p>
-<div class="highlight"><pre><span class="n">python</span> <span class="n">setup</span><span class="p">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
+<div class="highlight"><pre>python setup.py build_ext --inplace
 </pre></div>
 
 
 <p>which will compile and link you source code and create a shared object
 called <code>_chi2.so</code> in the same directory. Then, from Python, you can do
 the following:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">import</span> <span class="n">_chi2</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">print</span> <span class="n">_chi2</span><span class="p">.</span><span class="n">chi2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">30.6</span><span class="p">],</span>
-<span class="p">...</span>                            <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">63.0</span><span class="p">],</span>
-<span class="p">...</span>                            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">_chi2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">_chi2</span><span class="o">.</span><span class="n">chi2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">30.6</span><span class="p">],</span>
+<span class="o">...</span>                            <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">63.0</span><span class="p">],</span>
+<span class="o">...</span>                            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
 <span class="mf">2.89888888889</span>
 </pre></div>
 
-
-<hr>
 
 <h2>Summary</h2>
 <p>Hopefully, after going through this tutorial, you should be able to write
@@ -408,9 +403,9 @@ yet.</p>
 <p>To see all the source code for this tutorial in one place, you can
 check out <a href="https://gist.github.com/3247796">the gist</a> or clone the
 repository using <code>git</code>:</p>
-<div class="highlight"><pre><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="o">:</span><span class="c1">//gist.github.com/3247796.git c_ext</span>
-<span class="n">cd</span> <span class="n">c_ext</span>
-<span class="n">python</span> <span class="n">setup</span><span class="p">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">inplace</span>
+<div class="highlight"><pre>git clone git://gist.github.com/3247796.git c_ext
+<span class="nb">cd </span>c_ext
+python setup.py build_ext --inplace
 </pre></div>
 
 
@@ -419,7 +414,6 @@ page</a>
 or <a href="https://twitter.com/__dfm__">tweet at me</a>.</p>
         </section>
     </div>
-
 
 <div id="bottom">
 <div class="container">
