@@ -3,33 +3,38 @@
 {% block title %}{{ article.title }} by Dan Foreman-Mackey{% endblock %}
 
 {% block head %}
+    {{ super() }}
 
-  {{ super() }}
-
-  {% for keyword in article.keywords %}
+    {% for keyword in article.keywords %}
     <meta name="keywords" contents="{{keyword}}" />
-  {% endfor %}
+    {% endfor %}
 
-  {% for description in article.description %}
+    {% for description in article.description %}
     <meta name="description" contents="{{description}}" />
-  {% endfor %}
+    {% endfor %}
 
-  {% for tag in article.tags %}
+    {% for tag in article.tags %}
     <meta name="tags" contents="{{tag}}" />
-  {% endfor %}
+    {% endfor %}
 
+    <link rel="stylesheet" href="{{ SITEURL }}/theme/css/article.css" type="text/css" />
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
 {% endblock %}
 
 {% block content %}
+    <div class="container">
+        <div id="topbar">
+            <a href="{{ SITEURL }}">dan foreman-mackey</a>
 
-    <div id="topbar">
-        <div class="container">
-            <a href="{{ SITEURL }}">
-            <img src="{{ SITEURL }}/theme/images/avatar.png" class="avatar"><span>dan foreman-mackey</span></a>
+            <ul>
+                <li><a href="{{ SITEURL }}#about">About</a></li>
+                <li><a href="{{ SITEURL }}#research">Research</a></li>
+                <li><a href="{{ SITEURL }}#software">Code</a></li>
+            </ul>
         </div>
     </div>
+
+    <div id="topimage" style="background-image: url('{{ article.image }}')"></div>
 
     <div class="container">
 
@@ -39,5 +44,4 @@
             {{ article.content }}
         </section>
     </div>
-
 {% endblock %}

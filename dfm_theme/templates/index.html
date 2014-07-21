@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ SITEURL }}/theme/css/index.css" type="text/css" />
+{% endblock %}
+
 {% block content %}
 
 <div id="top" class="full-page">

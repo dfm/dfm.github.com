@@ -3,6 +3,7 @@ Date: 2012-08-03 0:00
 Category: Tutorial
 Slug: python-c-extensions
 Summary: How to roll your own Python modules in C.
+Image: /images/chi2.jpg
 
 Writing your own C extensions to Python can seem like a pretty daunting task
 when you first get started. If you take a look at the [Python/C API
@@ -38,7 +39,6 @@ chi-squared (or maximum likelihood) solution to a problem using something
 like
 [scipy.optimize](http://docs.scipy.org/doc/scipy/reference/optimize.html).
 
-<hr>
 
 The Objective
 -------------
@@ -59,34 +59,29 @@ It's probably overkill to write this function in C but it'll do for our
 purposes today. In C, the file `chi2.c` containing our function should look
 something like:
 
-```
+    :::c
+    #include "chi2.h"
 
-#include "chi2.h"
+    double chi2(double m, double b, double *x, double *y, double *yerr, int N) {
+        int n;
+        double result = 0.0, diff;
 
-double chi2(double m, double b, double *x, double *y, double *yerr, int N) {
-    int n;
-    double result = 0.0, diff;
+        for (n = 0; n < N; n++) {
+            diff = (y[n] - (m * x[n] + b)) / yerr[n];
+            result += diff * diff;
+        }
 
-    for (n = 0; n < N; n++) {
-        diff = (y[n] - (m * x[n] + b)) / yerr[n];
-        result += diff * diff;
+        return result;
     }
-
-    return result;
-}
-
-```
 
 And the corresponding header file `chi2.h` is simply:
 
-```
-double chi2(double m, double b, double *x, double *y, double *yerr, int N);
-```
+    :::c
+    double chi2(double m, double b, double *x, double *y, double *yerr, int N);
 
 Now, our goal is to wrap this function so that we can call it from directly
 within Python.
 
-<hr>
 
 The Wrapper
 -----------
@@ -102,28 +97,25 @@ the first thing that we need to do is import the Python header. I also
 expect that we'll want to interact with `numpy` arrays and our `chi2`
 function as well so let's import those headers too:
 
-```
-#include <Python.h>
-#include <numpy/arrayobject.h>
-#include "chi2.h"
-```
+    :::c
+    #include <Python.h>
+    #include <numpy/arrayobject.h>
+    #include "chi2.h"
 
 Next, we should write the
 [docstrings](http://www.python.org/dev/peps/pep-0257/) for our module and
 the function that we're wrapping:
 
-```
-static char module_docstring[] =
-    "This module provides an interface for calculating chi-squared using C.";
-static char chi2_docstring[] =
-    "Calculate the chi-squared of some data given a model.";
-```
+    :::c
+    static char module_docstring[] =
+        "This module provides an interface for calculating chi-squared using C.";
+    static char chi2_docstring[] =
+        "Calculate the chi-squared of some data given a model.";
 
 and declare the function:
 
-```
-static PyObject *chi2_chi2(PyObject *self, PyObject *args);
-```
+    :::c
+    static PyObject *chi2_chi2(PyObject *self, PyObject *args);
 
 This is the first time that we're seeing anything Python-specific. The
 type `PyObject` refers to all Python types. Any communication between the
@@ -152,12 +144,11 @@ Now, we'll specify what the members of this module will be. In this case
 there is only going to be one function (called `chi2`) so the "method
 definition" looks like:
 
-```
-static PyMethodDef module_methods[] = {
-    {"chi2", chi2_chi2, METH_VARARGS, chi2_docstring},
-    {NULL, NULL, 0, NULL}
-};
-```
+    :::c
+    static PyMethodDef module_methods[] = {
+        {"chi2", chi2_chi2, METH_VARARGS, chi2_docstring},
+        {NULL, NULL, 0, NULL}
+    };
 
 More functions can be added by adding more lines like the second one. This
 second line contains all the info that the interpreter needs to link a Python
@@ -173,24 +164,22 @@ The final step in initializing your new C module is to write an `init{name}`
 function. This function **must** be called `init_chi2` where `_chi2` is
 (of course) the name of the module.
 
-```
-PyMODINIT_FUNC init_chi2(void)
-{
-    PyObject *m = Py_InitModule3("_chi2", module_methods, module_docstring);
-    if (m == NULL)
-        return;
+    :::c
+    PyMODINIT_FUNC init_chi2(void)
+    {
+        PyObject *m = Py_InitModule3("_chi2", module_methods, module_docstring);
+        if (m == NULL)
+            return;
 
-    /* Load `numpy` functionality. */
-    import_array();
-}
-```
+        /* Load `numpy` functionality. */
+        import_array();
+    }
 
 Everything that's going on here should be fairly self explanatory by this
 point but it's important to note that if you want to use any of the
 functionality defined by `numpy`, you need to include the call to
 `import_array()` (a function defined in the `numpy/arrayobject.h` header).
 
-<hr>
 
 The Interface
 -------------
@@ -207,58 +196,57 @@ and uncertainties that constitute the "data" that we're trying to model.
 Let's just throw down the whole function here and then dissect it line-by-line
 below:
 
-```
-static PyObject *chi2_chi2(PyObject *self, PyObject *args)
-{
-    double m, b;
-    PyObject *x_obj, *y_obj, *yerr_obj;
+    :::c
+    static PyObject *chi2_chi2(PyObject *self, PyObject *args)
+    {
+        double m, b;
+        PyObject *x_obj, *y_obj, *yerr_obj;
 
-    /* Parse the input tuple */
-    if (!PyArg_ParseTuple(args, "ddOOO", &m, &b, &x_obj, &y_obj,
-                                         &yerr_obj))
-        return NULL;
+        /* Parse the input tuple */
+        if (!PyArg_ParseTuple(args, "ddOOO", &m, &b, &x_obj, &y_obj,
+                                            &yerr_obj))
+            return NULL;
 
-    /* Interpret the input objects as numpy arrays. */
-    PyObject *x_array = PyArray_FROM_OTF(x_obj, NPY_DOUBLE, NPY_IN_ARRAY);
-    PyObject *y_array = PyArray_FROM_OTF(y_obj, NPY_DOUBLE, NPY_IN_ARRAY);
-    PyObject *yerr_array = PyArray_FROM_OTF(yerr_obj, NPY_DOUBLE,
-                                            NPY_IN_ARRAY);
+        /* Interpret the input objects as numpy arrays. */
+        PyObject *x_array = PyArray_FROM_OTF(x_obj, NPY_DOUBLE, NPY_IN_ARRAY);
+        PyObject *y_array = PyArray_FROM_OTF(y_obj, NPY_DOUBLE, NPY_IN_ARRAY);
+        PyObject *yerr_array = PyArray_FROM_OTF(yerr_obj, NPY_DOUBLE,
+                                                NPY_IN_ARRAY);
 
-    /* If that didn't work, throw an exception. */
-    if (x_array == NULL || y_array == NULL || yerr_array == NULL) {
-        Py_XDECREF(x_array);
-        Py_XDECREF(y_array);
-        Py_XDECREF(yerr_array);
-        return NULL;
+        /* If that didn't work, throw an exception. */
+        if (x_array == NULL || y_array == NULL || yerr_array == NULL) {
+            Py_XDECREF(x_array);
+            Py_XDECREF(y_array);
+            Py_XDECREF(yerr_array);
+            return NULL;
+        }
+
+        /* How many data points are there? */
+        int N = (int)PyArray_DIM(x_array, 0);
+
+        /* Get pointers to the data as C-types. */
+        double *x    = (double*)PyArray_DATA(x_array);
+        double *y    = (double*)PyArray_DATA(y_array);
+        double *yerr = (double*)PyArray_DATA(yerr_array);
+
+        /* Call the external C function to compute the chi-squared. */
+        double value = chi2(m, b, x, y, yerr, N);
+
+        /* Clean up. */
+        Py_DECREF(x_array);
+        Py_DECREF(y_array);
+        Py_DECREF(yerr_array);
+
+        if (value < 0.0) {
+            PyErr_SetString(PyExc_RuntimeError,
+                        "Chi-squared returned an impossible value.");
+            return NULL;
+        }
+
+        /* Build the output tuple */
+        PyObject *ret = Py_BuildValue("d", value);
+        return ret;
     }
-
-    /* How many data points are there? */
-    int N = (int)PyArray_DIM(x_array, 0);
-
-    /* Get pointers to the data as C-types. */
-    double *x    = (double*)PyArray_DATA(x_array);
-    double *y    = (double*)PyArray_DATA(y_array);
-    double *yerr = (double*)PyArray_DATA(yerr_array);
-
-    /* Call the external C function to compute the chi-squared. */
-    double value = chi2(m, b, x, y, yerr, N);
-
-    /* Clean up. */
-    Py_DECREF(x_array);
-    Py_DECREF(y_array);
-    Py_DECREF(yerr_array);
-
-    if (value < 0.0) {
-        PyErr_SetString(PyExc_RuntimeError,
-                    "Chi-squared returned an impossible value.");
-        return NULL;
-    }
-
-    /* Build the output tuple */
-    PyObject *ret = Py_BuildValue("d", value);
-    return ret;
-}
-```
 
 I know that that was a lot in one go so let's break things down a little bit.
 The first thing that we did was parse the input tuple using the
@@ -360,7 +348,6 @@ work but you'll notice that we've only written about 120 lines of code and
 the vast majority of these lines will be exactly the same in every module
 that you need to write.
 
-<hr>
 
 Building
 --------
@@ -372,35 +359,31 @@ utilities](http://docs.python.org/distutils/index.html). Traditionally,
 the build script is called `setup.py` and for our example, the file
 is actually extremely simple:
 
-```
-from distutils.core import setup, Extension
-import numpy.distutils.misc_util
+    :::python
+    from distutils.core import setup, Extension
+    import numpy.distutils.misc_util
 
-setup(
-    ext_modules=[Extension("_chi2", ["_chi2.c", "chi2.c"])],
-    include_dirs=numpy.distutils.misc_util.get_numpy_include_dirs(),
-)
-```
+    setup(
+        ext_modules=[Extension("_chi2", ["_chi2.c", "chi2.c"])],
+        include_dirs=numpy.distutils.misc_util.get_numpy_include_dirs(),
+    )
 
 and you can call it using the command:
 
-```
-python setup.py build_ext --inplace
-```
+    :::bash
+    python setup.py build_ext --inplace
 
 which will compile and link you source code and create a shared object
 called `_chi2.so` in the same directory. Then, from Python, you can do
 the following:
 
-```
->>> import _chi2
->>> print _chi2.chi2(2.0, 1.0, [-1.0, 4.2, 30.6],
-...                            [-1.5, 8.0, 63.0],
-...                            [1.0, 1.5, 0.6])
-2.89888888889
-```
+    :::python
+    >>> import _chi2
+    >>> print _chi2.chi2(2.0, 1.0, [-1.0, 4.2, 30.6],
+    ...                            [-1.5, 8.0, 63.0],
+    ...                            [1.0, 1.5, 0.6])
+    2.89888888889
 
-<hr>
 
 Summary
 -------
@@ -419,11 +402,10 @@ To see all the source code for this tutorial in one place, you can
 check out [the gist](https://gist.github.com/3247796) or clone the
 repository using `git`:
 
-```
-git clone git://gist.github.com/3247796.git c_ext
-cd c_ext
-python setup.py build_ext --inplace
-```
+    :::bash
+    git clone git://gist.github.com/3247796.git c_ext
+    cd c_ext
+    python setup.py build_ext --inplace
 
 If you have any comments, suggestions or questions, [fork this
 page](https://github.com/dfm/dfm.github.com/edit/master/_posts/2012-08-01-python-c-extensions.markdown)

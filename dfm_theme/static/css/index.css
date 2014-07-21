@@ -1,10 +1,6 @@
-section {
-    display: block;
-}
-
 
 hr {
-    display: none;
+    display: block;
     width: 14%;
     margin: 50px auto 40px auto;
     border: 0;
@@ -12,21 +8,6 @@ hr {
     box-sizing: content-box;
     height: 0;
 }
-
-/*
- *  FULL PAGE BACKGROUND IMAGE
- */
-
-.full-page {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    /* min-height: 500px; */
-}
-
-/*
- *  SCROLLING WIDGET
- */
 
 .page-scroll {
     position: absolute;
@@ -44,10 +25,6 @@ hr {
 .page-scroll a:hover {
     color: rgba(255, 255, 255, 0.8);
 }
-
-/*
- *  HACKISHLY CENTERED BLOCK
- */
 
 .centered {
     display: table;
@@ -68,11 +45,10 @@ hr {
     background-color: rgba(0, 0, 0, 0.6);
 }
 
-/*
- *  CUSTOM STYLES
- */
-
 #top {
+    position: relative;
+    width: 100%;
+    height: 100%;
     background: #000;
     background-image: url('../images/top1.jpg');
     background-repeat: no-repeat;
@@ -156,5 +132,3 @@ hr {
 .project {
     font-weight: 700;
 }
-
-
