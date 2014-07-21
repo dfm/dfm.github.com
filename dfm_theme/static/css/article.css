@@ -4,6 +4,17 @@
     font-size: 28px;
     letter-spacing: -0.01em;
     line-height: 36px;
+    *zoom: 1;
+}
+
+#topbar:before,
+#topbar:after {
+    content: " ";
+    display: table;
+}
+
+#topbar:after {
+    clear: both;
 }
 
 #topbar a {
@@ -15,7 +26,13 @@
     color: steelblue;
 }
 
+#topbar span {
+    display: block;
+    float: left;
+}
+
 #topbar ul {
+    display: block;
     float: right;
     font-size: 15px;
     font-weight: 700;
@@ -38,4 +55,23 @@
     background-repeat: no-repeat;
     background-position: top center;
     background-size: 100% auto;
+}
+
+@media (max-width: 650px) {
+    #topbar {
+        text-align: center;
+    }
+
+    #topbar span {
+        float: none;
+    }
+
+    #topbar ul {
+        float: none;
+        display: block;
+    }
+
+    #topbar li {
+        padding: 0 9px;
+    }
 }
