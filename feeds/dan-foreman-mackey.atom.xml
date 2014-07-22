@@ -31,8 +31,6 @@ format that would be needed if you just wanted to find the minimum
 chi-squared (or maximum likelihood) solution to a problem using something
 like
 &lt;a href="http://docs.scipy.org/doc/scipy/reference/optimize.html"&gt;scipy.optimize&lt;/a&gt;.&lt;/p&gt;
-&lt;hr&gt;
-
 &lt;h2&gt;The Objective&lt;/h2&gt;
 &lt;p&gt;To be concrete, let's consider a specific example: fitting a line
 (parameterized by a slope &lt;em&gt;m&lt;/em&gt; and y intercept &lt;em&gt;b&lt;/em&gt;) to some &lt;em&gt;N&lt;/em&gt; noisy data
@@ -71,8 +69,6 @@ something like:&lt;/p&gt;
 
 &lt;p&gt;Now, our goal is to wrap this function so that we can call it from directly
 within Python.&lt;/p&gt;
-&lt;hr&gt;
-
 &lt;h2&gt;The Wrapper&lt;/h2&gt;
 &lt;p&gt;The code needed to write the wrapper module is another C file containing
 a few special Python functions. Conventionally, the names of C extensions
@@ -83,9 +79,9 @@ just a minute ago).&lt;/p&gt;
 the first thing that we need to do is import the Python header. I also
 expect that we'll want to interact with &lt;code&gt;numpy&lt;/code&gt; arrays and our &lt;code&gt;chi2&lt;/code&gt;
 function as well so let's import those headers too:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#include &amp;lt;Python.h&amp;gt;&lt;/span&gt;
-&lt;span class="c"&gt;#include &amp;lt;numpy/arrayobject.h&amp;gt;&lt;/span&gt;
-&lt;span class="c"&gt;#include &amp;quot;chi2.h&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &amp;lt;Python.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;lt;numpy/arrayobject.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include &amp;quot;chi2.h&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -146,14 +142,14 @@ METH_KEYWORDS&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The final step in initializing your new C module is to write an &lt;code&gt;init{name}&lt;/code&gt;
 function. This function &lt;strong&gt;must&lt;/strong&gt; be called &lt;code&gt;init_chi2&lt;/code&gt; where &lt;code&gt;_chi2&lt;/code&gt; is
 (of course) the name of the module.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;PyMODINIT_FUNC&lt;/span&gt; &lt;span class="nx"&gt;init_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;PyMODINIT_FUNC&lt;/span&gt; &lt;span class="nf"&gt;init_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Py_InitModule3&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_chi2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;module_methods&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;module_docstring&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Py_InitModule3&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_chi2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;module_methods&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;module_docstring&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Load `numpy` functionality. */&lt;/span&gt;
-    &lt;span class="nx"&gt;import_array&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="n"&gt;import_array&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -162,8 +158,6 @@ function. This function &lt;strong&gt;must&lt;/strong&gt; be called &lt;code&gt;
 point but it's important to note that if you want to use any of the
 functionality defined by &lt;code&gt;numpy&lt;/code&gt;, you need to include the call to
 &lt;code&gt;import_array()&lt;/code&gt; (a function defined in the &lt;code&gt;numpy/arrayobject.h&lt;/code&gt; header).&lt;/p&gt;
-&lt;hr&gt;
-
 &lt;h2&gt;The Interface&lt;/h2&gt;
 &lt;p&gt;Up to this point, we've written only about 25 lines of C code to set up
 a C extension module. All of these steps will be common between any modules
@@ -175,55 +169,55 @@ and y-intercept of our model) and three &lt;code&gt;numpy&lt;/code&gt; arrays fo
 and uncertainties that constitute the "data" that we're trying to model.
 Let's just throw down the whole function here and then dissect it line-by-line
 below:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kr"&gt;static&lt;/span&gt; &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;chi2_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nf"&gt;chi2_chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;{&lt;/span&gt;
-    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Parse the input tuple */&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;PyArg_ParseTuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;ddOOO&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                                         &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;PyArg_ParseTuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;ddOOO&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                        &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Interpret the input objects as numpy arrays. */&lt;/span&gt;
-    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                                            &lt;span class="nx"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;x_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;y_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;yerr_array&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;PyArray_FROM_OTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;yerr_obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NPY_DOUBLE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                                            &lt;span class="n"&gt;NPY_IN_ARRAY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* If that didn&amp;#39;t work, throw an exception. */&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;y_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;yerr_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-        &lt;span class="nx"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-        &lt;span class="nx"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-        &lt;span class="nx"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="n"&gt;y_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="n"&gt;yerr_array&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;Py_XDECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="p"&gt;}&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* How many data points are there? */&lt;/span&gt;
-    &lt;span class="kr"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DIM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;PyArray_DIM&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Get pointers to the data as C-types. */&lt;/span&gt;
-    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;x&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;yerr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;    &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;yerr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;double&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;PyArray_DATA&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Call the external C function to compute the chi-squared. */&lt;/span&gt;
-    &lt;span class="kr"&gt;double&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="kt"&gt;double&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Clean up. */&lt;/span&gt;
-    &lt;span class="nx"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="nx"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="nx"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;Py_DECREF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;yerr_array&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-        &lt;span class="nx"&gt;PyErr_SetString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;PyExc_RuntimeError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                    &lt;span class="s2"&gt;&amp;quot;Chi-squared returned an impossible value.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;PyErr_SetString&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;PyExc_RuntimeError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                    &lt;span class="s"&gt;&amp;quot;Chi-squared returned an impossible value.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="p"&gt;}&lt;/span&gt;
 
     &lt;span class="cm"&gt;/* Build the output tuple */&lt;/span&gt;
-    &lt;span class="nx"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Py_BuildValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;d&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;ret&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;PyObject&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Py_BuildValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;d&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;ret&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -322,8 +316,6 @@ generated the output in a different way, you might have to.&lt;/p&gt;
 work but you'll notice that we've only written about 120 lines of code and
 the vast majority of these lines will be exactly the same in every module
 that you need to write.&lt;/p&gt;
-&lt;hr&gt;
-
 &lt;h2&gt;Building&lt;/h2&gt;
 &lt;p&gt;The last thing that we need to talk about is how you might compile and
 link this module so that it can actually be called from Python. The best
@@ -331,33 +323,31 @@ way to do this is to use the built-in Python &lt;a href="http://docs.python.org/
 utilities&lt;/a&gt;. Traditionally,
 the build script is called &lt;code&gt;setup.py&lt;/code&gt; and for our example, the file
 is actually extremely simple:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;core&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Extension&lt;/span&gt;
-&lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;misc_util&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;distutils.core&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Extension&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy.distutils.misc_util&lt;/span&gt;
 
 &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
     &lt;span class="n"&gt;ext_modules&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extension&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_chi2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_chi2.c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;chi2.c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;])],&lt;/span&gt;
-    &lt;span class="n"&gt;include_dirs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;misc_util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_numpy_include_dirs&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+    &lt;span class="n"&gt;include_dirs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;numpy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;distutils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;misc_util&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get_numpy_include_dirs&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
 &lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;and you can call it using the command:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt; &lt;span class="n"&gt;build_ext&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;inplace&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;python setup.py build_ext --inplace
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;which will compile and link you source code and create a shared object
 called &lt;code&gt;_chi2.so&lt;/code&gt; in the same directory. Then, from Python, you can do
 the following:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;_chi2&lt;/span&gt;
-&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;print&lt;/span&gt; &lt;span class="n"&gt;_chi2&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;4.2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;30.6&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
-&lt;span class="p"&gt;...&lt;/span&gt;                            &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;8.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;63.0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
-&lt;span class="p"&gt;...&lt;/span&gt;                            &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.6&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;_chi2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;_chi2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chi2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;4.2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;30.6&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt;                            &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;8.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;63.0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="o"&gt;...&lt;/span&gt;                            &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;1.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.6&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 &lt;span class="mf"&gt;2.89888888889&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
-
-&lt;hr&gt;
 
 &lt;h2&gt;Summary&lt;/h2&gt;
 &lt;p&gt;Hopefully, after going through this tutorial, you should be able to write
@@ -372,9 +362,9 @@ yet.&lt;/p&gt;
 &lt;p&gt;To see all the source code for this tutorial in one place, you can
 check out &lt;a href="https://gist.github.com/3247796"&gt;the gist&lt;/a&gt; or clone the
 repository using &lt;code&gt;git&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;git&lt;/span&gt; &lt;span class="n"&gt;clone&lt;/span&gt; &lt;span class="n"&gt;git&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//gist.github.com/3247796.git c_ext&lt;/span&gt;
-&lt;span class="n"&gt;cd&lt;/span&gt; &lt;span class="n"&gt;c_ext&lt;/span&gt;
-&lt;span class="n"&gt;python&lt;/span&gt; &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;py&lt;/span&gt; &lt;span class="n"&gt;build_ext&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;inplace&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git clone git://gist.github.com/3247796.git c_ext
+&lt;span class="nb"&gt;cd &lt;/span&gt;c_ext
+python setup.py build_ext --inplace
 &lt;/pre&gt;&lt;/div&gt;
 
 
