@@ -9,263 +9,31 @@
 <link rel="stylesheet" href="./theme/css/font-awesome.min.css" type="text/css" />
 <link rel="stylesheet" href="./theme/css/base.css" type="text/css" />
 <link rel="stylesheet" href="./theme/css/code.css" type="text/css" />
-
-    
-    <link rel="stylesheet" href="./theme/css/index.css" type="text/css" />
+<link rel="stylesheet" href="./theme/css/index.css" type="text/css" />
 
 </head>
 <body>
 
+<div class="index-body">
+    <div class="shim"></div>
+    <div class="index-inner">
 
-<div id="top" class="full-page">
-
-    <div id="top-social" class="centered">
-        <div class="centered-inner">
-            <div class="centered-content">
-                <div id="top-social-text">
-                    Dan Foreman-Mackey
-                </div>
-                <div>
-                    <a href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a>
-                    <a href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a>
-                    <a href="http://arxiv.org/find/all/1/au:foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a>
-                    <a href="https://speakerdeck.com/dfm"><i class="fa fa-bullhorn fa-3x"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="page-scroll">
-        <a href="#about" class="btn btn-circle">
-            <i class="fa fa-angle-double-down fa-2x"></i>
-        </a>
-    </div>
-</section>
-
-<div class="container">
-
-    <section id="about">
-
-        <img src="./theme/images/avatar-vert.png" alt="me" />
-
-        <p>I'm a graduate student at NYU working on next generation
-        astronomical data analysis under the supervision of <a
-        href="http://hoggresearch.blogspot.com/">David W. Hogg</a>. When
-        I'm not writing code, I'm probably climbing rocks somewhere. Take a
-        look at my <a href="cv">C.V.</a> or <a href="#research">scroll down</a>
-        to read about some of the projects that I'm working on.</p>
-
-    </section>
-
-    <hr>
-
-    <section id="research">
-
-        <h1>Research</h1>
-
-        <p>
-
-        My main research interest is the application of probabilistic data
-        analysis techniques to interesting datasets in astronomy.  These days,
-        I'm mostly working with
-        <a href="http://en.wikipedia.org/wiki/Kepler_(spacecraft)"
-        >Kepler</a> data; everything from the raw pixel
-        values to catalog level inferences.
-        I'm also interested in the development of
-        <a href="#software">scientific software</a> and
-        open-source practices</a>.
-
-        </p>
-
-        <h2>Selected Papers</h2>
-
-        <ul>
-
-<li>
-Below is a list of some recent interesting papers that I've worked on but
-<a href="http://arxiv.org/find/all/1/au:foreman_mackey/0/1/0/all/0/1">all
-    of my papers are on the ArXiv</a>.
-</li>
-
-<li>
-    <div class="meta">
-        <a class="title" href="http://arxiv.org/abs/1406.3020">Exoplanet
-        population inference and the abundance of Earth analogs from
-        noisy, incomplete catalogs [1406.3020]</a>
-        <span class="authors"><strong>Daniel Foreman-Mackey</strong>,
-            David W. Hogg, Timothy D. Morton</span>
-    </div>
-    <span class="description">In this paper, we develop a framework
-        for hierarchical probabilistic inference of exoplanet
-        populations taking into account survey completeness,
-        detection efficiency, and observational uncertainties.
-        Applying our method to <a href="http://arxiv.org/abs/1311.6806">an existing catalog</a>,
-        we find that Earth-like exoplanets are less common than previously thought.
-        This paper comes with
-        <a href="http://figshare.com/articles/Exoplanet_population_inference/1051864">publicly released data</a>
-        and <a href="https://github.com/dfm/exopop">open-source code</a>.</span>
-</li>
-
-<li>
-    <div class="meta">
-        <a class="title" href="http://arxiv.org/abs/1403.6015">Fast
-            Direct Methods for Gaussian Processes and the Analysis
-            of NASA Kepler Mission Data [1403.6015]</a>
-        <span class="authors">Sivaram Ambikasaran,
-            <strong>Daniel Foreman-Mackey</strong>, Leslie Greengard,
-            David W. Hogg, Michael O'Neil</span>
-    </div>
-    <span class="description">My collaborators in applied math have developed
-        <a href="http://www.cims.nyu.edu/~sivaram/manuscript/FDSPAPER.pdf">some
-            fast algorithms for solving dense linear systems</a>.
-        In this paper, we use these algorithms to compute log-determinants and
-        apply these methods to model correlated noise in Kepler data.</span>
-</li>
-
-<li>
-    <div class="meta">
-        <a class="title" href="http://arxiv.org/abs/1202.3665">emcee:
-            The MCMC Hammer [1202.3665]</a>
-        <span class="authors">
-            <strong>Daniel Foreman-Mackey</strong>, David W. Hogg, Dustin Lang,
-            Jonathan Goodman</span>
-    </div>
-    <span class="description">In this paper, we present a popular open-source
-        Markov chain Monte Carlo package written in Python. There is also
-        <a href="http://dan.iel.fm/emcee">online documentation</a> and MIT-licensed
-        <a href="https://github.com/dfm/emcee">code</a>.</span>
-</li>
-
-        </ul>
-
-        <h2 id="software">Software</h2>
-
-<p>Most of my job involves writing scientific software. All of it lives on
-<a href="https://github.com/dfm">my GitHub account</a> and
-some of the highlights are listed here:</p>
-
-<ul class="projects">
-
-<li>
-<a href="http://dan.iel.fm/emcee" class="project">emcee</a> &mdash;
-Kick-ass MCMC sampling in Python.
-See <a href="http://arxiv.org/abs/1202.3665">the paper</a>.
-</li>
-
-<li>
-<a href="https://github.com/dfm/george" class="project">George</a> &mdash;
-Blazingly fast Gaussian processes for regression.
-Implemented in C++ and Python bindings.
-See <a href="http://arxiv.org/abs/1202.3665">the paper</a>.
-</li>
-
-<li>
-<a href="https://github.com/dfm/triangle.py" class="project">triangle.py</a> &mdash;
-Simple corner plots (or scatterplot matrices) in matplotlib.
-</li>
-
-<li>
-<a href="https://github.com/dfm/kplr" class="project">kplr</a> &mdash;
-Python bindings to the
-<a href="http://archive.stsci.edu/vo/mast_services.html">MAST Kepler API</a>.
-</li>
-
-<li>
-<a href="http://daft-pgm.org" class="project">Daft</a> &mdash;
-Pixel-perfect probabilistic graphical models using matplotlib.
-</li>
-
-</ul>
-
-    </section>
-
-    <hr>
-
-    <section id="projects">
-
-        <h1>Projects</h1>
-<p>
-Outside of work, I also make silly things on the internet.
-Here are some of them:
-</p>
-
-<ul class="projects">
-
-<li>
-<a href="http://coffee.dfm.io" class="project">NYC Coffee Map</a> &mdash;
-An interactive map showing the "best" coffee (and <a href="http://coffee.dfm.io/pizza">other things</a>) in NYC.
-Based on <a href="http://bangalorebanerjee.blogspot.com/2014/02/nyc-best-coffee.html">this</a>.
-</li>
-
-<li>
-<a href="http://osrc.dfm.io" class="project">The Open Source Report Card</a> &mdash;
-Automatically generate a human-readable description of
-<a href="https://github.com">GitHub</a> users' personality based on their
-activity.
-</li>
-
-<li>
-<a href="https://reader.dfm.io" class="project">Ugly Reader</a> &mdash;
-The ugliest Google Reader replacement on the market.
-</li>
-
-<li>
-<a href="http://twitterick.com" class="project">Twitterick</a> &mdash;
-Poems (roughly following
-<a href="http://en.wikipedia.org/wiki/Limerick_(poetry)">the
-limerick form</a>) automatically generated using tweets.
-</li>
-
-<li>
-<a href="http://www.wtfisforlunch.com" class="project">WTF Is For Lunch?</a> &mdash;
-Let a robot decide where you're going to go for lunch.
-</li>
-
-<li>
-<a href="xkcd" class="project">D3-XKCD</a> &mdash;
-Draw like <a href="http://xkcd.com/1064/">Randall Munroe</a>
-using <a href="http://d3js.org">D3.js</a>.
-</li>
-
-</ul>
-</section>
-
-    <hr>
-
-    <section id="writing">
-
-        <h1>Writing</h1>
-
-<ul class="projects">
-<li>
-<a href="./posts/python-c-extensions/" rel="bookmark" title="Permalink to Python modules in C">Python modules in C</a> &mdash;
-How to roll your own Python modules in C.
-</li>
-</ul>
-
-</section>
-
+<div class="topbar">
+    <span><a href=".">dan foreman-mackey</a></span>
+    <ul>
+        <li><a href="./research">Research</a></li>
+        <li><a href="./cv">CV</a></li>
+        <li><a href="./code">Code</a></li>
+        <li><a href="./posts">Blog</a></li>
+    </ul>
 </div>
+        <div class="social">
+            <a href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a>
+            <a href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a>
+            <a href="http://arxiv.org/find/all/1/au:foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a>
+            <a href="https://speakerdeck.com/dfm"><i class="fa fa-bullhorn fa-3x"></i></a>
+        </div>
 
-
-<div id="bottom">
-<div class="container">
-        <ul>
-            <li class="title"><a href=".">Dan Foreman-Mackey</a></li>
-            <hr>
-            <li><i class="fa fa-envelope"></i> <a href="mailto:danfm@nyu.edu">danfm@nyu.edu</a></li>
-            <li><i class="fa fa-twitter"></i> <a href="https://twitter.com/exoplaneteer">@exoplaneteer</a></li>
-            <li><i class="fa fa-phone"></i> <a href="tel:917-327-3473">917-327-3473</a></li>
-        </ul>
-
-        <hr>
-
-        <p class="copyright">
-Top photo taken in <a href="http://en.wikipedia.org/wiki/Heidelberg">Heidelberg</a> by <a href="http://ruthang.us">Ruth Angus</a>. Used without permission.
-<br>
-        All content copyright 2014 Dan Foreman-Mackey unless otherwise noted.
-        Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
-        </p>
     </div>
 </div>
 
@@ -278,6 +46,5 @@ Top photo taken in <a href="http://en.wikipedia.org/wiki/Heidelberg">Heidelberg<
   ga('require', 'displayfeatures');
   ga('send', 'pageview');
 </script>
-
 </body>
 </html>

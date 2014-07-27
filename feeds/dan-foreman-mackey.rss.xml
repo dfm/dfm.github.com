@@ -36,13 +36,10 @@ like
 (parameterized by a slope &lt;em&gt;m&lt;/em&gt; and y intercept &lt;em&gt;b&lt;/em&gt;) to some &lt;em&gt;N&lt;/em&gt; noisy data
 points \( \{ x_n, y_n, \sigma_n \} \). In this case, the
 chi-squared function is given by:&lt;/p&gt;
-&lt;p&gt;
-\(
-    \displaystyle{\chi^2 (m, b) = \sum_{n = 1} ^N \frac{[y_n -
-        (m \, x_n + b)]^2}{\sigma_n^2}} \quad .
-\)
-&lt;/p&gt;
-
+&lt;p&gt;$$
+\chi^2 (m, b) = \sum_{n = 1} ^N \frac{[y_n -
+        (m \, x_n + b)]^2}{\sigma_n^2} \quad .
+$$&lt;/p&gt;
 &lt;p&gt;It's probably overkill to write this function in C but it'll do for our
 purposes today. In C, the file &lt;code&gt;chi2.c&lt;/code&gt; containing our function should look
 something like:&lt;/p&gt;

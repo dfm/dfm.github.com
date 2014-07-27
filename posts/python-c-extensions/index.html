@@ -5,8 +5,8 @@
 <title>Python modules in C by Dan Foreman-Mackey</title>
 <meta id="viewport" name="viewport" content="width=500" />
 
+
 <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
-<link rel="stylesheet" href="../../theme/css/font-awesome.min.css" type="text/css" />
 <link rel="stylesheet" href="../../theme/css/base.css" type="text/css" />
 <link rel="stylesheet" href="../../theme/css/code.css" type="text/css" />
 
@@ -16,31 +16,36 @@
 
 
     <link rel="stylesheet" href="../../theme/css/article.css" type="text/css" />
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 </head>
 <body>
 
-    <div class="container">
-        <div id="topbar">
-            <span><a href="../..">dan foreman-mackey</a></span>
 
-            <ul>
-                <li><a href="../..#about">About</a></li>
-                <li><a href="../..#research">Research</a></li>
-                <li><a href="../..#software">Code</a></li>
-            </ul>
-        </div>
-    </div>
+<div class="container">
+<div class="topbar">
+    <span><a href="../..">dan foreman-mackey</a></span>
+    <ul>
+        <li><a href="../../research">Research</a></li>
+        <li><a href="../../cv">CV</a></li>
+        <li><a href="../../code">Code</a></li>
+        <li><a href="../../posts">Blog</a></li>
+    </ul>
+</div></div>
 
-    <div id="topimage" style="background-image: url('/images/chi2.jpg')"></div>
+<div class="topimage" style="background-image: url('/images/chi2.jpg')"></div>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Python modules in C</h1>
+    <h1>Python modules in C</h1>
 
-        <section>
-            <p>Writing your own C extensions to Python can seem like a pretty daunting task
+    <section>
+        <p>Writing your own C extensions to Python can seem like a pretty daunting task
 when you first get started. If you take a look at the <a href="http://docs.python.org/c-api/">Python/C API
 docs</a> the details of reference counting and compilation are enough to
 make you go crazy. This is the main reason why <a href="http://www.cython.org/">so</a> <a href="http://www.swig.org/">many</a>
@@ -77,13 +82,10 @@ like
 (parameterized by a slope <em>m</em> and y intercept <em>b</em>) to some <em>N</em> noisy data
 points \( \{ x_n, y_n, \sigma_n \} \). In this case, the
 chi-squared function is given by:</p>
-<p>
-\(
-    \displaystyle{\chi^2 (m, b) = \sum_{n = 1} ^N \frac{[y_n -
-        (m \, x_n + b)]^2}{\sigma_n^2}} \quad .
-\)
-</p>
-
+<p>$$
+\chi^2 (m, b) = \sum_{n = 1} ^N \frac{[y_n -
+        (m \, x_n + b)]^2}{\sigma_n^2} \quad .
+$$</p>
 <p>It's probably overkill to write this function in C but it'll do for our
 purposes today. In C, the file <code>chi2.c</code> containing our function should look
 something like:</p>
@@ -412,26 +414,21 @@ python setup.py build_ext --inplace
 <p>If you have any comments, suggestions or questions, <a href="https://github.com/dfm/dfm.github.com/edit/master/_posts/2012-08-01-python-c-extensions.markdown">fork this
 page</a>
 or <a href="https://twitter.com/__dfm__">tweet at me</a>.</p>
-        </section>
-    </div>
+    </section>
+</div>
 
-<div id="bottom">
-<div class="container">
-        <ul>
-            <li class="title"><a href="../..">Dan Foreman-Mackey</a></li>
-            <hr>
-            <li><i class="fa fa-envelope"></i> <a href="mailto:danfm@nyu.edu">danfm@nyu.edu</a></li>
-            <li><i class="fa fa-twitter"></i> <a href="https://twitter.com/exoplaneteer">@exoplaneteer</a></li>
-            <li><i class="fa fa-phone"></i> <a href="tel:917-327-3473">917-327-3473</a></li>
-        </ul>
 
-        <hr>
-
-        <p class="copyright">
+<div class="container bottom">
+    <hr>
+    <p>
         All content copyright 2014 Dan Foreman-Mackey unless otherwise noted.
         Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
-        </p>
-    </div>
+    </p>
+    <p>
+    Find me on <a href="https://twitter.com/exoplaneteer">Twitter</a>,
+    <a href="https://github.com/dfm">GitHub</a>,
+    or <a href="mailto:danfm@nyu.edu">drop me a line</a>.
+    </p>
 </div>
 
 <script>
@@ -443,6 +440,5 @@ or <a href="https://twitter.com/__dfm__">tweet at me</a>.</p>
   ga('require', 'displayfeatures');
   ga('send', 'pageview');
 </script>
-
 </body>
 </html>
