@@ -17,7 +17,7 @@ html, body {
 a {
     background: transparent;
     background-size: 2px 2px;
-    background-position: 0 22px;
+    background-position: 0 20px;
     text-decoration: none;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, rgba(0,0,0,0.8) 75%);
     background-repeat: repeat-x;
