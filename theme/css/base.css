@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Buenard:400,700|Inconsolata:400,700|Source+Sans+Pro:300,400,700);
+@import url(https://fonts.googleapis.com/css?Inconsolata:400,700|Source+Sans+Pro:300,400,700);
 
 /*
  *  TYPOGRAPHIC STYLES
@@ -6,8 +6,9 @@
 
 html, body {
     height: 100%;
-    font-family: "Buenard", Georgia, Cambria, "Times New Roman", Times, serif;
-    font-weight: 300;
+    font-family: "Source Sans Pro", "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
     font-size: 20px;
     line-height: 1.8;
     color: rgba(0, 0, 0, 0.8);
@@ -110,9 +111,10 @@ blockquote {
     font-family: "Source Sans Pro", "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
     padding: 0 0 30px;
     font-size: 28px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02rem;
     line-height: 36px;
     text-align: center;
+    font-weight: 300;
 }
 
 .topbar a {
