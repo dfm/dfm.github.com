@@ -6,6 +6,14 @@
     *zoom: 1;
 }
 
+.topbar a:hover {
+    color: #fff;
+}
+
+.topbar ul a:hover {
+    text-decoration: underline;
+}
+
 .topbar:before,
 .topbar:after {
     content: " ";
