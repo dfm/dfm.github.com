@@ -1,3 +1,11 @@
+pre {
+    line-height: 18px;
+    font-size: 16px;
+    margin: 0;
+    margin-bottom: 30px;
+}
+
+
 .highlight, .highlight-ipynb {
     padding: 0 0 0 13px;
     border-left: 2px solid #eee;

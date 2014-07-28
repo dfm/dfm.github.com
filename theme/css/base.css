@@ -74,16 +74,8 @@ h2 {
     font-weight: normal;
 }
 
-
 pre, code {
     font-family: "Inconsolata", monospace;
-}
-
-pre {
-    line-height: 24px;
-    font-size: 16px;
-    margin: 0;
-    margin-bottom: 30px;
 }
 
 blockquote {
