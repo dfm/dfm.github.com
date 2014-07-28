@@ -47,9 +47,8 @@ h1, h2 {
 
 h1 {
     font-size: 36px;
-    padding: 10px 10px 10px 23px;
-    border-left: 7px solid #eee;
-    margin: 40px -30px 30px -30px;
+    margin: 0;
+    padding: 0;
 }
 
 h2 {
@@ -57,7 +56,24 @@ h2 {
     padding: 10px 30px 10px 25px;
     margin: 50px -30px 20px -30px;
     border-left: 5px solid #eee;
+    line-height: 1;
 }
+
+.page-title {
+    padding: 15px 10px 15px 23px;
+    border-left: 7px solid #eee;
+    margin: 40px -30px 30px -30px;
+    line-height: 1;
+}
+
+.page-title p {
+    margin: 0;
+    padding: 7px 0 0;
+    font-size: 16px;
+    color: #999;
+    font-weight: normal;
+}
+
 
 pre, code {
     font-family: "Inconsolata", monospace;
@@ -97,9 +113,10 @@ blockquote {
     }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 500px) {
     .container {
-        width: 88.88%;
+        width: 400px;
+        margin: 0 50px;
     }
 }
 

@@ -30,9 +30,12 @@
 .index-inner {
     position: relative;
     top: 50%;
-    transform: translateY(-50%);
     padding: 20px 0;
     color: #fff;
+    -webkit-transform: translateY(-50%);
+       -moz-transform: translateY(-50%);
+         -o-transform: translateY(-50%);
+            transform: translateY(-50%);
 }
 
 .topbar {
@@ -61,4 +64,18 @@
 
 .topbar a:hover, .social a:hover {
     color: rgba(255, 255, 255, 0.8);
+}
+
+.photo-credit {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    color: #aaa;
+    font-size: 13px;
+    padding: 12px;
+}
+
+.photo-credit a {
+    background-position: 0 13px;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, #aaa 75%);
 }
