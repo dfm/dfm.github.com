@@ -97,6 +97,10 @@
     overflow-x: auto;
 }
 
+.MathJax a {
+    background-position: 0 22px;
+}
+
 .prompt, .anchor-link {
     display: none;
 }
