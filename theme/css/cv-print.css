@@ -1,0 +1,22 @@
+.topavatar, .topbar, .bottom, .pdf-link {
+    display: none;
+}
+
+body, h1, h2 {
+    font-family: "Latin Modern Roman";
+}
+
+li, .address {
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.address a, li a {
+    background: none;
+    text-decoration: underline;
+}
+
+.container {
+    width: 95%;
+    margin: 0 auto;
+}
