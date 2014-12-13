@@ -73,7 +73,7 @@
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="the-basic-model">The basic model</h2>
-<p>The idea here is that you have some data drawn from them model that you care about and some data points that are outliers—drawn from a different model that you don&#39;t care about! For simplicity, let&#39;s consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a> give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.</p>
+<p>The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don&#39;t care about! For simplicity, let&#39;s consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a> give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.</p>
 <p>To start, let&#39;s generate some fake data:</p>
 </div>
 </div>
@@ -993,7 +993,7 @@ height=391
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let&#39;s generalize this model and add a binary flag for each data point $q_k$. If $q_k$ is zero, then the point is &quot;good&quot; and the likelihood is given by the usual Gaussian:</p>
+<p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let&#39;s generalize this model and add a binary flag $q_k$ for each data point $k$. If $q_k$ is zero, then the point is &quot;good&quot; and the likelihood is given by the usual Gaussian:</p>
 <p>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$</p>
 <p>where $f_\theta (x_k) = \theta_1 \, x_k + \theta_2$ is the linear model.</p>
 <p>Now, if $q_k = 1$ then the point is an outlier and the likelihood becomes:</p>
@@ -1009,7 +1009,7 @@ height=391
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Under this new model, the full likelihood for the entire dataset becomes:</p>
 <p>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta,\,\{q_k\}) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$</p>
-<p>where, for each term, the correct Gaussian is choosen depending on the value of $q_k$. To write this equation, I&#39;ve assumed that the data points are independent and if that&#39;s not true for your dataset then things get <em>a lot</em> harder.</p>
+<p>where, for each term, the correct Gaussian is chosen depending on the value of $q_k$. To write this equation, I&#39;ve assumed that the data points are independent and if that&#39;s not true for your dataset then things get <em>a lot</em> harder.</p>
 </div>
 </div>
 </div>
@@ -14735,7 +14735,7 @@ height=391
 <p>Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn&#39;t we throw away a lot of information when we used the marginalized likelihood instead of sampling in the $q_k$ parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the <em>outlierness</em> of each point. This is a very common question when I suggest that people use this model so I wanted to show that you&#39;re actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!</p>
 <p>To be specific, the thing that we want to compute is:</p>
 <p>$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$</p>
-<p>the posterior probability of a spcific point $k$ being good ($q_k=0$) given all the data. In this equation, I&#39;ve simplified the notation a bit and $y = \{y_k\}$ now indicates <em>all the data</em> and I&#39;m leaving out the implied $\{x_k\},\,\{\sigma_k\}$ on the right-hand side of every probability. To compute this, we&#39;ll need to evaluate the conditional probability</p>
+<p>the posterior probability of a specific point $k$ being good ($q_k=0$) given all the data. In this equation, I&#39;ve simplified the notation a bit and $y = \{y_k\}$ now indicates <em>all the data</em> and I&#39;m leaving out the implied $\{x_k\},\,\{\sigma_k\}$ on the right-hand side of every probability. To compute this, we&#39;ll need to evaluate the conditional probability</p>
 <p>$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q_k)}{\sum_{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$</p>
 <p>where the sum is over every allowed value of $q_k$. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee&#39;s <a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs">blobs feature</a> so it&#39;ll be ease to evaluate $p(q_k\,|\,y,\,\theta^{(n)})$ for each sample $\theta^{(n)}$ from the chain.</p>
 <p>Then, we need to realize that the Markov chain gave us samples $\theta^{(n)}$ from the probability distribution $p(\theta\,|\,y)$, so we can approximate the previous integral as</p>
@@ -14778,7 +14778,7 @@ In&nbsp;[47]:
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[55]:
+In&nbsp;[59]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
@@ -14811,14 +14811,15 @@ In&nbsp;[55]:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It can be useful to label outliers on the final plot so let&#39;s use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!</p>
+<p>This model works pretty well... so well, in fact, that the strong outliers are given nearly zero probability of being in the foreground model!</p>
+<p>Finally, it can be useful to label outliers on the final plot so let&#39;s use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">
-In&nbsp;[57]:
+In&nbsp;[60]:
 </div>
 <div class="inner_cell">
     <div class="input_area">
@@ -15884,6 +15885,16 @@ height=391
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Acknowledgments</strong> &nbsp;
+<em>I&#39;d like to thank <a href="http://ruthang.us">Ruth Angus</a> for useful comments.</em></p>
+</div>
+</div>
 </div></p>
     </section>
 </div>
