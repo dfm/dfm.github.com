@@ -9,10 +9,10 @@
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;There are a lot of reasons why you might use a mixture model and there is a &lt;a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20"&gt;huge&lt;/a&gt; &lt;a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20"&gt;related&lt;/a&gt; &lt;a href="http://arxiv.org/abs/1008.4686"&gt;literature&lt;/a&gt;. That being said, there are a few questions that I regularly get so I thought that I would write up the answers here.&lt;/p&gt;
-&lt;p&gt;In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&amp;#39;s the language I&amp;#39;ll use here but the results are applicable to any other mixture model. The questions that I&amp;#39;ll try to answer here are:&lt;/p&gt;
+&lt;p&gt;There are a lot of reasons why you might use a mixture model and there is a &lt;a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20"&gt;huge&lt;/a&gt; &lt;a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20"&gt;related&lt;/a&gt; &lt;a href="http://arxiv.org/abs/1008.4686"&gt;literature&lt;/a&gt;. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.&lt;/p&gt;
+&lt;p&gt;In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&amp;#39;s the language I&amp;#39;ll use but the results are applicable to any other mixture model. The questions that I&amp;#39;ll try to answer are:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;How do you get to the &lt;em&gt;marginalized&lt;/em&gt; likelihood—as popularized by &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt;, I think—and why would you want to?&lt;/li&gt;
+&lt;li&gt;How do you derive the &lt;em&gt;marginalized&lt;/em&gt; likelihood—as popularized by &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt;, I think—and why would you want to?&lt;/li&gt;
 &lt;li&gt;How do you work out the mixture membership probabilities (or what is the probability that the point is an outlier) after using this model?&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
@@ -72,7 +72,7 @@ In&amp;nbsp;[2]:
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Here&amp;#39;s what these data look like. In this plot, the empty, square points are outliers and the purple line is the fit if we ignore them. Compare this to the correct answer (shown as the black line).&lt;/p&gt;
+&lt;p&gt;Here&amp;#39;s what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don&amp;#39;t account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;

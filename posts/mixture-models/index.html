@@ -58,10 +58,10 @@
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>There are a lot of reasons why you might use a mixture model and there is a <a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20">huge</a> <a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20">related</a> <a href="http://arxiv.org/abs/1008.4686">literature</a>. That being said, there are a few questions that I regularly get so I thought that I would write up the answers here.</p>
-<p>In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&#39;s the language I&#39;ll use here but the results are applicable to any other mixture model. The questions that I&#39;ll try to answer here are:</p>
+<p>There are a lot of reasons why you might use a mixture model and there is a <a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20">huge</a> <a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20">related</a> <a href="http://arxiv.org/abs/1008.4686">literature</a>. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.</p>
+<p>In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&#39;s the language I&#39;ll use but the results are applicable to any other mixture model. The questions that I&#39;ll try to answer are:</p>
 <ol>
-<li>How do you get to the <em>marginalized</em> likelihood—as popularized by <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>, I think—and why would you want to?</li>
+<li>How do you derive the <em>marginalized</em> likelihood—as popularized by <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>, I think—and why would you want to?</li>
 <li>How do you work out the mixture membership probabilities (or what is the probability that the point is an outlier) after using this model?</li>
 </ol>
 </div>
@@ -121,7 +121,7 @@ In&nbsp;[2]:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here&#39;s what these data look like. In this plot, the empty, square points are outliers and the purple line is the fit if we ignore them. Compare this to the correct answer (shown as the black line).</p>
+<p>Here&#39;s what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don&#39;t account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).</p>
 </div>
 </div>
 </div>
