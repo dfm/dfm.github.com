@@ -1,6 +1,12 @@
+@import url(https://fonts.googleapis.com/css?family=Inconsolata:400,700);
+
+pre, code {
+    font-family: "Inconsolata", monospace;
+}
+
 pre {
-    line-height: 18px;
-    font-size: 16px;
+    line-height: 15px;
+    font-size: 14px;
     margin: 0;
     margin-bottom: 30px;
 }

@@ -1,191 +1,109 @@
-@import url(https://fonts.googleapis.com/css?family=Inconsolata:400,700|Source+Sans+Pro:300,400,700);
-
-/*
- *  TYPOGRAPHIC STYLES
- */
-
 html, body {
-    height: 100%;
-    font-family: "Source Sans Pro", "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
     font-weight: normal;
     -webkit-font-smoothing: antialiased;
-    font-size: 20px;
-    line-height: 1.8;
-    color: rgba(0, 0, 0, 0.8);
+    line-height: 1.5;
+
+    color: rgba(0, 0, 0, 0.9);
 }
 
 a {
+    text-decoration: none;
     background: transparent;
     background-size: 2px 2px;
-    background-position: 0 20px;
-    text-decoration: none;
+    background-position: 0 15px;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0) 75%, rgba(0,0,0,0.8) 75%);
     background-repeat: repeat-x;
     color: inherit;
 }
 
-p {
-    margin: 0;
-    margin-bottom: 30px;
+small {
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+small a {
+    background-position: 0 12px;
 }
 
 ul {
     list-style: none;
-    margin: 0;
+    margin: 20px 0;
     padding: 0;
 }
 
 li {
-    margin: 0;
-    margin-bottom: 30px;
-}
-
-h1, h2 {
-    font-family: "Source Sans Pro", "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
-    font-weight: 700;
-}
-
-h1 {
-    font-size: 36px;
-    margin: 0;
-    padding: 0;
+    margin: 7px 0 13px;
+    line-height: 1.2;
 }
 
 h2 {
-    font-size: 28px;
-    padding: 10px 30px 10px 25px;
-    margin: 50px -30px 20px -30px;
-    border-left: 5px solid #eee;
-    line-height: 1;
-}
-
-.page-title {
-    padding: 15px 10px 15px 23px;
-    border-left: 7px solid #eee;
-    margin: 40px -30px 30px -30px;
-    line-height: 1;
-}
-
-.page-title p {
-    margin: 0;
-    padding: 7px 0 0;
+    display: inline;
     font-size: 16px;
-    color: #999;
-    font-weight: normal;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 0 10px 0 0;
 }
 
-pre, code {
-    font-family: "Inconsolata", monospace;
-}
-
-blockquote {
-    display: block;
-    margin: 1em;
-    font-style: italic;
-}
-
-/*
- *  LAYOUT STYLES
- */
-
-.container {
-    width: 800px;
+.content {
+    width: 600px;
     margin: 0 auto;
 }
 
-@media (max-width: 850px) {
-    .container {
-        width: 600px;
-    }
-}
-
-@media (max-width: 650px) {
-    .container {
-        width: 400px;
-    }
-}
-
-@media (max-width: 500px) {
-    .container {
-        width: 400px;
-        margin: 0 50px;
-    }
-}
-
-/*
- *  TOP BAR STYLE
- */
-
-.topbar {
-    font-family: "Source Sans Pro", "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
-    padding: 0 0 30px;
-    font-size: 28px;
-    letter-spacing: -0.02rem;
-    line-height: 36px;
+header {
     text-align: center;
-    font-weight: 300;
+    margin: 50px 0 0;
 }
 
-.topbar a {
-    background-image: none;
-    -webkit-transition: color 0.2s;
-}
-
-.topbar a:hover {
-    color: steelblue;
-}
-
-.topbar ul {
-    font-size: 15px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.topbar li {
-    display: inline;
-    padding: 0 9px;
-}
-
-.topavatar {
-    padding: 50px 0 0;
-    text-align: center;
-}
-
-.topavatar img {
+header img {
     width: 100px;
     height: 100px;
+    margin: 0 0 5px;
 }
 
-
-/*
- *  BOTTOM BAR STYLE
- */
-
-.bottom {
-    width: 80%;
-    text-align: center;
-    color: #5b5b5b;
-    font-family: "Source Sans Pro", "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
-    font-weight: normal;
-    font-size: 14px;
-    padding: 20px 0 50px;
+header h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
+    font-weight: bold;
 }
 
-.bottom hr {
-    display: block;
-    width: 14%;
-    margin: 40px auto;
-    border: 0;
-    border-top: 1px solid rgba(0,0,0,0.15);
-    box-sizing: content-box;
-    height: 0;
-}
-
-.bottom p {
+header li {
+    display: inline;
+    padding: 0 9px;
     margin: 0;
 }
 
-.bottom a {
-    background-position: 0 14px;
-    font-weight: 700;
+header:after,
+section:after {
+    content: '';
+    display: block;
+    width: 150px;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    margin: 30px auto;
+    padding: 0;
+}
+
+footer {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.5);
+    margin: 0 0 50px;
+}
+
+header a,
+footer a {
+    background: none;
+    transition: 0.2s;
+}
+
+header a:hover,
+footer a:hover {
+    color: rgba(70, 130, 180, 0.9);
+}
+
+footer a {
+    font-weight: bold;
+    text-decoration: underline;
 }

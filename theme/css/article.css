@@ -1,91 +1,20 @@
-.topbar {
-    color: #fff;
-    padding-top: 20px;
-    width: 80%;
-    min-width: 500px;
-    margin: 0 auto;
-    *zoom: 1;
+.page-title {
+
 }
 
-.topbar a:hover {
-    color: #fff;
+.page-title h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+    font-weight: bold;
 }
 
-.topbar ul a:hover {
-    text-decoration: underline;
-}
-
-.topbar:before,
-.topbar:after {
-    content: " ";
-    display: table;
-}
-
-.topbar:after {
-    clear: both;
-}
-
-.topbar span {
-    display: block;
-    float: left;
-}
-
-.topbar ul {
-    display: block;
-    float: right;
-}
-
-.topbar li {
-    padding: 0 0 0 18px;
-}
-
-@media (max-width: 650px) {
-    .topbar {
-        text-align: center;
-    }
-
-    .topbar span {
-        float: none;
-    }
-
-    .topbar ul {
-        float: none;
-        display: block;
-    }
-
-    .topbar li {
-        padding: 0 9px;
-    }
-}
-
-.topimage {
-    background: #333;
-    position: relative;
-    width: 100%;
-    min-width: 500px;
-    height: 200px;
-    margin: 0 0 30px;
-
-    background-repeat: no-repeat;
-    background-position: top center;
-    background-size: 100% auto;
-}
-
-.topimage .shim {
-    content: " ";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-
-    background: -webkit-linear-gradient(top, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 100%);
-    background:    -moz-linear-gradient(top, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 100%);
-    background:     -ms-linear-gradient(top, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 100%);
-    background:      -o-linear-gradient(top, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 100%);
-    background:   linear-gradient(to bottom, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 100%);
-}
-
-.topimage .topbar {
-    position: relative;
+.page-title p {
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.4);
+    font-weight: normal;
 }
 
 /*

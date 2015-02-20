@@ -1,45 +1,194 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<meta charset="utf-8">
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>Dan Foreman-Mackey</title>
 <meta id="viewport" name="viewport" content="width=500" />
 
+
 <link rel="stylesheet" href="../theme/css/normalize.css" type="text/css" />
-<link rel="stylesheet" href="../theme/css/font-awesome.min.css" type="text/css" />
 <link rel="stylesheet" href="../theme/css/base.css" type="text/css" />
 <link rel="stylesheet" href="../theme/css/code.css" type="text/css" />
-<link rel="stylesheet" href="../theme/css/index.css" type="text/css" />
+
+<link rel="icon" type="image/png" href="../theme/images/avatar.png" sizes="200x200">
+<link rel="icon" type="image/png" href="../theme/images/favicon.png" sizes="32x32">
+
 
 </head>
 <body>
 
-<div class="index-body">
-    <div class="shim"></div>
-    <div class="index-inner">
+<div class="content">
 
-<div class="topbar">
-    <span><a href="..">dan foreman-mackey</a></span>
+    <header>
+        <img src="../theme/images/avatar.png" alt="me">
+        <h1><a href="../">Dan Foreman-Mackey</a></h1>
+        <ul>
+            <li><a href="../#pubs">Publications</a></li>
+            <li><a href="../#talks">Talks</a></li>
+            <li><a href="../#code">Code</a></li>
+            <li><a href="../cv.pdf">CV</a></li>
+            <li><a href="../posts/">Blog</a></li>
+        </ul>
+    </header>
+
+
+<section id="bio">
+
+    I'm a graduate student at NYU working on next generation astronomical
+    data analysis under the supervision of <a
+    href="http://hoggresearch.blogspot.com/">David W. Hogg</a>. My
+    main research interest is the application of probabilistic data
+    analysis techniques to interesting datasets in astronomy. These days,
+    I'm mostly working with <i>Kepler</i> data; everything from the raw pixel
+    values to catalog level inferences. I'm also interested in the
+    development of scientific software and open-source practices. In Fall
+    2015, I will begin as a Sagan Postdoctoral Fellow at University of
+    Washington.
+
+</section>
+
+<section id="pubs">
+
+    <h2>Publications</h2>
+    My full list of publications is available
+    <a href="http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?return_req=no_params&author=Foreman-Mackey&db_key=PRE">on ADS</a>
+    but here are a few recent highlights:
+
     <ul>
-        <li><a href="../research">Research</a></li>
-        <li><a href="../cv.pdf" target="_blank">CV</a></li>
-        <li><a href="../code">Code</a></li>
-        <li><a href="../posts">Blog</a></li>
+        <li>
+
+            D. Foreman-Mackey, B. T. Montet, D. W. Hogg, T. D. Morton,
+            D. Wang, and B. Sch&ouml;lkopf,
+            2015,
+            <a href="http://arxiv.org/abs/1502.04715"><i>A systematic
+            search for transiting planets in the K2 data</i></a>.<br>
+            <small>
+            [<a href="https://github.com/dfm/ketu">code</a>,
+                <a href="http://bbq.dfm.io/ketu/">data</a>]</small>
+
+        </li>
+
+        <li>
+            D. Foreman-Mackey, D. W. Hogg, and T. D. Morton,
+            2014,
+            <a href="http://arxiv.org/abs/1406.3020"><i>Exoplanet
+            population inference and the abundance of Earth analogs
+            from noisy, incomplete catalogs</i></a><br>
+            <small>
+            [<a href="https://github.com/dfm/exopop">code</a>,
+                <a href="https://github.com/dfm/exopop-results">data</a>]</small>
+
+        </li>
+
+        <li>
+            D. Foreman-Mackey, D. W. Hogg, D. Lang, and J. Goodman,
+            2013,
+            <a href="http://arxiv.org/abs/1202.3665"><i>emcee: The MCMC Hammer</i></a>
+            <br><small>
+            [<a href="https://github.com/dfm/emcee">code</a>,
+                <a href="http://dfm.io/emcee">docs</a>]</small>
+
+        </li>
     </ul>
-</div>
-        <div class="social">
-            <a href="https://github.com/dfm"><i class="fa fa-github fa-3x"></i></a>
-            <a href="https://twitter.com/exoplaneteer"><i class="fa fa-twitter fa-3x"></i></a>
-            <a href="http://arxiv.org/find/all/1/au:foreman_mackey/0/1/0/all/0/1"><i class="fa fa-pencil fa-3x"></i></a>
-            <a href="https://speakerdeck.com/dfm"><i class="fa fa-bullhorn fa-3x"></i></a>
-        </div>
 
-    </div>
-</div>
+</section>
 
-<div class="photo-credit">
-    Photo taken in <a href="http://en.wikipedia.org/wiki/Heidelberg">Heidelberg</a>
-    by <a href="http://ruthang.us">Ruth Angus</a>
+<section id="talks">
+
+    <h2>Talks</h2>
+    I post most of my slides to <a href="https://speakerdeck.com/dfm">Speaker Deck</a>
+    but here are a few that I really love giving:
+
+    <ul>
+
+        <li>
+            <a href="https://speakerdeck.com/dfm/exoplanet-population-inference-v2"><i>Exoplanet population inference</i></a>
+            &mdash;
+            Slides for my talk about <a href="http://arxiv.org/abs/1406.3020">Foreman-Mackey,
+            Hogg, &amp; Morton (2014)</a>.
+        </li>
+
+        <li>
+            <a href="https://speakerdeck.com/dfm/an-astronomers-introduction-to-gaussian-processes-v2"><i>An astronomer's introduction to Gaussian Processes</i></a>
+            &mdash;
+            A motivation and introduction to the use of Gaussian Processes
+            in astronomy. The level is aimed at interested astronomers who
+            have experience fitting models to data.
+        </li>
+
+        <li>
+            <a href="https://speakerdeck.com/dfm/licenses-in-the-wild"><i>Licenses in the wild</i></a>
+            &mdash; I gave this talk at the 225th meeting of the American Astronomical
+            Society. It is about software licensing and it's based on my analysis
+            of 1.5 million repositories from GitHub.
+        </li>
+
+        <li>
+            <i>Hack &amp; Tell (<a href="https://speakerdeck.com/dfm/wtf-is-for-lunch-at-hackandtell">1</a>,
+            <a href="https://speakerdeck.com/dfm/hack-and-tell-twitterick">2</a>,
+            <a href="https://speakerdeck.com/dfm/hack-and-tell-ugly-reader">3</a>, and
+            <a href="https://speakerdeck.com/dfm/hack-and-tell-the-coffee-map">4</a>)</i>
+            &mdash;
+            One of my favorite events in NYC is the <a href="http://hackandtell.org/">Hack
+            &amp; Tell Meetup</a> where local coders, hackers, and makers talk for 5 minutes
+            each about fun projects they've been working on in their spare time. I've
+            presented at this meetup 4 times so far and it's always been a blast.
+        </li>
+
+    </ul>
+
+</section>
+
+<section id="code">
+
+    <h2>Code</h2>
+    I write a lot of code for work and in my spare time. All my projects live in
+    <a href="https://github.com/dfm">public repositories on GitHub</a>.
+    Here are some of my most popular research codes:
+
+    <ul>
+
+        <li>
+            <i><a href="http://dfm.io/emcee">emcee</a></i>
+            &mdash;
+            Kick-ass MCMC sampling in Python. See <a href="http://arxiv.org/abs/1202.3665">the paper</a>.
+        </li>
+
+        <li>
+            <i><a href="http://dfm.io/george">George</a></i>
+            &mdash;
+            Blazingly fast Gaussian processes for regression. Implemented in C++ with Python bindings.
+        </li>
+
+        <li>
+            <i><a href="https://github.com/dfm/triangle.py">triangle.py</a></i>
+            &mdash;
+            Simple corner plots (or scatterplot matrices) in matplotlib.
+        </li>
+
+        <li>
+            <i><a href="http://daft-pgm.org/">Daft</a></i>
+            &mdash;
+            Pixel-perfect probabilistic graphical models using matplotlib.
+            (Pretty much unmaintained at the moment but hopefully that will
+            change some day).
+        </li>
+
+    </ul>
+
+</section>
+
+
+    <footer>
+
+    Copyright 2014, 2015 Dan Foreman-Mackey unless otherwise noted.<br>
+    Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><b>Creative Commons</b></a>.<br>
+    Find me on <a href="https://twitter.com/exoplaneteer">Twitter</a> or
+    <a href="mailto:danfm@nyu.edu">drop me a line</a>.
+
+    </footer>
+
 </div>
 
 <script>
