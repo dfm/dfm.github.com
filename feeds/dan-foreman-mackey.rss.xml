@@ -148,11 +148,12 @@ or any of the other organizers.&lt;/p&gt;</description><dc:creator xmlns:dc="htt
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;There are a lot of reasons why you might use a mixture model and there is a &lt;a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20"&gt;huge&lt;/a&gt; &lt;a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20"&gt;related&lt;/a&gt; &lt;a href="http://arxiv.org/abs/1008.4686"&gt;literature&lt;/a&gt;. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.&lt;/p&gt;
-&lt;p&gt;In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&amp;#39;s the language I&amp;#39;ll use but the results are applicable to any other mixture model. The questions that I&amp;#39;ll try to answer are:&lt;/p&gt;
+&lt;p&gt;In astronomy, the most common reason for using a mixture model is to fit data with outliers so that's the language I'll use but the results are applicable to any other mixture model. The questions that I'll try to answer are:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;How do you derive the &lt;em&gt;marginalized&lt;/em&gt; likelihood—as popularized by &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt;, I think—and why would you want to?&lt;/li&gt;
 &lt;li&gt;How do you work out the mixture membership probabilities (or what is the probability that the point is an outlier) after using this model?&lt;/li&gt;
 &lt;/ol&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -161,21 +162,19 @@ or any of the other organizers.&lt;/p&gt;</description><dc:creator xmlns:dc="htt
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="the-basic-model"&gt;The basic model&lt;/h2&gt;
-&lt;p&gt;The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don&amp;#39;t care about! For simplicity, let&amp;#39;s consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt; give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.&lt;/p&gt;
-&lt;p&gt;To start, let&amp;#39;s generate some fake data:&lt;/p&gt;
+&lt;h2 id="The-basic-model"&gt;The basic model&lt;a class="anchor-link" href="#The-basic-model"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don't care about! For simplicity, let's consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt; give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.&lt;/p&gt;
+&lt;p&gt;To start, let's generate some fake data:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[2]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[2]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pl&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pl&lt;/span&gt;
 
 &lt;span class="c"&gt;# We&amp;#39;ll choose the parameters of our synthetic data.&lt;/span&gt;
 &lt;span class="c"&gt;# The outlier probability will be 80%:&lt;/span&gt;
@@ -210,20 +209,19 @@ In&amp;nbsp;[2]:
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Here&amp;#39;s what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don&amp;#39;t account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).&lt;/p&gt;
+&lt;p&gt;Here's what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don't account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[3]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[3]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# First, fit the data and find the maximum likelihood model ignoring outliers.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# First, fit the data and find the maximum likelihood model ignoring outliers.&lt;/span&gt;
 &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vander&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;linalg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;solve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;linalg&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;solve&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt; &lt;span class="k"&gt;None&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 
 &lt;span class="c"&gt;# Then save the *true* line.&lt;/span&gt;
 &lt;span class="n"&gt;x0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;linspace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;2.1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;2.1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -1082,12 +1080,11 @@ height=391
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;The purple line is &lt;em&gt;clearly&lt;/em&gt; a terrible fit because we ignored the outliers. To fix this, let&amp;#39;s generalize this model and add a binary flag $q_k$ for each data point $k$. If $q_k$ is zero, then the point is &amp;quot;good&amp;quot; and the likelihood is given by the usual Gaussian:&lt;/p&gt;
-&lt;p&gt;$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$&lt;/p&gt;
-&lt;p&gt;where $f_\theta (x_k) = \theta_1 \, x_k + \theta_2$ is the linear model.&lt;/p&gt;
+&lt;p&gt;The purple line is &lt;em&gt;clearly&lt;/em&gt; a terrible fit because we ignored the outliers. To fix this, let's generalize this model and add a binary flag $q_k$ for each data point $k$. If $q_k$ is zero, then the point is "good" and the likelihood is given by the usual Gaussian:&lt;/p&gt;
+$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$&lt;p&gt;where $f_\theta (x_k) = \theta_1 \, x_k + \theta_2$ is the linear model.&lt;/p&gt;
 &lt;p&gt;Now, if $q_k = 1$ then the point is an outlier and the likelihood becomes:&lt;/p&gt;
-&lt;p&gt;$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) = \frac{1}{\sqrt{2\,\pi\,[\sigma_k^2 + \theta_4]}} \exp \left(-\frac{[y_k - \theta_3]^2}{2\,[\sigma_k^2 + \theta_4]}\right) \quad.$$&lt;/p&gt;
-&lt;p&gt;I have made the simplifying assumption that the outliers are drawn from a single Gaussian with mean $\theta_3$ and variance $\theta_4$. From experience, the results aren&amp;#39;t normally very sensitive to the choice of outlier model and the Gaussian model is often good enough but the following derivations will be valid for any model that you choose.&lt;/p&gt;
+$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) = \frac{1}{\sqrt{2\,\pi\,[\sigma_k^2 + \theta_4]}} \exp \left(-\frac{[y_k - \theta_3]^2}{2\,[\sigma_k^2 + \theta_4]}\right) \quad.$$&lt;p&gt;I have made the simplifying assumption that the outliers are drawn from a single Gaussian with mean $\theta_3$ and variance $\theta_4$. From experience, the results aren't normally very sensitive to the choice of outlier model and the Gaussian model is often good enough but the following derivations will be valid for any model that you choose.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1097,8 +1094,8 @@ height=391
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Under this new model, the full likelihood for the entire dataset becomes:&lt;/p&gt;
-&lt;p&gt;$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta,\,\{q_k\}) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$&lt;/p&gt;
-&lt;p&gt;where, for each term, the correct Gaussian is chosen depending on the value of $q_k$. To write this equation, I&amp;#39;ve assumed that the data points are independent and if that&amp;#39;s not true for your dataset then things get &lt;em&gt;a lot&lt;/em&gt; harder.&lt;/p&gt;
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta,\,\{q_k\}) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$&lt;p&gt;where, for each term, the correct Gaussian is chosen depending on the value of $q_k$. To write this equation, I've assumed that the data points are independent and if that's not true for your dataset then things get &lt;em&gt;a lot&lt;/em&gt; harder.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1107,7 +1104,8 @@ height=391
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Now we could just take this likelihood function, apply priors, and use MCMC to find posterior constraints on $\theta$ and the $\{q_k\}$ flags but this would be hard for a few reasons. First, if you&amp;#39;re used to using &lt;a href="http://dfm.io/emcee"&gt;emcee&lt;/a&gt; for your MCMC needs, you&amp;#39;ll find that it&amp;#39;s pretty hard to implement a model with discrete variables so you&amp;#39;d probably need to learn some &lt;a href="http://pymc-devs.github.io/pymc/"&gt;other&lt;/a&gt; &lt;a href="http://mc-stan.org/"&gt;sampler&lt;/a&gt; and, honestly, it probably wouldn&amp;#39;t work well for this problem either! Which brings us to our second problem. This problem is &lt;em&gt;very&lt;/em&gt; high dimensional and the dimension scales with the number of data points. Without the outlier model, the problem is only two-dimensional but when we include the outliers, the model suddenly becomes $(4 + K)$-dimensional, where $K$ is the number of data points. This will always be hard! Therefore, in practice, it is useful to marginalize out the badly behaved parameters ($q_k$) and just sample in $\theta$.&lt;/p&gt;
+&lt;p&gt;Now we could just take this likelihood function, apply priors, and use MCMC to find posterior constraints on $\theta$ and the $\{q_k\}$ flags but this would be hard for a few reasons. First, if you're used to using &lt;a href="http://dfm.io/emcee"&gt;emcee&lt;/a&gt; for your MCMC needs, you'll find that it's pretty hard to implement a model with discrete variables so you'd probably need to learn some &lt;a href="http://pymc-devs.github.io/pymc/"&gt;other&lt;/a&gt; &lt;a href="http://mc-stan.org/"&gt;sampler&lt;/a&gt; and, honestly, it probably wouldn't work well for this problem either! Which brings us to our second problem. This problem is &lt;em&gt;very&lt;/em&gt; high dimensional and the dimension scales with the number of data points. Without the outlier model, the problem is only two-dimensional but when we include the outliers, the model suddenly becomes $(4 + K)$-dimensional, where $K$ is the number of data points. This will always be hard! Therefore, in practice, it is useful to marginalize out the badly behaved parameters ($q_k$) and just sample in $\theta$.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -1116,32 +1114,25 @@ height=391
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="the-marginalized-likelihood"&gt;The marginalized likelihood&lt;/h2&gt;
-&lt;p&gt;In order to marginalize out the $\{q_k\}$ flags, we need to choose a prior $p(q_k)$. After making this choice (I won&amp;#39;t specialize yet), the marginalization can be written:&lt;/p&gt;
-&lt;p&gt;$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \sum_{\{q_k\}} \prod_{k=1}^{K} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k)$$&lt;/p&gt;
-&lt;p&gt;where the sum is over all the possible permutations of the $q_k$ flags. If you squint for a second, you&amp;#39;ll see that you can actually switch the order of the sum and product without changing anything. This follows from our assumption that the data points are independent. Therefore, we&amp;#39;re left with the much simpler likelihood function&lt;/p&gt;
-&lt;p&gt;$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\,\sigma_k,\,\theta)$$&lt;/p&gt;
-&lt;p&gt;where&lt;/p&gt;
-&lt;p&gt;$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta) = \sum_{q_k} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k) \quad.$$&lt;/p&gt;
-&lt;p&gt;The prior $p(q_k)$ could be different for every data point but it is often sufficient to choose a simple model like&lt;/p&gt;
-&lt;p&gt;$$p(q_k) = \left \{\begin{array}{ll}
-Q &amp;amp; \mathrm{if}\,q_k=0 \\
-1-Q &amp;amp; \mathrm{if}\,q_k=1
-\end{array}\right.$$&lt;/p&gt;
-&lt;p&gt;where $Q \in [0, 1]$ is a constant that sets the prior probability that a point is drawn from the foreground model. Chosing this model, we recover the (possibly) familiar likelihood function from &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt;:&lt;/p&gt;
-&lt;p&gt;$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} \left [ Q\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) + (1-Q)\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) \right ] \quad.$$&lt;/p&gt;
-&lt;p&gt;This is a much easier model to sample so let&amp;#39;s do that now:&lt;/p&gt;
+&lt;h2 id="The-marginalized-likelihood"&gt;The marginalized likelihood&lt;a class="anchor-link" href="#The-marginalized-likelihood"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;In order to marginalize out the $\{q_k\}$ flags, we need to choose a prior $p(q_k)$. After making this choice (I won't specialize yet), the marginalization can be written:&lt;/p&gt;
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \sum_{\{q_k\}} \prod_{k=1}^{K} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k)$$&lt;p&gt;where the sum is over all the possible permutations of the $q_k$ flags. If you squint for a second, you'll see that you can actually switch the order of the sum and product without changing anything. This follows from our assumption that the data points are independent. Therefore, we're left with the much simpler likelihood function&lt;/p&gt;
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\,\sigma_k,\,\theta)$$&lt;p&gt;where&lt;/p&gt;
+$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta) = \sum_{q_k} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k) \quad.$$&lt;p&gt;The prior $p(q_k)$ could be different for every data point but it is often sufficient to choose a simple model like&lt;/p&gt;
+$$p(q_k) = \left \{\begin{array}{ll}
+Q &amp; \mathrm{if}\,q_k=0 \\
+1-Q &amp; \mathrm{if}\,q_k=1
+\end{array}\right.$$&lt;p&gt;where $Q \in [0, 1]$ is a constant that sets the prior probability that a point is drawn from the foreground model. Chosing this model, we recover the (possibly) familiar likelihood function from &lt;a href="http://arxiv.org/abs/1008.4686"&gt;Hogg &lt;em&gt;et al.&lt;/em&gt; (2010)&lt;/a&gt;:&lt;/p&gt;
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} \left [ Q\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) + (1-Q)\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) \right ] \quad.$$&lt;p&gt;This is a much easier model to sample so let's do that now:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[35]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[35]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;emcee&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;emcee&lt;/span&gt;
 
 &lt;span class="c"&gt;# Define the probabilistic model...&lt;/span&gt;
 &lt;span class="c"&gt;# A simple prior:&lt;/span&gt;
@@ -1171,7 +1162,7 @@ In&amp;nbsp;[35]:
     &lt;span class="c"&gt;# First check the prior.&lt;/span&gt;
     &lt;span class="n"&gt;lp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lnprior&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
     &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;isfinite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lp&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;inf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;inf&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;None&lt;/span&gt;
     
     &lt;span class="c"&gt;# Compute the vector of foreground likelihoods and include the q prior.&lt;/span&gt;
     &lt;span class="n"&gt;ll_fg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lnlike_fg&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -1192,7 +1183,7 @@ In&amp;nbsp;[35]:
 &lt;span class="c"&gt;# Initialize the walkers at a reasonable location.&lt;/span&gt;
 &lt;span class="n"&gt;ndim&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;nwalkers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;32&lt;/span&gt;
 &lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
-&lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mf"&gt;1e-5&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ndim&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nwalkers&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randn&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ndim&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nwalkers&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
 
 &lt;span class="c"&gt;# Set up the sampler.&lt;/span&gt;
 &lt;span class="n"&gt;sampler&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;emcee&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;EnsembleSampler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nwalkers&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ndim&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lnprob&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -1215,19 +1206,18 @@ In&amp;nbsp;[35]:
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;This code should only take about a minute to run. Compare that to any attempt you&amp;#39;ve ever made at sampling the same problem with another 15 or more parameters and you should be pretty stoked!&lt;/p&gt;
-&lt;p&gt;Let&amp;#39;s show the resulting parameter constraints and compare them to the &lt;em&gt;true&lt;/em&gt; values (indicated in blue) used to generate the synthetic dataset. This should encourage us that we&amp;#39;ve done something reasonable.&lt;/p&gt;
+&lt;p&gt;This code should only take about a minute to run. Compare that to any attempt you've ever made at sampling the same problem with another 15 or more parameters and you should be pretty stoked!&lt;/p&gt;
+&lt;p&gt;Let's show the resulting parameter constraints and compare them to the &lt;em&gt;true&lt;/em&gt; values (indicated in blue) used to generate the synthetic dataset. This should encourage us that we've done something reasonable.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[43]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[43]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;triangle&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;triangle&lt;/span&gt;
 &lt;span class="n"&gt;labels&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$m$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$b$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$Q$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$M$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$\ln V$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
 &lt;span class="n"&gt;truths&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;true_params&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;true_frac&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;true_outliers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;true_outliers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;])]&lt;/span&gt;
 &lt;span class="n"&gt;triangle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;corner&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sampler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;flatchain&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bins&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;35&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;extents&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;bounds&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;labels&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;labels&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;truths&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;truths&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
@@ -13733,17 +13723,16 @@ height=1144
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Similarly, the predicted constraint on the linear model is:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[42]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[42]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Compute the quantiles of the predicted line and plot them.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Compute the quantiles of the predicted line and plot them.&lt;/span&gt;
 &lt;span class="n"&gt;A&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vander&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;lines&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sampler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;flatchain&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;A&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;quantiles&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;percentile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lines&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;84&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;axis&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -14812,6 +14801,7 @@ height=391
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Great! Comparing the purple swath to the true line (shown in black), I think that we can all agree that this is a much better fit! But now, how do we label the points to decide which ones are outliers?&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -14820,27 +14810,22 @@ height=391
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;h2 id="mixture-membership-probabilities"&gt;Mixture membership probabilities&lt;/h2&gt;
-&lt;p&gt;Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn&amp;#39;t we throw away a lot of information when we used the marginalized likelihood instead of sampling in the $q_k$ parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the &lt;em&gt;outlierness&lt;/em&gt; of each point. This is a very common question when I suggest that people use this model so I wanted to show that you&amp;#39;re actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!&lt;/p&gt;
+&lt;h2 id="Mixture-membership-probabilities"&gt;Mixture membership probabilities&lt;a class="anchor-link" href="#Mixture-membership-probabilities"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn't we throw away a lot of information when we used the marginalized likelihood instead of sampling in the $q_k$ parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the &lt;em&gt;outlierness&lt;/em&gt; of each point. This is a very common question when I suggest that people use this model so I wanted to show that you're actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!&lt;/p&gt;
 &lt;p&gt;To be specific, the thing that we want to compute is:&lt;/p&gt;
-&lt;p&gt;$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$&lt;/p&gt;
-&lt;p&gt;the posterior probability of a specific point $k$ being good ($q_k=0$) given all the data. In this equation, I&amp;#39;ve simplified the notation a bit and $y = \{y_k\}$ now indicates &lt;em&gt;all the data&lt;/em&gt; and I&amp;#39;m leaving out the implied $\{x_k\},\,\{\sigma_k\}$ on the right-hand side of every probability. To compute this, we&amp;#39;ll need to evaluate the conditional probability&lt;/p&gt;
-&lt;p&gt;$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q_k)}{\sum_{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$&lt;/p&gt;
-&lt;p&gt;where the sum is over every allowed value of $q_k$. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee&amp;#39;s &lt;a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs"&gt;blobs feature&lt;/a&gt; so it&amp;#39;ll be ease to evaluate $p(q_k\,|\,y,\,\theta^{(n)})$ for each sample $\theta^{(n)}$ from the chain.&lt;/p&gt;
+$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$&lt;p&gt;the posterior probability of a specific point $k$ being good ($q_k=0$) given all the data. In this equation, I've simplified the notation a bit and $y = \{y_k\}$ now indicates &lt;em&gt;all the data&lt;/em&gt; and I'm leaving out the implied $\{x_k\},\,\{\sigma_k\}$ on the right-hand side of every probability. To compute this, we'll need to evaluate the conditional probability&lt;/p&gt;
+$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q_k)}{\sum_{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$&lt;p&gt;where the sum is over every allowed value of $q_k$. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee's &lt;a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs"&gt;blobs feature&lt;/a&gt; so it'll be ease to evaluate $p(q_k\,|\,y,\,\theta^{(n)})$ for each sample $\theta^{(n)}$ from the chain.&lt;/p&gt;
 &lt;p&gt;Then, we need to realize that the Markov chain gave us samples $\theta^{(n)}$ from the probability distribution $p(\theta\,|\,y)$, so we can approximate the previous integral as&lt;/p&gt;
-&lt;p&gt;$$p(q_k\,|\,y) = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \approx \frac{1}{N}\sum_{n=1}^N p(q_k\,|\,y,\,\theta^{(n)}) \quad.$$&lt;/p&gt;
-&lt;p&gt;Therefore, the posterior probaility of being an outlier or not can be computed by just taking the average of a bunch of values that we&amp;#39;ve already computed! In practice, this would look like the following:&lt;/p&gt;
+$$p(q_k\,|\,y) = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \approx \frac{1}{N}\sum_{n=1}^N p(q_k\,|\,y,\,\theta^{(n)}) \quad.$$&lt;p&gt;Therefore, the posterior probaility of being an outlier or not can be computed by just taking the average of a bunch of values that we've already computed! In practice, this would look like the following:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[47]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[47]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="n"&gt;norm&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="n"&gt;norm&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;
 &lt;span class="n"&gt;post_prob&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;zeros&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sampler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chain&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]):&lt;/span&gt;
     &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sampler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chain&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]):&lt;/span&gt;
@@ -14861,17 +14846,16 @@ In&amp;nbsp;[47]:
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Therefore, from left to right, the marginalized posterior probability that each point is part of the foreground model is:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[59]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[59]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{0:.3f}&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;post_prob&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{0:.3f}&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;post_prob&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -14884,9 +14868,7 @@ In&amp;nbsp;[59]:
 
 &lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
-&lt;pre&gt;
-0.357, 0.936, 0.000, 0.954, 0.000, 0.890, 0.885, 0.830, 0.858, 0.966, 0.000, 0.994, 0.995, 0.995, 0.979
-
+&lt;pre&gt;0.357, 0.936, 0.000, 0.954, 0.000, 0.890, 0.885, 0.830, 0.858, 0.966, 0.000, 0.994, 0.995, 0.995, 0.979
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -14901,18 +14883,17 @@ In&amp;nbsp;[59]:
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;This model works pretty well... so well, in fact, that the strong outliers are given nearly zero probability of being in the foreground model!&lt;/p&gt;
-&lt;p&gt;Finally, it can be useful to label outliers on the final plot so let&amp;#39;s use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!&lt;/p&gt;
+&lt;p&gt;Finally, it can be useful to label outliers on the final plot so let's use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[60]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[60]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Plot the predition.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Plot the predition.&lt;/span&gt;
 &lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fill_between&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;quantiles&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;quantiles&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;#8d44ad&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c"&gt;# Plot the data points.&lt;/span&gt;
@@ -15981,7 +15962,8 @@ height=391
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;&lt;strong&gt;Acknowledgments&lt;/strong&gt; &amp;nbsp;
-&lt;em&gt;I&amp;#39;d like to thank &lt;a href="http://ruthang.us"&gt;Ruth Angus&lt;/a&gt; for useful comments.&lt;/em&gt;&lt;/p&gt;
+&lt;em&gt;I'd like to thank &lt;a href="http://ruthang.us"&gt;Ruth Angus&lt;/a&gt; for useful comments.&lt;/em&gt;&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Dan Foreman-Mackey</dc:creator><pubDate>Fri, 12 Dec 2014 00:00:00 -0500</pubDate><guid>tag:dan.iel.fm,2014-12-12:posts/mixture-models/</guid></item><item><title>The Histogram (Part 1)</title><link>http://dan.iel.fm/posts/histogram1/</link><description>&lt;blockquote&gt;
@@ -15996,12 +15978,13 @@ It is the first in a series about hierarchical inference in astronomy.&lt;/p&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;When I was writing &lt;a href="http://arxiv.org/abs/1406.3020"&gt;my recent paper&lt;/a&gt; where I infer the population of exoplanets from an incomplete catalog of noisy measurements, I spent a lot of time thinking about histograms and I came across a few cute results that I wanted to share.
-Histograms are commonly used as simple &amp;quot;non-parametric&amp;quot; estimates of probability distributions but they get something of a bad rap (&lt;em&gt;binning is sinning&lt;/em&gt;) because it&amp;#39;s easy to use them inappropriately!
-For example, in astronomy, it&amp;#39;s not uncommon for people to make a histogram of their data then fit a model to the bin heights (think luminosity functions, mass functions, &lt;em&gt;etc.&lt;/em&gt;) instead of just modeling the points directly.
-This definitely isn&amp;#39;t the right thing to do in that case and maybe this should be the topic of a future post but there are some situations where making a histogram of your data isn&amp;#39;t such a bad idea.
-Even if a histogram &lt;em&gt;is&lt;/em&gt; a good model for the data, we&amp;#39;re often still left with the question of what we should do in the face of incompleteness and finite measurement uncertainties.
-In this post, I derive the maximum-likelihood &amp;quot;histogram&amp;quot; when your data are censored by some (known) detection efficiency function and in a later post, I&amp;#39;ll generalize this to include a treatment of measurement uncertainties (following &lt;a href="http://arXiv.org/abs/1008.4146"&gt;Hogg, Myers &amp;amp; Bovy 2010&lt;/a&gt; and &lt;a href="http://arxiv.org/abs/1406.3020"&gt;DFM, Hogg &amp;amp; Morton&lt;/a&gt;).
-For all the results in this post, we will fix the bin locations and widths &lt;em&gt;a priori&lt;/em&gt; but it would be interesting to generalize this derivation to include adaptive widths (see, for example, &lt;a href="http://jakevdp.github.io/blog/2012/09/12/dynamic-programming-in-python/"&gt;Jake VanderPlas&amp;#39; excellent post&lt;/a&gt;).&lt;/p&gt;
+Histograms are commonly used as simple "non-parametric" estimates of probability distributions but they get something of a bad rap (&lt;em&gt;binning is sinning&lt;/em&gt;) because it's easy to use them inappropriately!
+For example, in astronomy, it's not uncommon for people to make a histogram of their data then fit a model to the bin heights (think luminosity functions, mass functions, &lt;em&gt;etc.&lt;/em&gt;) instead of just modeling the points directly.
+This definitely isn't the right thing to do in that case and maybe this should be the topic of a future post but there are some situations where making a histogram of your data isn't such a bad idea.
+Even if a histogram &lt;em&gt;is&lt;/em&gt; a good model for the data, we're often still left with the question of what we should do in the face of incompleteness and finite measurement uncertainties.
+In this post, I derive the maximum-likelihood "histogram" when your data are censored by some (known) detection efficiency function and in a later post, I'll generalize this to include a treatment of measurement uncertainties (following &lt;a href="http://arXiv.org/abs/1008.4146"&gt;Hogg, Myers &amp;amp; Bovy 2010&lt;/a&gt; and &lt;a href="http://arxiv.org/abs/1406.3020"&gt;DFM, Hogg &amp;amp; Morton&lt;/a&gt;).
+For all the results in this post, we will fix the bin locations and widths &lt;em&gt;a priori&lt;/em&gt; but it would be interesting to generalize this derivation to include adaptive widths (see, for example, &lt;a href="http://jakevdp.github.io/blog/2012/09/12/dynamic-programming-in-python/"&gt;Jake VanderPlas' excellent post&lt;/a&gt;).&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16014,7 +15997,6 @@ For all the results in this post, we will fix the bin locations and widths &lt;e
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
@@ -16022,16 +16004,15 @@ For all the results in this post, we will fix the bin locations and widths &lt;e
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;The act of making a histogram is often thought of as a (very intuitive) &lt;em&gt;procedure&lt;/em&gt;: count the number of points that fall in each bin and normalize by the bin volume to get the bin heights.
 It can be difficult to generalize a procedure like this to deal with more complicated models so I prefer to think of data analysis in terms of &lt;em&gt;probabilities&lt;/em&gt;.
-When we do this, it&amp;#39;s easy to derive the above procedure as the &lt;em&gt;analytic maximum-likelihood result for a specific model!&lt;/em&gt;&lt;/p&gt;
+When we do this, it's easy to derive the above procedure as the &lt;em&gt;analytic maximum-likelihood result for a specific model!&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;To set this up, we have a set of $K$ data points $\{ w_k \}_{k=1}^K$ where each $w_k$ is a vector in an arbitrary number of dimensions $D$.
-We&amp;#39;re going to assume that these points are independent draws from the inhomogeneous Poisson process generated by the rate density&lt;/p&gt;
-&lt;p&gt;$$ \Gamma_\theta (w) = \frac{\mathrm{d}N}{\mathrm{d}w} $$&lt;/p&gt;
-&lt;p&gt;where $\theta$ is the set of parameters describing this function.
-Under this assumption, the log-likelihood of the entire dataset is the commonly used result &lt;/p&gt;
-&lt;p&gt;$$\ln p(\{ w_k \}_{k=1}^K\,|\,\theta) = \ell (\theta) = -\int \Gamma_\theta (w)\,\mathrm{d}w + \sum_{k=1}^K \ln \Gamma_\theta (w_k) \quad.\label{eq:poisson}
-$$&lt;/p&gt;
-&lt;p&gt;This derivation is left to the interested reader… I&amp;#39;ve always wanted to say that!
+We're going to assume that these points are independent draws from the inhomogeneous Poisson process generated by the rate density&lt;/p&gt;
+$$ \Gamma_\theta (w) = \frac{\mathrm{d}N}{\mathrm{d}w} $$&lt;p&gt;where $\theta$ is the set of parameters describing this function.
+Under this assumption, the log-likelihood of the entire dataset is the commonly used result&lt;/p&gt;
+$$\ln p(\{ w_k \}_{k=1}^K\,|\,\theta) = \ell (\theta) = -\int \Gamma_\theta (w)\,\mathrm{d}w + \sum_{k=1}^K \ln \Gamma_\theta (w_k) \quad.\label{eq:poisson}
+$$&lt;p&gt;This derivation is left to the interested reader… I've always wanted to say that!
 A good starting place is Section 3.2 of &lt;a href="http://arxiv.org/abs/astro-ph/0202141"&gt;this PhD thesis&lt;/a&gt;.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16040,19 +16021,18 @@ A good starting place is Section 3.2 of &lt;a href="http://arxiv.org/abs/astro-p
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Note that the derivation up to this point isn&amp;#39;t specific to a histogram model and you can (and should) use a physical model for $\Gamma_\theta$ if you have one and fit for $\theta$ numerically.
-But now, for the purposes of today&amp;#39;s discussion, let&amp;#39;s model $\Gamma_\theta$ as a piecewise constant step function&lt;/p&gt;
-&lt;p&gt;$$ \Gamma_\theta (w) = \left\{\begin{array}{ll}
-    \theta_1 &amp;amp; w \in \Delta_1 \\
-    \theta_2 &amp;amp; w \in \Delta_2 \\
-    \vdots &amp;amp; \\
-    \theta_N &amp;amp; w \in \Delta_N \\
-    0 &amp;amp; \mathrm{otherwise}
-\end{array}\right. $$&lt;/p&gt;
-&lt;p&gt;where the $N$ parameters $\theta_n$ are the step heights and the step volumes $\Delta_n$ have been fixed in advance.
+&lt;p&gt;Note that the derivation up to this point isn't specific to a histogram model and you can (and should) use a physical model for $\Gamma_\theta$ if you have one and fit for $\theta$ numerically.
+But now, for the purposes of today's discussion, let's model $\Gamma_\theta$ as a piecewise constant step function&lt;/p&gt;
+$$ \Gamma_\theta (w) = \left\{\begin{array}{ll}
+    \theta_1 &amp; w \in \Delta_1 \\
+    \theta_2 &amp; w \in \Delta_2 \\
+    \vdots &amp; \\
+    \theta_N &amp; w \in \Delta_N \\
+    0 &amp; \mathrm{otherwise}
+\end{array}\right. $$&lt;p&gt;where the $N$ parameters $\theta_n$ are the step heights and the step volumes $\Delta_n$ have been fixed in advance.
 When we use this model for the rate density in the likelihood expression above (Equation $\ref{eq:poisson}$), we find&lt;/p&gt;
-&lt;p&gt;$$ \ell(\theta) = -\sum_{n=1}^N \Delta_n\,\theta_n + \sum_{k=1}^K \,\sum_{n=1}^N \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \quad.$$&lt;/p&gt;
-&lt;p&gt;where $\Delta_n$ is the volume of the $n$-th bin and the function $\mathbf{1}[\cdot]$ is one if its argument evaluates to true and zero otherwise.&lt;/p&gt;
+$$ \ell(\theta) = -\sum_{n=1}^N \Delta_n\,\theta_n + \sum_{k=1}^K \,\sum_{n=1}^N \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \quad.$$&lt;p&gt;where $\Delta_n$ is the volume of the $n$-th bin and the function $\mathbf{1}[\cdot]$ is one if its argument evaluates to true and zero otherwise.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16064,9 +16044,9 @@ When we use this model for the rate density in the likelihood expression above (
 &lt;p&gt;The maximum-likelihood parameters $\theta$ are the values that maximize the log-likelihood $\ell(\theta)$.
 To find these, we can just compute the derivative of $\ell(\theta)$, set it to zero, and solve.
 For a specific step $m$, this works out to give&lt;/p&gt;
-&lt;p&gt;$$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\Delta_m + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\Delta_m}$$&lt;/p&gt;
-&lt;p&gt;where $N_m = \sum_{k=1}^K \mathbf{1}[w_k \in \Delta_m]$ is the number of points that fall in the $m$-th bin.
+$$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\Delta_m + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\Delta_m}$$&lt;p&gt;where $N_m = \sum_{k=1}^K \mathbf{1}[w_k \in \Delta_m]$ is the number of points that fall in the $m$-th bin.
 &lt;em&gt;This is exactly what you would get if you made a histogram!&lt;/em&gt;&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16076,13 +16056,12 @@ For a specific step $m$, this works out to give&lt;/p&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Now we can go one step further and estimate the uncertainty $\sigma_{\theta_m^*}$ on $\theta_m^*$ using the second derivative of $\ell (\theta)$&lt;/p&gt;
-&lt;p&gt;$$\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2} = -\frac{N_m}{{\theta_m}^2}$$&lt;/p&gt;
-&lt;p&gt;giving&lt;/p&gt;
-&lt;p&gt;$$\begin{eqnarray}
-\sigma_{\theta_m^*}^2 &amp;amp;=&amp;amp; -\left[\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2}\right]_{\theta_m = \theta_m^*}^{-1} \\
-&amp;amp;=&amp;amp; \frac{N_m}{\Delta_m^2}
-\end{eqnarray}$$&lt;/p&gt;
-&lt;p&gt;the familiar $\sqrt{N}$ counting statistics.&lt;/p&gt;
+$$\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2} = -\frac{N_m}{{\theta_m}^2}$$&lt;p&gt;giving&lt;/p&gt;
+$$\begin{eqnarray}
+\sigma_{\theta_m^*}^2 &amp;=&amp; -\left[\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2}\right]_{\theta_m = \theta_m^*}^{-1} \\
+&amp;=&amp; \frac{N_m}{\Delta_m^2}
+\end{eqnarray}$$&lt;p&gt;the familiar $\sqrt{N}$ counting statistics.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16091,7 +16070,8 @@ For a specific step $m$, this works out to give&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Okay. Now that we&amp;#39;ve done all this work to derive this trivial and familiar result, let&amp;#39;s get on to generalizing it!&lt;/p&gt;
+&lt;p&gt;Okay. Now that we've done all this work to derive this trivial and familiar result, let's get on to generalizing it!&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16104,18 +16084,18 @@ For a specific step $m$, this works out to give&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;The generalization that we&amp;#39;ll work through in this post is relevant for a lot of projects in astronomy and I expect that it occurs in many other fields too.
+&lt;p&gt;The generalization that we'll work through in this post is relevant for a lot of projects in astronomy and I expect that it occurs in many other fields too.
 Suppose that you have a censored dataset where the completeness or detection efficiency $Q(w)$ is a function of the parameters $w$ and you want to determine the underlying population, not the observed distribution.
 This occurs when studying the population of transiting exoplanets because smaller planets on longer periods are harder to detect than larger ones on shorter periods.
 For the luminosity function of stars or quasars, this occurs because the detection efficiency scales with apparent brightness.&lt;/p&gt;
-&lt;p&gt;In what follows, we&amp;#39;ll assume that we know (from some other means) the completeness function $Q(w)$ of our data but you could relax this and infer the parameters of $Q(w)$ simultaneously with $\theta$.
+&lt;p&gt;In what follows, we'll assume that we know (from some other means) the completeness function $Q(w)$ of our data but you could relax this and infer the parameters of $Q(w)$ simultaneously with $\theta$.
 Unfortunately the result of this joint inference will no longer be analytic and, in practice, there will probably be large degeneracies.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16127,26 +16107,23 @@ Unfortunately the result of this joint inference will no longer be analytic and,
 &lt;p&gt;&lt;strong&gt;Inverse detection efficiency (IDE)&lt;/strong&gt; &amp;nbsp;
 The standard practice in these fields is to make the &lt;em&gt;weighted&lt;/em&gt; histogram of the points where each point is counted with a weight inversely proportional to the detection efficiency at that point.
 In other words, the estimated step height becomes&lt;/p&gt;
-&lt;p&gt;$$ \theta_m^* = \frac{1}{\Delta_m} \, \sum_{k=1}^K \frac{\mathbf{1}[w_k \in \Delta_m]}{Q(w_k)} $$&lt;/p&gt;
-&lt;p&gt;where $Q(w_k)$ is the absolute probability of detecting an object at $w_k$.
-&lt;strong&gt;Don&amp;#39;t do this!&lt;/strong&gt;
-As you&amp;#39;ll see in a moment, while this procedure seems intuitively correct, it gives biased results and the maximum-likelihood result is actually &lt;em&gt;very simple&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;To see qualitatively why this procedure will, in general, yield biased inferences, let&amp;#39;s consider a slightly pathological example.
-In this example, there is a single bin $(0 &amp;lt;= w &amp;lt; 1)$ where the completeness function is&lt;/p&gt;
-&lt;p&gt;$$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$&lt;/p&gt;
-&lt;p&gt;The following figure shows a plot of this example:&lt;/p&gt;
+$$ \theta_m^* = \frac{1}{\Delta_m} \, \sum_{k=1}^K \frac{\mathbf{1}[w_k \in \Delta_m]}{Q(w_k)} $$&lt;p&gt;where $Q(w_k)$ is the absolute probability of detecting an object at $w_k$.
+&lt;strong&gt;Don't do this!&lt;/strong&gt;
+As you'll see in a moment, while this procedure seems intuitively correct, it gives biased results and the maximum-likelihood result is actually &lt;em&gt;very simple&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;To see qualitatively why this procedure will, in general, yield biased inferences, let's consider a slightly pathological example.
+In this example, there is a single bin $(0 &lt;= w &lt; 1)$ where the completeness function is&lt;/p&gt;
+$$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$&lt;p&gt;The following figure shows a plot of this example:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[263]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[263]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pl&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pl&lt;/span&gt;
 &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;seed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;12345&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c"&gt;# Define the completeness function.&lt;/span&gt;
@@ -16821,20 +16798,19 @@ height=391
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;In this figure, the black points show the locations of the points that get detected and the red points indicate points that would have been observed with a perfectly complete sample but were missed because of $Q(w)$.
-If you look at the code above, you&amp;#39;ll see that the true step height should be 50 but, if you evaluate the IDE approximation, you&amp;#39;ll find that it gives&lt;/p&gt;
+If you look at the code above, you'll see that the true step height should be 50 but, if you evaluate the IDE approximation, you'll find that it gives&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[264]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[264]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="n"&gt;th&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wobs&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="n"&gt;th&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wobs&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="n"&gt;sigma_th&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;th&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wobs&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;{0:.1f} ± {1:.1f}&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sigma_th&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;{0:.1f} ± {1:.1f}&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sigma_th&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -16847,9 +16823,7 @@ In&amp;nbsp;[264]:
 
 &lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
-&lt;pre&gt;
-28.5 ± 5.5
-
+&lt;pre&gt;28.5 ± 5.5
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16863,8 +16837,9 @@ In&amp;nbsp;[264]:
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;This result is about &lt;em&gt;half&lt;/em&gt; of what it should be and if you look at the figure above, I think you&amp;#39;ll see what went wrong: only about half of the points were observed and each of those points was in a region where $Q(w) \approx 1$, meaning that each point gets a weight of 1.
-It&amp;#39;s clear that in this case each point should get a weight of 2 (or one-over-a-half) but let&amp;#39;s see if we can derive this intuition more formally.&lt;/p&gt;
+&lt;p&gt;This result is about &lt;em&gt;half&lt;/em&gt; of what it should be and if you look at the figure above, I think you'll see what went wrong: only about half of the points were observed and each of those points was in a region where $Q(w) \approx 1$, meaning that each point gets a weight of 1.
+It's clear that in this case each point should get a weight of 2 (or one-over-a-half) but let's see if we can derive this intuition more formally.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16876,7 +16851,7 @@ It&amp;#39;s clear that in this case each point should get a weight of 2 (or one
 &lt;p&gt;&lt;strong&gt;The maximum-likelihood (ML) solution&lt;/strong&gt; &amp;nbsp;
 The first thing to note is that when we have an incomplete catalog, the likelihood of the data given the population is exactly the same as our previous expression (Equation $\ref{eq:poisson}$) but the rate $\Gamma_\theta (w)$ is replaced by the &lt;em&gt;observable rate&lt;/em&gt; $\hat{\Gamma}_\theta(w) = Q(w)\,\Gamma_\theta (w)$.
 Therefore, for a piecewise constant model of $\Gamma_\theta(w)$, the log-likelihood becomes&lt;/p&gt;
-&lt;p&gt;$$ \ell(\theta) = -\sum_{n=1}^N \theta_n \int_{\Delta_n} Q(w)\,\mathrm{d}w + \sum_{k=1}^K \left[\ln Q(w_k) + \sum_{n=1}^N  \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \right] \quad.$$&lt;/p&gt;
+$$ \ell(\theta) = -\sum_{n=1}^N \theta_n \int_{\Delta_n} Q(w)\,\mathrm{d}w + \sum_{k=1}^K \left[\ln Q(w_k) + \sum_{n=1}^N  \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \right] \quad.$$
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16885,10 +16860,9 @@ Therefore, for a piecewise constant model of $\Gamma_\theta(w)$, the log-likelih
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;As before, let&amp;#39;s take the derivative of this with respect to a specific step height $\theta_m$ to find&lt;/p&gt;
-&lt;p&gt;$$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\int_{\Delta_m} Q(w)\,\mathrm{d}w + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\int_{\Delta_m}Q(w)\,\mathrm{d}w}$$&lt;/p&gt;
-&lt;p&gt;with uncertainty&lt;/p&gt;
-&lt;p&gt;$$\sigma_{\theta_m^*} = \frac{\sqrt{N_m}}{\int_{\Delta_m}Q(w)\,\mathrm{d}w} \quad.$$&lt;/p&gt;
+&lt;p&gt;As before, let's take the derivative of this with respect to a specific step height $\theta_m$ to find&lt;/p&gt;
+$$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\int_{\Delta_m} Q(w)\,\mathrm{d}w + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\int_{\Delta_m}Q(w)\,\mathrm{d}w}$$&lt;p&gt;with uncertainty&lt;/p&gt;
+$$\sigma_{\theta_m^*} = \frac{\sqrt{N_m}}{\int_{\Delta_m}Q(w)\,\mathrm{d}w} \quad.$$
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16898,8 +16872,9 @@ Therefore, for a piecewise constant model of $\Gamma_\theta(w)$, the log-likelih
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;This result shows that the maximum-likelihood result is also a weighted histogram but instead of weighting the points by their &lt;em&gt;per-object&lt;/em&gt; completeness, the weight of each point should be the &lt;em&gt;mean completeness in that bin&lt;/em&gt;.
-In the limit of a constant completeness function, the IDE procedure will give the correct result but whenever the detection efficiency varies across the bin (or if there are latent dimensions; I&amp;#39;ll come back to this in the next example), &lt;strong&gt;the IDE result is just plain wrong!&lt;/strong&gt;
-To make matters worse, as you collect more data, the IDE result gets more precise but it&amp;#39;s still just as wrong.&lt;/p&gt;
+In the limit of a constant completeness function, the IDE procedure will give the correct result but whenever the detection efficiency varies across the bin (or if there are latent dimensions; I'll come back to this in the next example), &lt;strong&gt;the IDE result is just plain wrong!&lt;/strong&gt;
+To make matters worse, as you collect more data, the IDE result gets more precise but it's still just as wrong.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16910,23 +16885,22 @@ To make matters worse, as you collect more data, the IDE result gets more precis
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Luckily, the ML solution will probably be easy to compute, even if you need to compute the weighting integrals numerically.
 For our extreme example from above, the integral becomes $\sim 0.5$ and the maximum-likelihood estimate of the step height is&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[265]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[265]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Evaluate the completeness integral numerically.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Evaluate the completeness integral numerically.&lt;/span&gt;
 &lt;span class="n"&gt;weight&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Q&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;rand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50000&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
 
 &lt;span class="c"&gt;# Compute the maximum-likelihood step height.&lt;/span&gt;
 &lt;span class="n"&gt;th&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wobs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;weight&lt;/span&gt;
 &lt;span class="n"&gt;sigma_th&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;th&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wobs&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;{0:.1f} ± {1:.1f}&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sigma_th&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;{0:.1f} ± {1:.1f}&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;th&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sigma_th&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -16939,9 +16913,7 @@ In&amp;nbsp;[265]:
 
 &lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
-&lt;pre&gt;
-54.0 ± 10.4
-
+&lt;pre&gt;54.0 ± 10.4
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16956,6 +16928,7 @@ In&amp;nbsp;[265]:
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;which is consistent with the correct result: 50.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16968,19 +16941,18 @@ In&amp;nbsp;[265]:
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;Now that we&amp;#39;ve derived a formalism and developed some intuition for working with censored datasets, let&amp;#39;s work through a more realistic example to see whether or not this machinery matters.
-In this example, we&amp;#39;ll add another level of complexity that is especially relevant in the study of exoplanets: latent dimensions.&lt;/p&gt;
+&lt;p&gt;Now that we've derived a formalism and developed some intuition for working with censored datasets, let's work through a more realistic example to see whether or not this machinery matters.
+In this example, we'll add another level of complexity that is especially relevant in the study of exoplanets: latent dimensions.&lt;/p&gt;
 &lt;p&gt;For transiting exoplanets, the detection efficiency scales approximately with the signal strength times the geometric transit probability&lt;/p&gt;
-&lt;p&gt;$$Q(w) \propto \frac{R_\star}{P^{2/3}\,{M_\star}^{1/3}}\,\left[\frac{R}{R_\star}\right]^2\,\frac{1}{\sqrt{P}}$$&lt;/p&gt;
-&lt;p&gt;where $R_\star$ is the star&amp;#39;s radius, $M_\star$ is the stellar mass, $P$ is the planet&amp;#39;s orbital period, and $R$ is the planet&amp;#39;s radius.
+$$Q(w) \propto \frac{R_\star}{P^{2/3}\,{M_\star}^{1/3}}\,\left[\frac{R}{R_\star}\right]^2\,\frac{1}{\sqrt{P}}$$&lt;p&gt;where $R_\star$ is the star's radius, $M_\star$ is the stellar mass, $P$ is the planet's orbital period, and $R$ is the planet's radius.
 Then, if you want to measure the radius distribution of exoplanets, the standard practice is to run the one-dimensional IDE on the observed data computing the detection efficiency independently for each data point and ignoring the fact that the distribution is actually four-dimensional.
-We won&amp;#39;t work through exactly this example but instead, we&amp;#39;ll use a simpler two-dimensional toy problem.&lt;/p&gt;
+We won't work through exactly this example but instead, we'll use a simpler two-dimensional toy problem.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -16990,20 +16962,18 @@ We won&amp;#39;t work through exactly this example but instead, we&amp;#39;ll us
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;&lt;strong&gt;The setup&lt;/strong&gt; &amp;nbsp;
-For this example, we&amp;#39;ll consider a two-dimensional problem with parameters $a \in [1,\,2]$ and $b \in [1,\,10]$ where the detection efficiency is given by&lt;/p&gt;
-&lt;p&gt;$$Q(a,\,b) = 0.8 \, \left[ 1+ \exp \left(10\,\frac{a^2}{\sqrt{b}} - 10\right) \right]^{-1} \quad.$$&lt;/p&gt;
-&lt;p&gt;Here&amp;#39;s a plot of this function:&lt;/p&gt;
+For this example, we'll consider a two-dimensional problem with parameters $a \in [1,\,2]$ and $b \in [1,\,10]$ where the detection efficiency is given by&lt;/p&gt;
+$$Q(a,\,b) = 0.8 \, \left[ 1+ \exp \left(10\,\frac{a^2}{\sqrt{b}} - 10\right) \right]^{-1} \quad.$$&lt;p&gt;Here's a plot of this function:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[143]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[143]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Define the detection efficiency function.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Define the detection efficiency function.&lt;/span&gt;
 &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;detection_efficiency&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mf"&gt;0.8&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exp&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 
@@ -17744,19 +17714,18 @@ height=404
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;&lt;strong&gt;A synthetic dataset&lt;/strong&gt; &amp;nbsp;
-Now let&amp;#39;s generate a sample dataset and censor it using this completeness function.
-For simplicity, we&amp;#39;ll use a &lt;em&gt;uniform&lt;/em&gt; population where a complete sample would be uniformly distributed in $a$ and $b$:&lt;/p&gt;
+Now let's generate a sample dataset and censor it using this completeness function.
+For simplicity, we'll use a &lt;em&gt;uniform&lt;/em&gt; population where a complete sample would be uniformly distributed in $a$ and $b$:&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[270]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[270]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Generate the true (uncensored) samples.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Generate the true (uncensored) samples.&lt;/span&gt;
 &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;seed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1234&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;true_rate&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;500&lt;/span&gt;
 &lt;span class="n"&gt;K&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;poisson&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;true_rate&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amx&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;amn&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bmx&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;bmn&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
@@ -25068,19 +25037,18 @@ height=404
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;In this figure, the blue points are objects that passed the completeness cut and made it into the catalog and the red points were missed even though they would have been detected in a complete catalog.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Using inverse detection efficiency&lt;/strong&gt; &amp;nbsp;
-Now, let&amp;#39;s say that we&amp;#39;re only interested in the $b$ distribution and even though we know that it should be a flat line, we&amp;#39;ll model it as a histogram with a few bins.
-To start, let&amp;#39;s look at the IDE result&lt;/p&gt;
+Now, let's say that we're only interested in the $b$ distribution and even though we know that it should be a flat line, we'll model it as a histogram with a few bins.
+To start, let's look at the IDE result&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[271]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[271]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Define the bins.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Define the bins.&lt;/span&gt;
 &lt;span class="n"&gt;bin_edges&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;linspace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bmn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bmx&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c"&gt;# Compute the inverse detection efficiency model.&lt;/span&gt;
@@ -25088,12 +25056,12 @@ In&amp;nbsp;[271]:
 &lt;span class="n"&gt;n_ide&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;histogram&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dataset&lt;/span&gt;&lt;span class="p"&gt;[:,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;weights&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c"&gt;# This function makes a histogram plot given of a set of step heights.&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;plot_hist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bin_heights&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;plot_hist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bin_heights&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
     &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;zip&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;[:&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:])))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;flatten&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
     &lt;span class="n"&gt;bh&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;bin_heights&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;diff&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
     &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;zip&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bh&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bh&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;flatten&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
     &lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="k"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
         &lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;errorbar&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;[:&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:])&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
                     &lt;span class="n"&gt;bh&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;yerr&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;bh&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fmt&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;+&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
                     &lt;span class="n"&gt;capsize&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;color&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;k&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
@@ -25590,6 +25558,7 @@ height=404
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;In this figure, the &lt;em&gt;correct&lt;/em&gt; result (the rate that was used to generate the dataset) is shown as the thick gray line and the IDE estimate of this function is shown as the step function with error bars.
 As expected, the estimate is noisy and the error bars seem to be overly confident (especially in the regions of lower detection efficiency).&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -25599,20 +25568,18 @@ As expected, the estimate is noisy and the error bars seem to be overly confiden
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;&lt;strong&gt;The maximum-likelihood&lt;/strong&gt; &amp;nbsp;
-For comparison, let&amp;#39;s use the same dataset and apply the maximum-likelihood method that we derived above.
+For comparison, let's use the same dataset and apply the maximum-likelihood method that we derived above.
 First, we need to integrate (numerically) the completeness function over the bins where the $n$-th bin is the two-dimensional area defined by&lt;/p&gt;
-&lt;p&gt;$$b_n \le b &amp;lt; b_{n+1} \quad \mathrm{and} \quad 1 \le a &amp;lt; 2 \quad.$$&lt;/p&gt;
+$$b_n \le b &lt; b_{n+1} \quad \mathrm{and} \quad 1 \le a &lt; 2 \quad.$$
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[272]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[272]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="c"&gt;# Loop over the bins and numerically integrate Q(a, b) over a.&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Loop over the bins and numerically integrate Q(a, b) over a.&lt;/span&gt;
 &lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;50000&lt;/span&gt;
 &lt;span class="n"&gt;bq&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;empty&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;a0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;uniform&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amx&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -26047,17 +26014,16 @@ height=404
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;Using this integrated detection efficiency function, we can easily compute the ML step function given the prescription derived above and compare it to the IDE result.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[273]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[273]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;&lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gca&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axhline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;true_rate&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lw&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;k&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt;&lt;span class="n"&gt;pl&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gca&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;axhline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;true_rate&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lw&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;k&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plot_hist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n_ide&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="o"&gt;=-&lt;/span&gt;&lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
           &lt;span class="n"&gt;ls&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dotted&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;k&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plot_hist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bin_edges&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;bq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;reluncert&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sqrt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mf"&gt;0.05&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;k&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -26704,7 +26670,8 @@ height=404
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;In this figure, the IDE result is shown as a dotted line and the ML result is given by the solid black line with error bars.
 As before, the correct result is shown as the thick gray line.
-It&amp;#39;s clear from this comparison that the ML result is &lt;em&gt;much&lt;/em&gt; better than the IDE computation—the results are consistent with the truth!&lt;/p&gt;
+It's clear from this comparison that the ML result is &lt;em&gt;much&lt;/em&gt; better than the IDE computation—the results are consistent with the truth!&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -26717,27 +26684,27 @@ It&amp;#39;s clear from this comparison that the ML result is &lt;em&gt;much&lt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
-&lt;p&gt;In this post, we&amp;#39;ve derived a simple, maximum-likelihood method for making histograms of incomplete datasets.
+&lt;p&gt;In this post, we've derived a simple, maximum-likelihood method for making histograms of incomplete datasets.
 This method should &lt;em&gt;always&lt;/em&gt; give less biased results—at minimal extra computational cost—than the standard techniques used in astronomy and in some cases the results will be &lt;em&gt;drastically different&lt;/em&gt;.
-How different the results are from the two methods is going to be very problem dependent and it&amp;#39;s possible that the existing results in the literature aren&amp;#39;t very wrong because of this effect.
-That being said, the &amp;quot;correct&amp;quot; method isn&amp;#39;t really any more complicated than what we&amp;#39;re doing already so I hope that someone will read this and do The Right Thing™ next time!&lt;/p&gt;
+How different the results are from the two methods is going to be very problem dependent and it's possible that the existing results in the literature aren't very wrong because of this effect.
+That being said, the "correct" method isn't really any more complicated than what we're doing already so I hope that someone will read this and do The Right Thing™ next time!&lt;/p&gt;
 &lt;p&gt;Another huge benefit of casting the histogram procedure as a problem in probabilistic data analysis is that it forces us to think explicitly about our assumptions.
 The result derived here is going to be the best possible result under the following assumptions:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;The data are independent samples from an inhomogeneous Poisson process where the rate function is a piecewise constant step function,&lt;/li&gt;
 &lt;li&gt;the measurement uncertainties on the data are negligible, and&lt;/li&gt;
-&lt;li&gt;the detection efficiency function $Q(w)$ is known but it doesn&amp;#39;t need to be constant.&lt;/li&gt;
+&lt;li&gt;the detection efficiency function $Q(w)$ is known but it doesn't need to be constant.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;In contrast, the IDE procedure is &lt;em&gt;only&lt;/em&gt; correct if the detection efficiency is &lt;em&gt;constant&lt;/em&gt; across each bin!
 These assumptions are slightly less restrictive than the standard histogram procedure but assumption (2) is still a fairly glaring simplification and it is rarely satisfied in real astronomical datasets.
-Therefore, in my next post, I&amp;#39;ll relax the assumption of negligible uncertainties and demonstrate where and how this becomes a problem.&lt;/p&gt;
+Therefore, in my next post, I'll relax the assumption of negligible uncertainties and demonstrate where and how this becomes a problem.&lt;/p&gt;
 &lt;p&gt;Let me know if you have any comments by adding it below, &lt;a href="https://twitter.com/exoplaneteer"&gt;tweeting at me&lt;/a&gt;, and/or &lt;a href="https://github.com/dfm/dfm.io/issues"&gt;opening a GitHub issue&lt;/a&gt;.&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -26747,18 +26714,17 @@ Therefore, in my next post, I&amp;#39;ll relax the assumption of negligible unce
 &lt;div class="inner_cell"&gt;
 &lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
 &lt;p&gt;&lt;strong&gt;Acknowledgments&lt;/strong&gt; &amp;nbsp;
-&lt;em&gt;I&amp;#39;d like to thank &lt;a href="http://ruthang.us"&gt;Ruth Angus&lt;/a&gt; and &lt;a href="https://twitter.com/mfouesneau"&gt;Morgan Fouesneau&lt;/a&gt; for useful comments.&lt;/em&gt;&lt;/p&gt;
+&lt;em&gt;I'd like to thank &lt;a href="http://ruthang.us"&gt;Ruth Angus&lt;/a&gt; and &lt;a href="https://twitter.com/mfouesneau"&gt;Morgan Fouesneau&lt;/a&gt; for useful comments.&lt;/em&gt;&lt;/p&gt;
+
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
-&lt;div class="prompt input_prompt"&gt;
-In&amp;nbsp;[]:
-&lt;/div&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[&amp;nbsp;]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class="highlight-ipynb"&gt;&lt;pre class="ipynb"&gt;
+&lt;div class=" highlight hl-ipython3"&gt;&lt;pre&gt; 
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;

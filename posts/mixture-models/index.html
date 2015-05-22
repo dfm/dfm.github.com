@@ -65,11 +65,12 @@
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>There are a lot of reasons why you might use a mixture model and there is a <a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20">huge</a> <a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20">related</a> <a href="http://arxiv.org/abs/1008.4686">literature</a>. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.</p>
-<p>In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&#39;s the language I&#39;ll use but the results are applicable to any other mixture model. The questions that I&#39;ll try to answer are:</p>
+<p>In astronomy, the most common reason for using a mixture model is to fit data with outliers so that's the language I'll use but the results are applicable to any other mixture model. The questions that I'll try to answer are:</p>
 <ol>
 <li>How do you derive the <em>marginalized</em> likelihood—as popularized by <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>, I think—and why would you want to?</li>
 <li>How do you work out the mixture membership probabilities (or what is the probability that the point is an outlier) after using this model?</li>
 </ol>
+
 </div>
 </div>
 </div>
@@ -78,21 +79,19 @@
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="the-basic-model">The basic model</h2>
-<p>The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don&#39;t care about! For simplicity, let&#39;s consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a> give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.</p>
-<p>To start, let&#39;s generate some fake data:</p>
+<h2 id="The-basic-model">The basic model<a class="anchor-link" href="#The-basic-model">&#182;</a></h2><p>The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don't care about! For simplicity, let's consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a> give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.</p>
+<p>To start, let's generate some fake data:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[2]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">pl</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">pl</span>
 
 <span class="c"># We&#39;ll choose the parameters of our synthetic data.</span>
 <span class="c"># The outlier probability will be 80%:</span>
@@ -127,20 +126,19 @@ In&nbsp;[2]:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here&#39;s what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don&#39;t account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).</p>
+<p>Here's what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don't account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[3]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="c"># First, fit the data and find the maximum likelihood model ignoring outliers.</span>
+<div class=" highlight hl-ipython3"><pre><span class="c"># First, fit the data and find the maximum likelihood model ignoring outliers.</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vander</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span> <span class="o">/</span> <span class="n">yerr</span><span class="p">[:,</span> <span class="bp">None</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">yerr</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span> <span class="o">/</span> <span class="n">yerr</span><span class="p">[:,</span> <span class="k">None</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">yerr</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 
 <span class="c"># Then save the *true* line.</span>
 <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
@@ -999,12 +997,11 @@ height=391
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let&#39;s generalize this model and add a binary flag $q_k$ for each data point $k$. If $q_k$ is zero, then the point is &quot;good&quot; and the likelihood is given by the usual Gaussian:</p>
-<p>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$</p>
-<p>where $f_\theta (x_k) = \theta_1 \, x_k + \theta_2$ is the linear model.</p>
+<p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let's generalize this model and add a binary flag $q_k$ for each data point $k$. If $q_k$ is zero, then the point is "good" and the likelihood is given by the usual Gaussian:</p>
+$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$<p>where $f_\theta (x_k) = \theta_1 \, x_k + \theta_2$ is the linear model.</p>
 <p>Now, if $q_k = 1$ then the point is an outlier and the likelihood becomes:</p>
-<p>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) = \frac{1}{\sqrt{2\,\pi\,[\sigma_k^2 + \theta_4]}} \exp \left(-\frac{[y_k - \theta_3]^2}{2\,[\sigma_k^2 + \theta_4]}\right) \quad.$$</p>
-<p>I have made the simplifying assumption that the outliers are drawn from a single Gaussian with mean $\theta_3$ and variance $\theta_4$. From experience, the results aren&#39;t normally very sensitive to the choice of outlier model and the Gaussian model is often good enough but the following derivations will be valid for any model that you choose.</p>
+$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) = \frac{1}{\sqrt{2\,\pi\,[\sigma_k^2 + \theta_4]}} \exp \left(-\frac{[y_k - \theta_3]^2}{2\,[\sigma_k^2 + \theta_4]}\right) \quad.$$<p>I have made the simplifying assumption that the outliers are drawn from a single Gaussian with mean $\theta_3$ and variance $\theta_4$. From experience, the results aren't normally very sensitive to the choice of outlier model and the Gaussian model is often good enough but the following derivations will be valid for any model that you choose.</p>
+
 </div>
 </div>
 </div>
@@ -1014,8 +1011,8 @@ height=391
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Under this new model, the full likelihood for the entire dataset becomes:</p>
-<p>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta,\,\{q_k\}) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$</p>
-<p>where, for each term, the correct Gaussian is chosen depending on the value of $q_k$. To write this equation, I&#39;ve assumed that the data points are independent and if that&#39;s not true for your dataset then things get <em>a lot</em> harder.</p>
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta,\,\{q_k\}) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$<p>where, for each term, the correct Gaussian is chosen depending on the value of $q_k$. To write this equation, I've assumed that the data points are independent and if that's not true for your dataset then things get <em>a lot</em> harder.</p>
+
 </div>
 </div>
 </div>
@@ -1024,7 +1021,8 @@ height=391
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now we could just take this likelihood function, apply priors, and use MCMC to find posterior constraints on $\theta$ and the $\{q_k\}$ flags but this would be hard for a few reasons. First, if you&#39;re used to using <a href="http://dfm.io/emcee">emcee</a> for your MCMC needs, you&#39;ll find that it&#39;s pretty hard to implement a model with discrete variables so you&#39;d probably need to learn some <a href="http://pymc-devs.github.io/pymc/">other</a> <a href="http://mc-stan.org/">sampler</a> and, honestly, it probably wouldn&#39;t work well for this problem either! Which brings us to our second problem. This problem is <em>very</em> high dimensional and the dimension scales with the number of data points. Without the outlier model, the problem is only two-dimensional but when we include the outliers, the model suddenly becomes $(4 + K)$-dimensional, where $K$ is the number of data points. This will always be hard! Therefore, in practice, it is useful to marginalize out the badly behaved parameters ($q_k$) and just sample in $\theta$.</p>
+<p>Now we could just take this likelihood function, apply priors, and use MCMC to find posterior constraints on $\theta$ and the $\{q_k\}$ flags but this would be hard for a few reasons. First, if you're used to using <a href="http://dfm.io/emcee">emcee</a> for your MCMC needs, you'll find that it's pretty hard to implement a model with discrete variables so you'd probably need to learn some <a href="http://pymc-devs.github.io/pymc/">other</a> <a href="http://mc-stan.org/">sampler</a> and, honestly, it probably wouldn't work well for this problem either! Which brings us to our second problem. This problem is <em>very</em> high dimensional and the dimension scales with the number of data points. Without the outlier model, the problem is only two-dimensional but when we include the outliers, the model suddenly becomes $(4 + K)$-dimensional, where $K$ is the number of data points. This will always be hard! Therefore, in practice, it is useful to marginalize out the badly behaved parameters ($q_k$) and just sample in $\theta$.</p>
+
 </div>
 </div>
 </div>
@@ -1033,32 +1031,25 @@ height=391
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="the-marginalized-likelihood">The marginalized likelihood</h2>
-<p>In order to marginalize out the $\{q_k\}$ flags, we need to choose a prior $p(q_k)$. After making this choice (I won&#39;t specialize yet), the marginalization can be written:</p>
-<p>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \sum_{\{q_k\}} \prod_{k=1}^{K} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k)$$</p>
-<p>where the sum is over all the possible permutations of the $q_k$ flags. If you squint for a second, you&#39;ll see that you can actually switch the order of the sum and product without changing anything. This follows from our assumption that the data points are independent. Therefore, we&#39;re left with the much simpler likelihood function</p>
-<p>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\,\sigma_k,\,\theta)$$</p>
-<p>where</p>
-<p>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta) = \sum_{q_k} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k) \quad.$$</p>
-<p>The prior $p(q_k)$ could be different for every data point but it is often sufficient to choose a simple model like</p>
-<p>$$p(q_k) = \left \{\begin{array}{ll}
-Q &amp; \mathrm{if}\,q_k=0 \\
-1-Q &amp; \mathrm{if}\,q_k=1
-\end{array}\right.$$</p>
-<p>where $Q \in [0, 1]$ is a constant that sets the prior probability that a point is drawn from the foreground model. Chosing this model, we recover the (possibly) familiar likelihood function from <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>:</p>
-<p>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} \left [ Q\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) + (1-Q)\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) \right ] \quad.$$</p>
-<p>This is a much easier model to sample so let&#39;s do that now:</p>
+<h2 id="The-marginalized-likelihood">The marginalized likelihood<a class="anchor-link" href="#The-marginalized-likelihood">&#182;</a></h2><p>In order to marginalize out the $\{q_k\}$ flags, we need to choose a prior $p(q_k)$. After making this choice (I won't specialize yet), the marginalization can be written:</p>
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \sum_{\{q_k\}} \prod_{k=1}^{K} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k)$$<p>where the sum is over all the possible permutations of the $q_k$ flags. If you squint for a second, you'll see that you can actually switch the order of the sum and product without changing anything. This follows from our assumption that the data points are independent. Therefore, we're left with the much simpler likelihood function</p>
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\,\sigma_k,\,\theta)$$<p>where</p>
+$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta) = \sum_{q_k} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k) \quad.$$<p>The prior $p(q_k)$ could be different for every data point but it is often sufficient to choose a simple model like</p>
+$$p(q_k) = \left \{\begin{array}{ll}
+Q & \mathrm{if}\,q_k=0 \\
+1-Q & \mathrm{if}\,q_k=1
+\end{array}\right.$$<p>where $Q \in [0, 1]$ is a constant that sets the prior probability that a point is drawn from the foreground model. Chosing this model, we recover the (possibly) familiar likelihood function from <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>:</p>
+$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} \left [ Q\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) + (1-Q)\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) \right ] \quad.$$<p>This is a much easier model to sample so let's do that now:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[35]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[35]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="kn">import</span> <span class="nn">emcee</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">emcee</span>
 
 <span class="c"># Define the probabilistic model...</span>
 <span class="c"># A simple prior:</span>
@@ -1088,7 +1079,7 @@ In&nbsp;[35]:
     <span class="c"># First check the prior.</span>
     <span class="n">lp</span> <span class="o">=</span> <span class="n">lnprior</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">lp</span><span class="p">):</span>
-        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="k">None</span>
     
     <span class="c"># Compute the vector of foreground likelihoods and include the q prior.</span>
     <span class="n">ll_fg</span> <span class="o">=</span> <span class="n">lnlike_fg</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
@@ -1109,7 +1100,7 @@ In&nbsp;[35]:
 <span class="c"># Initialize the walkers at a reasonable location.</span>
 <span class="n">ndim</span><span class="p">,</span> <span class="n">nwalkers</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">32</span>
 <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)])</span>
-<span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="n">p0</span> <span class="o">+</span> <span class="mf">1e-5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">ndim</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">)]</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="n">p0</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">ndim</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">)]</span>
 
 <span class="c"># Set up the sampler.</span>
 <span class="n">sampler</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">lnprob</span><span class="p">)</span>
@@ -1132,19 +1123,18 @@ In&nbsp;[35]:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This code should only take about a minute to run. Compare that to any attempt you&#39;ve ever made at sampling the same problem with another 15 or more parameters and you should be pretty stoked!</p>
-<p>Let&#39;s show the resulting parameter constraints and compare them to the <em>true</em> values (indicated in blue) used to generate the synthetic dataset. This should encourage us that we&#39;ve done something reasonable.</p>
+<p>This code should only take about a minute to run. Compare that to any attempt you've ever made at sampling the same problem with another 15 or more parameters and you should be pretty stoked!</p>
+<p>Let's show the resulting parameter constraints and compare them to the <em>true</em> values (indicated in blue) used to generate the synthetic dataset. This should encourage us that we've done something reasonable.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[43]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[43]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="kn">import</span> <span class="nn">triangle</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">triangle</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;$m$&quot;</span><span class="p">,</span> <span class="s">&quot;$b$&quot;</span><span class="p">,</span> <span class="s">&quot;$Q$&quot;</span><span class="p">,</span> <span class="s">&quot;$M$&quot;</span><span class="p">,</span> <span class="s">&quot;$\ln V$&quot;</span><span class="p">]</span>
 <span class="n">truths</span> <span class="o">=</span> <span class="n">true_params</span> <span class="o">+</span> <span class="p">[</span><span class="n">true_frac</span><span class="p">,</span> <span class="n">true_outliers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">true_outliers</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
 <span class="n">triangle</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">flatchain</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">extents</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">truths</span><span class="o">=</span><span class="n">truths</span><span class="p">);</span>
@@ -13650,17 +13640,16 @@ height=1144
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Similarly, the predicted constraint on the linear model is:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[42]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="c"># Compute the quantiles of the predicted line and plot them.</span>
+<div class=" highlight hl-ipython3"><pre><span class="c"># Compute the quantiles of the predicted line and plot them.</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vander</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">lines</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">flatchain</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 <span class="n">quantiles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">84</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -14729,6 +14718,7 @@ height=391
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Great! Comparing the purple swath to the true line (shown in black), I think that we can all agree that this is a much better fit! But now, how do we label the points to decide which ones are outliers?</p>
+
 </div>
 </div>
 </div>
@@ -14737,27 +14727,22 @@ height=391
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="mixture-membership-probabilities">Mixture membership probabilities</h2>
-<p>Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn&#39;t we throw away a lot of information when we used the marginalized likelihood instead of sampling in the $q_k$ parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the <em>outlierness</em> of each point. This is a very common question when I suggest that people use this model so I wanted to show that you&#39;re actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!</p>
+<h2 id="Mixture-membership-probabilities">Mixture membership probabilities<a class="anchor-link" href="#Mixture-membership-probabilities">&#182;</a></h2><p>Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn't we throw away a lot of information when we used the marginalized likelihood instead of sampling in the $q_k$ parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the <em>outlierness</em> of each point. This is a very common question when I suggest that people use this model so I wanted to show that you're actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!</p>
 <p>To be specific, the thing that we want to compute is:</p>
-<p>$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$</p>
-<p>the posterior probability of a specific point $k$ being good ($q_k=0$) given all the data. In this equation, I&#39;ve simplified the notation a bit and $y = \{y_k\}$ now indicates <em>all the data</em> and I&#39;m leaving out the implied $\{x_k\},\,\{\sigma_k\}$ on the right-hand side of every probability. To compute this, we&#39;ll need to evaluate the conditional probability</p>
-<p>$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q_k)}{\sum_{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$</p>
-<p>where the sum is over every allowed value of $q_k$. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee&#39;s <a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs">blobs feature</a> so it&#39;ll be ease to evaluate $p(q_k\,|\,y,\,\theta^{(n)})$ for each sample $\theta^{(n)}$ from the chain.</p>
+$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$<p>the posterior probability of a specific point $k$ being good ($q_k=0$) given all the data. In this equation, I've simplified the notation a bit and $y = \{y_k\}$ now indicates <em>all the data</em> and I'm leaving out the implied $\{x_k\},\,\{\sigma_k\}$ on the right-hand side of every probability. To compute this, we'll need to evaluate the conditional probability</p>
+$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q_k)}{\sum_{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$<p>where the sum is over every allowed value of $q_k$. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee's <a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs">blobs feature</a> so it'll be ease to evaluate $p(q_k\,|\,y,\,\theta^{(n)})$ for each sample $\theta^{(n)}$ from the chain.</p>
 <p>Then, we need to realize that the Markov chain gave us samples $\theta^{(n)}$ from the probability distribution $p(\theta\,|\,y)$, so we can approximate the previous integral as</p>
-<p>$$p(q_k\,|\,y) = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \approx \frac{1}{N}\sum_{n=1}^N p(q_k\,|\,y,\,\theta^{(n)}) \quad.$$</p>
-<p>Therefore, the posterior probaility of being an outlier or not can be computed by just taking the average of a bunch of values that we&#39;ve already computed! In practice, this would look like the following:</p>
+$$p(q_k\,|\,y) = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \approx \frac{1}{N}\sum_{n=1}^N p(q_k\,|\,y,\,\theta^{(n)}) \quad.$$<p>Therefore, the posterior probaility of being an outlier or not can be computed by just taking the average of a bunch of values that we've already computed! In practice, this would look like the following:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[47]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[47]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="n">norm</span> <span class="o">=</span> <span class="mf">0.0</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">norm</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="n">post_prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
@@ -14778,17 +14763,16 @@ In&nbsp;[47]:
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Therefore, from left to right, the marginalized posterior probability that each point is part of the foreground model is:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[59]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[59]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="k">print</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s">&quot;{0:.3f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">post_prob</span><span class="p">)))</span>
+<div class=" highlight hl-ipython3"><pre><span class="nb">print</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s">&quot;{0:.3f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">post_prob</span><span class="p">)))</span>
 </pre></div>
 
 </div>
@@ -14801,9 +14785,7 @@ In&nbsp;[59]:
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
-0.357, 0.936, 0.000, 0.954, 0.000, 0.890, 0.885, 0.830, 0.858, 0.966, 0.000, 0.994, 0.995, 0.995, 0.979
-
+<pre>0.357, 0.936, 0.000, 0.954, 0.000, 0.890, 0.885, 0.830, 0.858, 0.966, 0.000, 0.994, 0.995, 0.995, 0.979
 </pre>
 </div>
 </div>
@@ -14818,18 +14800,17 @@ In&nbsp;[59]:
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This model works pretty well... so well, in fact, that the strong outliers are given nearly zero probability of being in the foreground model!</p>
-<p>Finally, it can be useful to label outliers on the final plot so let&#39;s use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!</p>
+<p>Finally, it can be useful to label outliers on the final plot so let's use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">
-In&nbsp;[60]:
-</div>
+<div class="prompt input_prompt">In&nbsp;[60]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class="highlight-ipynb"><pre class="ipynb"><span class="c"># Plot the predition.</span>
+<div class=" highlight hl-ipython3"><pre><span class="c"># Plot the predition.</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">quantiles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">quantiles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;#8d44ad&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
 <span class="c"># Plot the data points.</span>
@@ -15898,7 +15879,8 @@ height=391
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Acknowledgments</strong> &nbsp;
-<em>I&#39;d like to thank <a href="http://ruthang.us">Ruth Angus</a> for useful comments.</em></p>
+<em>I'd like to thank <a href="http://ruthang.us">Ruth Angus</a> for useful comments.</em></p>
+
 </div>
 </div>
 </div></p>
