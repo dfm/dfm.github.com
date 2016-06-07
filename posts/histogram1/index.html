@@ -5,6 +5,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>The Histogram (Part 1) by Dan Foreman-Mackey</title>
 <meta id="viewport" name="viewport" content="width=500" />
+<meta name="description" content="Dan Foreman-Mackey is a Sagan Fellow in the Astronomy Department at the University of Washington" />
 
 
 <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
@@ -208,32 +209,32 @@ $$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$<p>The following figure show
 <div class="prompt input_prompt">In&nbsp;[263]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 
-<span class="c"># Define the completeness function.</span>
+<span class="c1"># Define the completeness function.</span>
 <span class="n">Q</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">w</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="mf">0.01</span><span class="p">))</span>
 
-<span class="c"># Sample some points from a constant rate function</span>
+<span class="c1"># Sample some points from a constant rate function</span>
 <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="p">)</span>
 <span class="n">wobs</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">K</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Q</span><span class="p">(</span><span class="n">w</span><span class="p">)]</span>
 
-<span class="c"># Plot the observations.</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="s">&quot;.r&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wobs</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wobs</span><span class="p">)),</span> <span class="s">&quot;.k&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="s">&quot;observed&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="s">&quot;not observed&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">)</span>
+<span class="c1"># Plot the observations.</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="s2">&quot;.r&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">wobs</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wobs</span><span class="p">)),</span> <span class="s2">&quot;.k&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="s2">&quot;observed&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="s2">&quot;not observed&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 
-<span class="c"># Plot the completeness function.</span>
+<span class="c1"># Plot the completeness function.</span>
 <span class="n">w0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">Q</span><span class="p">(</span><span class="n">w0</span><span class="p">),</span> <span class="s">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">Q</span><span class="p">(</span><span class="n">w0</span><span class="p">),</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
 
 <span class="n">pl</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">r&quot;$Q(w)$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;$w$&quot;</span><span class="p">);</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$Q(w)$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$w$&quot;</span><span class="p">);</span>
 </pre></div>
 
 </div>
@@ -894,9 +895,9 @@ If you look at the code above, you'll see that the true step height should be 50
 <div class="prompt input_prompt">In&nbsp;[264]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">th</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">Q</span><span class="p">(</span><span class="n">wobs</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">th</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">Q</span><span class="p">(</span><span class="n">wobs</span><span class="p">))</span>
 <span class="n">sigma_th</span> <span class="o">=</span> <span class="n">th</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wobs</span><span class="p">))</span>
-<span class="nb">print</span> <span class="s">&quot;{0:.1f} ± {1:.1f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">sigma_th</span><span class="p">)</span>
+<span class="nb">print</span> <span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2"> ± </span><span class="si">{1:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">sigma_th</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -980,13 +981,13 @@ For our extreme example from above, the integral becomes $\sim 0.5$ and the maxi
 <div class="prompt input_prompt">In&nbsp;[265]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="c"># Evaluate the completeness integral numerically.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Evaluate the completeness integral numerically.</span>
 <span class="n">weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">50000</span><span class="p">)))</span>
 
-<span class="c"># Compute the maximum-likelihood step height.</span>
+<span class="c1"># Compute the maximum-likelihood step height.</span>
 <span class="n">th</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wobs</span><span class="p">)</span> <span class="o">/</span> <span class="n">weight</span>
 <span class="n">sigma_th</span> <span class="o">=</span> <span class="n">th</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wobs</span><span class="p">))</span>
-<span class="nb">print</span> <span class="s">&quot;{0:.1f} ± {1:.1f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">sigma_th</span><span class="p">)</span>
+<span class="nb">print</span> <span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2"> ± </span><span class="si">{1:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">sigma_th</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -1059,20 +1060,20 @@ $$Q(a,\,b) = 0.8 \, \left[ 1+ \exp \left(10\,\frac{a^2}{\sqrt{b}} - 10\right) \r
 <div class="prompt input_prompt">In&nbsp;[143]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="c"># Define the detection efficiency function.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define the detection efficiency function.</span>
 <span class="k">def</span> <span class="nf">detection_efficiency</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">0.8</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.1</span><span class="p">))</span>
 
-<span class="c"># Plot this function on a grid.</span>
+<span class="c1"># Plot this function on a grid.</span>
 <span class="n">amn</span><span class="p">,</span> <span class="n">amx</span><span class="p">,</span> <span class="n">bmn</span><span class="p">,</span> <span class="n">bmx</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span>
 <span class="n">A</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">amn</span><span class="p">,</span> <span class="n">amx</span><span class="p">,</span> <span class="mi">101</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">bmn</span><span class="p">,</span> <span class="n">bmx</span><span class="p">,</span> <span class="mi">103</span><span class="p">),</span>
-                   <span class="n">indexing</span><span class="o">=</span><span class="s">&quot;ij&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">detection_efficiency</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&quot;gray&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">detection_efficiency</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">amn</span><span class="p">,</span> <span class="n">amx</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">bmn</span><span class="p">,</span> <span class="n">bmx</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;$a$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">r&quot;$b$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">r&quot;$Q(a,\,b)$&quot;</span><span class="p">);</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$a$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$b$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">r&quot;$Q(a,\,b)$&quot;</span><span class="p">);</span>
 </pre></div>
 
 </div>
@@ -1811,7 +1812,7 @@ For simplicity, we'll use a <em>uniform</em> population where a complete sample 
 <div class="prompt input_prompt">In&nbsp;[270]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="c"># Generate the true (uncensored) samples.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Generate the true (uncensored) samples.</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
 <span class="n">true_rate</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">true_rate</span> <span class="o">*</span> <span class="p">(</span><span class="n">amx</span> <span class="o">-</span> <span class="n">amn</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">bmx</span> <span class="o">-</span> <span class="n">bmn</span><span class="p">))</span>
@@ -1820,21 +1821,21 @@ For simplicity, we'll use a <em>uniform</em> population where a complete sample 
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">bmn</span><span class="p">,</span> <span class="n">bmx</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="p">),</span>
 <span class="p">])</span><span class="o">.</span><span class="n">T</span>
 
-<span class="c"># Censor this dataset using the completeness function.</span>
+<span class="c1"># Censor this dataset using the completeness function.</span>
 <span class="n">q</span> <span class="o">=</span> <span class="n">detection_efficiency</span><span class="p">(</span><span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">K</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">q</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
 <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
 
-<span class="c"># Overplot the dataset on the completeness function. </span>
-<span class="n">pl</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">detection_efficiency</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&quot;gray&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">&quot;.r&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">&quot;.b&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># Overplot the dataset on the completeness function. </span>
+<span class="n">pl</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">detection_efficiency</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;.r&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;.b&quot;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="n">amn</span><span class="p">,</span> <span class="n">amx</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">bmn</span><span class="p">,</span> <span class="n">bmx</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;$a$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">r&quot;$b$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">r&quot;$Q(a,\,b)$&quot;</span><span class="p">);</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$a$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$b$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">r&quot;$Q(a,\,b)$&quot;</span><span class="p">);</span>
 </pre></div>
 
 </div>
@@ -9134,28 +9135,28 @@ To start, let's look at the IDE result</p>
 <div class="prompt input_prompt">In&nbsp;[271]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="c"># Define the bins.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define the bins.</span>
 <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">bmn</span><span class="p">,</span> <span class="n">bmx</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
 
-<span class="c"># Compute the inverse detection efficiency model.</span>
+<span class="c1"># Compute the inverse detection efficiency model.</span>
 <span class="n">n</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bin_edges</span><span class="p">)</span>
 <span class="n">n_ide</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bin_edges</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">q</span><span class="p">)</span>
 
-<span class="c"># This function makes a histogram plot given of a set of step heights.</span>
-<span class="k">def</span> <span class="nf">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">bin_heights</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="c1"># This function makes a histogram plot given of a set of step heights.</span>
+<span class="k">def</span> <span class="nf">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">bin_heights</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bin_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">:])))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="n">bh</span> <span class="o">=</span> <span class="n">bin_heights</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bh</span><span class="p">,</span> <span class="n">bh</span><span class="p">)))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">reluncert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="k">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">reluncert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pl</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">bin_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bin_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span>
-                    <span class="n">bh</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">bh</span> <span class="o">*</span> <span class="n">reluncert</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">,</span>
-                    <span class="n">capsize</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;color&quot;</span><span class="p">,</span> <span class="s">&quot;k&quot;</span><span class="p">))</span>
+                    <span class="n">bh</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">bh</span> <span class="o">*</span> <span class="n">reluncert</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                    <span class="n">capsize</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">))</span>
         
-<span class="n">pl</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">true_rate</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-<span class="n">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">n_ide</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;$b$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">r&quot;$\Gamma(b)$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">true_rate</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">n_ide</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$b$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$\Gamma(b)$&quot;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">800</span><span class="p">);</span>
 </pre></div>
 
@@ -9665,7 +9666,7 @@ $$b_n \le b < b_{n+1} \quad \mathrm{and} \quad 1 \le a < 2 \quad.$$
 <div class="prompt input_prompt">In&nbsp;[272]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="c"># Loop over the bins and numerically integrate Q(a, b) over a.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Loop over the bins and numerically integrate Q(a, b) over a.</span>
 <span class="n">N</span> <span class="o">=</span> <span class="mi">50000</span>
 <span class="n">bq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">a0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">amn</span><span class="p">,</span> <span class="n">amx</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
@@ -9673,10 +9674,10 @@ $$b_n \le b < b_{n+1} \quad \mathrm{and} \quad 1 \le a < 2 \quad.$$
     <span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">bin_edges</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">N</span><span class="p">)</span>
     <span class="n">bq</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">detection_efficiency</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">b0</span><span class="p">))</span>
 
-<span class="c"># Plot the integrated completeness function.</span>
-<span class="n">plot_histogram</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">bq</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;$b$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">r&quot;$Q_\mathrm{int}(b)$&quot;</span><span class="p">)</span>
+<span class="c1"># Plot the integrated completeness function.</span>
+<span class="n">plot_histogram</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">bq</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$b$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$Q_\mathrm</span><span class="si">{int}</span><span class="s2">(b)$&quot;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 
@@ -10109,12 +10110,12 @@ height=404
 <div class="prompt input_prompt">In&nbsp;[273]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">pl</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">true_rate</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pl</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">true_rate</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="n">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">n_ide</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">offset</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span>
-          <span class="n">ls</span><span class="o">=</span><span class="s">&quot;dotted&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">n</span> <span class="o">/</span> <span class="n">bq</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">r&quot;$b$&quot;</span><span class="p">)</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">r&quot;$\Gamma(b)$&quot;</span><span class="p">)</span>
+          <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;dotted&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">plot_hist</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">,</span> <span class="n">n</span> <span class="o">/</span> <span class="n">bq</span><span class="p">,</span> <span class="n">reluncert</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">r&quot;$b$&quot;</span><span class="p">)</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">r&quot;$\Gamma(b)$&quot;</span><span class="p">)</span>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">800</span><span class="p">);</span>
 </pre></div>
 
@@ -10810,7 +10811,7 @@ Therefore, in my next post, I'll relax the assumption of negligible uncertaintie
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre> 
+<div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
 </div>

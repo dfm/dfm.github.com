@@ -5,6 +5,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <title>Python modules in C by Dan Foreman-Mackey</title>
 <meta id="viewport" name="viewport" content="width=500" />
+<meta name="description" content="Dan Foreman-Mackey is a Sagan Fellow in the Astronomy Department at the University of Washington" />
 
 
 <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
@@ -96,7 +97,7 @@ $$</p>
 <p>It's probably overkill to write this function in C but it'll do for our
 purposes today. In C, the file <code>chi2.c</code> containing our function should look
 something like:</p>
-<div class="highlight"><pre><span class="cp">#include &quot;chi2.h&quot;</span>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
 
 <span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
@@ -113,7 +114,7 @@ something like:</p>
 
 
 <p>And the corresponding header file <code>chi2.h</code> is simply:</p>
-<div class="highlight"><pre><span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">);</span>
 </pre></div>
 
 
@@ -129,16 +130,16 @@ just a minute ago).</p>
 the first thing that we need to do is import the Python header. I also
 expect that we'll want to interact with <code>numpy</code> arrays and our <code>chi2</code>
 function as well so let's import those headers too:</p>
-<div class="highlight"><pre><span class="cp">#include &lt;Python.h&gt;</span>
-<span class="cp">#include &lt;numpy/arrayobject.h&gt;</span>
-<span class="cp">#include &quot;chi2.h&quot;</span>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;numpy/arrayobject.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
 </pre></div>
 
 
 <p>Next, we should write the
 <a href="http://www.python.org/dev/peps/pep-0257/">docstrings</a> for our module and
 the function that we're wrapping:</p>
-<div class="highlight"><pre><span class="k">static</span> <span class="kt">char</span> <span class="n">module_docstring</span><span class="p">[]</span> <span class="o">=</span>
+<div class="highlight"><pre><span></span><span class="k">static</span> <span class="kt">char</span> <span class="n">module_docstring</span><span class="p">[]</span> <span class="o">=</span>
     <span class="s">&quot;This module provides an interface for calculating chi-squared using C.&quot;</span><span class="p">;</span>
 <span class="k">static</span> <span class="kt">char</span> <span class="n">chi2_docstring</span><span class="p">[]</span> <span class="o">=</span>
     <span class="s">&quot;Calculate the chi-squared of some data given a model.&quot;</span><span class="p">;</span>
@@ -146,7 +147,7 @@ the function that we're wrapping:</p>
 
 
 <p>and declare the function:</p>
-<div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">);</span>
 </pre></div>
 
 
@@ -173,7 +174,7 @@ specification but let's not get into that here.</p>
 <p>Now, we'll specify what the members of this module will be. In this case
 there is only going to be one function (called <code>chi2</code>) so the "method
 definition" looks like:</p>
-<div class="highlight"><pre><span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">module_methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">module_methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="p">{</span><span class="s">&quot;chi2&quot;</span><span class="p">,</span> <span class="n">chi2_chi2</span><span class="p">,</span> <span class="n">METH_VARARGS</span><span class="p">,</span> <span class="n">chi2_docstring</span><span class="p">},</span>
     <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span>
 <span class="p">};</span>
@@ -192,7 +193,7 @@ METH_KEYWORDS</code></a>.</p>
 <p>The final step in initializing your new C module is to write an <code>init{name}</code>
 function. This function <strong>must</strong> be called <code>init_chi2</code> where <code>_chi2</code> is
 (of course) the name of the module.</p>
-<div class="highlight"><pre><span class="n">PyMODINIT_FUNC</span> <span class="nf">init_chi2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">PyMODINIT_FUNC</span> <span class="nf">init_chi2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span> <span class="o">=</span> <span class="n">Py_InitModule3</span><span class="p">(</span><span class="s">&quot;_chi2&quot;</span><span class="p">,</span> <span class="n">module_methods</span><span class="p">,</span> <span class="n">module_docstring</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
@@ -219,7 +220,7 @@ and y-intercept of our model) and three <code>numpy</code> arrays for the <em>x<
 and uncertainties that constitute the "data" that we're trying to model.
 Let's just throw down the whole function here and then dissect it line-by-line
 below:</p>
-<div class="highlight"><pre><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">x_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">y_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">yerr_obj</span><span class="p">;</span>
@@ -373,25 +374,25 @@ way to do this is to use the built-in Python <a href="http://docs.python.org/dis
 utilities</a>. Traditionally,
 the build script is called <code>setup.py</code> and for our example, the file
 is actually extremely simple:</p>
-<div class="highlight"><pre><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
 <span class="kn">import</span> <span class="nn">numpy.distutils.misc_util</span>
 
 <span class="n">setup</span><span class="p">(</span>
-    <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s">&quot;_chi2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;_chi2.c&quot;</span><span class="p">,</span> <span class="s">&quot;chi2.c&quot;</span><span class="p">])],</span>
+    <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s2">&quot;_chi2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;_chi2.c&quot;</span><span class="p">,</span> <span class="s2">&quot;chi2.c&quot;</span><span class="p">])],</span>
     <span class="n">include_dirs</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">distutils</span><span class="o">.</span><span class="n">misc_util</span><span class="o">.</span><span class="n">get_numpy_include_dirs</span><span class="p">(),</span>
 <span class="p">)</span>
 </pre></div>
 
 
 <p>and you can call it using the command:</p>
-<div class="highlight"><pre>python setup.py build_ext --inplace
+<div class="highlight"><pre><span></span>python setup.py build_ext --inplace
 </pre></div>
 
 
 <p>which will compile and link you source code and create a shared object
 called <code>_chi2.so</code> in the same directory. Then, from Python, you can do
 the following:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">_chi2</span>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">_chi2</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">_chi2</span><span class="o">.</span><span class="n">chi2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">30.6</span><span class="p">],</span>
 <span class="o">...</span>                            <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">63.0</span><span class="p">],</span>
 <span class="o">...</span>                            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
@@ -412,8 +413,8 @@ yet.</p>
 <p>To see all the source code for this tutorial in one place, you can
 check out <a href="https://gist.github.com/3247796">the gist</a> or clone the
 repository using <code>git</code>:</p>
-<div class="highlight"><pre>git clone git://gist.github.com/3247796.git c_ext
-<span class="nb">cd </span>c_ext
+<div class="highlight"><pre><span></span>git clone git://gist.github.com/3247796.git c_ext
+<span class="nb">cd</span> c_ext
 python setup.py build_ext --inplace
 </pre></div>
 
