@@ -22539,7 +22539,7 @@ C_n = M^{-1}\,S_n\,(M^{-1})^\mathrm{T} \quad.
 $$<p>Using <a href="https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_inversion">the block matrix inverse equations</a>, we can  find the inverse of $M$ to be</p>
 $$
 M^{-1} = \frac{1}{1+\vec{m}^\mathrm{T}\,\vec{m}}\left(\begin{array}{cc}
-I_{D-1} - \vec{m}^\mathrm{T}\,\vec{m} & \vec{m} \\
+I_{D-1} - \vec{m}\,\vec{m}^\mathrm{T} & \vec{m} \\
 -\vec{m}^\mathrm{T} & 1
 \end{array}\right) \quad.
 $$<p>Armed with these equations and some patience, we can derive the general expressions for the mean $\mu$ and covariance $C$, but I'll spare you the details and just give the results for the relevant values.
