@@ -136,7 +136,9 @@ I'm sure that this is written somewhere else in the literature with different no
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -1475,7 +1477,7 @@ Here's the model in code:</p>
 <span class="n">nwalkers</span> <span class="o">=</span> <span class="mi">64</span>
 <span class="n">xhat0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">m_true</span><span class="p">,</span> <span class="n">b_true</span><span class="p">],</span> <span class="n">xhat0</span><span class="p">)</span>
-<span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">))</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">))</span>
 
 <span class="n">sampler_naive</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">log_prob_naive</span><span class="p">)</span>
 <span class="n">pos</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sampler_naive</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
@@ -1518,7 +1520,9 @@ Here's the model in code:</p>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>2217 independent samples of m
 3267 independent samples of b
@@ -1559,7 +1563,9 @@ Here's the model in code:</p>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -3373,7 +3379,9 @@ The main thing to note about this equation is that you <em>must</em> include the
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>4402 independent samples of m
 3998 independent samples of b
@@ -3381,7 +3389,9 @@ The main thing to note about this equation is that you <em>must</em> include the
 </div>
 </div>
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -5551,7 +5561,9 @@ As expected, these results are indistinguishable within the sampling error, but 
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -10613,7 +10625,9 @@ In this case, $\vec{v}^\mathrm{T}\,\Lambda\,\vec{v}$ simplifies to $\lambda^2$.<
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -11910,7 +11924,7 @@ $$
 <span class="c1"># Run the MCMC.</span>
 <span class="n">sampler_scatter</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">log_marg_prob_scatter</span><span class="p">)</span>
 <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">m_true</span><span class="p">,</span> <span class="n">b_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_true</span><span class="p">)])</span>
-<span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">))</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">))</span>
 <span class="n">pos</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sampler_scatter</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
 <span class="n">sampler_scatter</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 <span class="n">sampler_scatter</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="mi">6000</span><span class="p">)</span>
@@ -11934,7 +11948,9 @@ $$
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>7734 independent samples of m
 9528 independent samples of b
@@ -11943,7 +11959,9 @@ $$
 </div>
 </div>
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -16358,7 +16376,9 @@ You can see that the constaints are wider than previously, but things seemed to 
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -22643,7 +22663,9 @@ It's a bit trickier to plot the simulated data in higher dimensions so we'll plo
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -25497,7 +25519,7 @@ height=462
 <span class="c1"># Run the MCMC.</span>
 <span class="n">sampler_D</span> <span class="o">=</span> <span class="n">emcee</span><span class="o">.</span><span class="n">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">log_prob_D</span><span class="p">)</span>
 <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_true</span><span class="p">,</span> <span class="p">[</span><span class="n">b_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_true</span><span class="p">)])</span>
-<span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">))</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">+</span> <span class="mf">1e-4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p0</span><span class="p">))</span>
 <span class="n">pos</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sampler_D</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
 <span class="n">sampler_D</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 <span class="n">sampler_D</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
@@ -25522,7 +25544,9 @@ height=462
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>11514 independent samples of m1
 5614 independent samples of m2
@@ -25532,7 +25556,9 @@ height=462
 </div>
 </div>
 
-<div class="output_area"><div class="prompt"></div>
+<div class="output_area">
+<div class="prompt"></div>
+
 
 
 <div class="output_png output_subarea ">
@@ -38985,7 +39011,10 @@ Hope this is helpful and please let me know of any mistakes in my work via the c
 </div>
 </div>
 
-</div></p>
+</div>
+ 
+
+</p>
 </section>
 
 <section>
