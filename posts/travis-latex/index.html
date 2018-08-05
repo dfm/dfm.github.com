@@ -72,7 +72,7 @@ Since then, I've started using it for <a href="https://github.com/dfm/celerite/b
 <a href="http://astrowizici.st/">Andy Casey</a> and I have both iterated to come up with a streamlined procedure that doesn't use all of the resources provided by Travis so I wanted to document what I've settled on.</p>
 <p>To get started, choose a GitHub repository that has a paper in it.
 I'll assume that the paper is in a subdirectory called <code>paper</code> and that the TeX file is called <code>ms.tex</code>, but it shouldn't be too hard to change these assumptions for your use case.
-If your repository isn't already using Travis, you should create a <code>.travis.yml</code> file, log into Travis (using your GitHub account), and enable builds for that repository (<a href="https://www.google.com/search?q=getting+started+with+travis+ci">there are resources online to get you started</a>).
+If your repository isn't already using Travis, you should create a <code>.travis.yml</code> file (at the top-level directory of your git repo), log into Travis (using your GitHub account), and enable builds for that repository (<a href="https://www.google.com/search?q=getting+started+with+travis+ci">there are resources online to get you started</a>).
 You'll also need to give Travis push access to your repository.
 To do this, <a href="https://github.com/settings/tokens">go to your GitHub settings and create a new personal access token</a>.
 Give it a good name and make sure that you enable <code>repo</code> access.
@@ -98,7 +98,7 @@ While you're in the settings, you might also want to enable the "Build only if .
 <p>It should be possible to combine this with any other tests that you're already running.
 For <a href="https://github.com/dfm/celerite/blob/master/.travis.yml">one of my projects</a>, I have combined this with testing C++ and several versions of Python and NumPy.</p>
 <p>The (yet non-existant) script <code>build-paper.sh</code> will check if any changes have been made in the <code>paper</code> subdirectory and, if they have, install the <a href="https://tectonic-typesetting.github.io">Tectonic</a> typesetting package using <code>conda</code>, compile the paper from source, and force-push the paper to a new branch called <code>master-pdf</code> (assuming you're currently on the <code>master</code> branch).
-To make this happen, create the file <code>.ci/build-paper.sh</code>, make it executable (<code>chmod +x .ci/build-paper.sh</code>), and add the following contents:</p>
+To make this happen, create the file <code>.ci/build-paper.sh</code> (at the top-level directory of your git repo; that is, the subdir <code>.ci</code> should be at the top level), make <code>build-paper.sh</code> executable (<code>chmod +x .ci/build-paper.sh</code>), and add the following contents:</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/bin/bash -x</span>
 
 <span class="k">if</span> git diff --name-only <span class="nv">$TRAVIS_COMMIT_RANGE</span> <span class="p">|</span> grep <span class="s1">&#39;paper/&#39;</span>
@@ -135,6 +135,7 @@ Then you'll get something that looks like this:</p>
 <p><a href="https://github.com/dfm/celerite/blob/master-pdf/paper/ms.pdf"><img src="https://img.shields.io/badge/PDF-latest-orange.svg?style=flat" alt=""></a></p>
 <p><em>(You can click on that to read the most up-to-date version of my most recent paper!)</em></p>
 <p>If you run into any issues, put them in the comments and let's try to debug.</p>
+<p>Thanks to <a href="https://github.com/dfm/dfm.io/pull/1">David W. Hogg for clarifications</a>.</p>
 
 </div>
 </div>
