@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/autocorr.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><em>This is a cross post from the new</em> <a href="http://emcee.readthedocs.io">emcee documentation</a>.</p>
 <p>In this tutorial, we will discuss a method for convincing yourself that your chains are sufficiently converged.
@@ -74,10 +72,8 @@ There are other convergence diagnostics like the <a href="http://digitalassets.l
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Monte-Carlo-error">Monte Carlo error<a class="anchor-link" href="#Monte-Carlo-error">&#182;</a></h2><p>The goal of every MCMC analysis is to evaluate integrals of the form</p>
 $$
@@ -103,10 +99,8 @@ Instead, you must compute a different $\tau_f$ for any integral you estimate usi
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Computing-autocorrelation-times">Computing autocorrelation times<a class="anchor-link" href="#Computing-autocorrelation-times">&#182;</a></h2><p>There is a great discussion of methods for autocorrelation estimation in <a href="https://pdfs.semanticscholar.org/0bfe/9e3db30605fe2d4d26e1a288a5e2997e7225.pdf">a set of lecture notes by Alan Sokal</a> and the interested reader should take a look at that for a more formal discussion, but I'll include a summary of some of the relevant points here.
 The integrated autocorrelation time is defined as</p>
@@ -138,10 +132,8 @@ Sokal says that he finds this procedure to work well for chains longer than $100
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="A-toy-problem">A toy problem<a class="anchor-link" href="#A-toy-problem">&#182;</a></h2><p>To demonstrate this method, we'll start by generating a set of "chains" from a process with known autocorrelation structure.
 To generate a large enough dataset, we'll use <a href="http://celerite.readthedocs.io">celerite</a>:</p>
@@ -184,7 +176,7 @@ To generate a large enough dataset, we'll use <a href="http://celerite.readthedo
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">tau_\mathrm{{true}} = </span><span class="si">{0:.0f}</span><span class="s2">$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">true_tau</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -193,7 +185,9 @@ To generate a large enough dataset, we'll use <a href="http://celerite.readthedo
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -2916,10 +2910,8 @@ height=406
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we'll estimate the empirical autocorrelation function for each of these parallel chains and compare this to the true function.</p>
 
@@ -2974,7 +2966,7 @@ height=406
 <span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -2983,7 +2975,9 @@ height=406
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -4628,10 +4622,8 @@ height=409
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This figure shows how the empirical estimate of the normalized autocorrelation function changes as more samples are generated.
 In each panel, the true autocorrelation function is shown as a black curve and the empricial estimator is shown as a blue line.</p>
@@ -4663,7 +4655,7 @@ It turns out that we'll actually do this averaging later in the process below, b
 <span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -4672,7 +4664,9 @@ It turns out that we'll actually do this averaging later in the process below, b
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -6187,10 +6181,8 @@ height=409
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now let's estimate the autocorrelation time using these estimated autocorrelation functions.
 Goodman &amp; Weare (2010) suggested averaging the ensemble over walkers and computing the autocorrelation function of the mean chain to lower the variance of the estimator and that was what was originally implemented in emcee.
@@ -6249,7 +6241,7 @@ This is absolutely correct and, instead of the Goodman &amp; Weare method, we no
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -6258,7 +6250,9 @@ This is absolutely correct and, instead of the Goodman &amp; Weare method, we no
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -7499,10 +7493,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, the true autocorrelation time is shown as a horizontal line and it should be clear that both estimators give outrageous results for the short chains.
 It should also be clear that the new algorithm has lower variance than the original method based on Goodman &amp; Weare.
@@ -7514,10 +7506,8 @@ Larger values of $F$ will be more conservative, but they will also (obviously) r
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="A-more-realistic-example">A more realistic example<a class="anchor-link" href="#A-more-realistic-example">&#182;</a></h2><p>Now, let's run an actual Markov chain and test these methods using those samples.
 So that the sampling isn't completely trivial, we'll sample a multimodal density in three dimensions.</p>
@@ -7541,7 +7531,7 @@ So that the sampling isn't completely trivial, we'll sample a multimodal density
                  <span class="mi">500000</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7550,7 +7540,9 @@ So that the sampling isn't completely trivial, we'll sample a multimodal density
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>100%|██████████| 500000/500000 [08:08&lt;00:00, 1023.55it/s]
@@ -7562,10 +7554,8 @@ So that the sampling isn't completely trivial, we'll sample a multimodal density
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Here's the marginalized density in the first dimension.</p>
 
@@ -7585,7 +7575,7 @@ So that the sampling isn't completely trivial, we'll sample a multimodal density
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$p(\theta)$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7594,7 +7584,9 @@ So that the sampling isn't completely trivial, we'll sample a multimodal density
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -7806,10 +7798,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And here's the comparison plot showing how the autocorrelation time estimates converge with longer chains.</p>
 
@@ -7840,7 +7830,7 @@ height=386
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7849,7 +7839,9 @@ height=386
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -9095,10 +9087,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As before, the short chains give absurd estimates of $\tau$, but the new method converges faster and with lower variance than the old method.
 The $\tau = N/50$ line is also included as above as an indication of where we might start trusting the estimates.</p>
@@ -9106,10 +9096,8 @@ The $\tau = N/50$ line is also included as above as an indication of where we mi
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="What-about-shorter-chains?">What about shorter chains?<a class="anchor-link" href="#What-about-shorter-chains?">&#182;</a></h2><p>Sometimes it just might not be possible to run chains that are long enough to get a reliable estimate of $\tau$ using the methods described above.
 In these cases, you might be able to get an estimate using parametric models for the autocorrelation.
@@ -9176,7 +9164,7 @@ The celerite model that we're using is equivalent to a second-order ARMA model a
     <span class="n">ml</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">autocorr_ml</span><span class="p">(</span><span class="n">chain</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n</span><span class="p">],</span> <span class="n">thin</span><span class="o">=</span><span class="n">thin</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9198,7 +9186,7 @@ The celerite model that we're using is equivalent to a second-order ARMA model a
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9207,7 +9195,9 @@ The celerite model that we're using is equivalent to a second-order ARMA model a
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -10568,10 +10558,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This figure is the same as the previous one, but we've added the maximum likelihood estimates for $\tau$ in green.
 In this case, this estimate seems to be robust even for very short chains with $N \sim \tau$.</p>
@@ -10587,7 +10575,7 @@ In this case, this estimate seems to be robust even for very short chains with $
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 

@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/pymc3-mass-matrix.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In my work I often come across probabilistic models where there are strong correlations between parameters.
 This certainly isn't a special feature of the problems that I work on, and the general advice from MCMC practitioners is that we should reparameterize our models in some form that removes the covariances, but this isn't always practical.
@@ -108,7 +106,7 @@ I have found that this can have a <em>huge</em> effect (a few orders of magnitud
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;time per effective sample: </span><span class="si">{0:.5f}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">simple_time_per_eff</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -117,7 +115,9 @@ I have found that this can have a <em>huge</em> effect (a few orders of magnitud
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Auto-assigning NUTS sampler...
@@ -127,7 +127,9 @@ Initializing NUTS using jitter+adapt_diag...
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>PyMC3 version 3.5
@@ -136,7 +138,9 @@ Initializing NUTS using jitter+adapt_diag...
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Multiprocess sampling (2 chains in 2 jobs)
@@ -147,7 +151,9 @@ Sampling 2 chains: 100%|██████████| 12000/12000 [00:04&lt;00
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>time per effective sample: 0.26766 ms
@@ -159,10 +165,8 @@ Sampling 2 chains: 100%|██████████| 12000/12000 [00:04&lt;00
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>On my laptop with two CPUs, I find that the computational cost per effective sample is a fraction of a millisecond.
 That's how things should be!</p>
@@ -193,7 +197,7 @@ First, let's take a look at a <a href="https://corner.readthedocs.io">corner plo
 <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$x_{{</span><span class="si">{0}</span><span class="s2">}}$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ndim</span><span class="o">+</span><span class="mi">1</span><span class="p">)]);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -202,7 +206,9 @@ First, let's take a look at a <a href="https://corner.readthedocs.io">corner plo
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -10480,10 +10486,8 @@ height=1148
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This plot will look familiar to any astronomers reading this (and probably some readers from other fields) because our parameters are often correlated and the dynamic range of the parameters can vary drastically.
 If you used emcee to sample this posterior and the isotropic case above, you would get identical performance (albeit somewhat worse performance than PyMC3) but, as we'll see, the same is not true of PyMC3.
@@ -10510,7 +10514,7 @@ Let's try to sample this probability density using PyMC3's default settings.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;time per effective sample: </span><span class="si">{0:.5f}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">default_time_per_eff</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -10519,7 +10523,9 @@ Let's try to sample this probability density using PyMC3's default settings.</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Auto-assigning NUTS sampler...
@@ -10535,7 +10541,9 @@ The number of effective samples is smaller than 10% for some parameters.
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>time per effective sample: 1719.01749 ms
@@ -10547,10 +10555,8 @@ The number of effective samples is smaller than 10% for some parameters.
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Yes, the units here are the same and the computational efficiency is orders of magnitude worse than the isotropic case.
 The standard recommendation would be to re-parameterize (we can see that that's what PyMC3 is telling us to do here too), but I'm not really clever or patient enough to do that in every case.
@@ -10574,15 +10580,13 @@ First, let's choose a tuning schedule roughly following section 34.2 from the <a
 <span class="n">n_window</span> <span class="o">=</span> <span class="n">n_window</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Next, here's a function that takes in a MultiTrace object from PyMC3, estimates the sample covariance, and builds a NUTS step for use in the <code>sample</code> method.</p>
 
@@ -10634,15 +10638,13 @@ First, let's choose a tuning schedule roughly following section 34.2 from the <a
     <span class="k">return</span> <span class="n">pm</span><span class="o">.</span><span class="n">NUTS</span><span class="p">(</span><span class="n">potential</span><span class="o">=</span><span class="n">potential</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally, we can combine our tuning schedule with this proposal estimator to automatically learn the mass matrix during burn-in.</p>
 
@@ -10677,7 +10679,7 @@ First, let's choose a tuning schedule roughly following section 34.2 from the <a
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;time per effective sample: </span><span class="si">{0:.5f}</span><span class="s2"> ms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dense_time_per_eff</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -10686,7 +10688,9 @@ First, let's choose a tuning schedule roughly following section 34.2 from the <a
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Only 2 samples in chain.
@@ -10730,7 +10734,9 @@ Sampling 2 chains: 100%|██████████| 11000/11000 [00:09&lt;00
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>time per effective sample: 0.75394 ms
@@ -10739,7 +10745,9 @@ Sampling 2 chains: 100%|██████████| 11000/11000 [00:09&lt;00
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>
@@ -10751,10 +10759,8 @@ Sampling 2 chains: 100%|██████████| 11000/11000 [00:09&lt;00
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The computational efficiency of this method is similar to PyMC3's default performance on an isotropic Gaussian (within a factor of a few) and corresponds to an improvement of more than <em>three orders of magnitude</em> over the default PyMC3 performance on a correlated Gaussian.</p>
 <p>While I've found that this procedure can substantially improve the sampling efficiency in many real world scenerios (especially during exploratory phases of a project), you shouldn't forget about reparameterization because that can provide even better performance and help identify problems with your model specification.

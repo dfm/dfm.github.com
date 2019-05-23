@@ -56,12 +56,12 @@
     <blockquote>
 <p>This post was generated from an IPython notebook that can be downloaded
 <a href="/downloads/notebooks/fitting-a-plane.ipynb">here</a>.</p>
+<p>This post can be cited with the DOI:
+<a href="https://doi.org/10.5281/zenodo.15856">10.5281/zenodo.15856</a></p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Who knew that it was possible to say more about how to fit a line to data?
 Recently, Megan Bedell asked about how to generalize the method described in section 7 of <a href="https://arxiv.org/abs/1008.4686">the bible</a> for fitting a line to data with 2-dimensional error elipses to higher dimensional problems, and how to include intrinsic scatter in that relation.
@@ -128,7 +128,7 @@ I'm sure that this is written somewhere else in the literature with different no
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -137,7 +137,9 @@ I'm sure that this is written somewhere else in the literature with different no
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -1390,10 +1392,8 @@ height=462
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, you're seeing the simulated dataset with its error ellipses shown in black.
 The true linear relation that was used to simulate the data is shown in blue.</p>
@@ -1405,8 +1405,8 @@ p(\{y_n,\,x_n\}\,|\,m,\,b,\,\{\hat{x}_n,\,S_n\}) = \prod_{n=1}^N \frac{1}{2\,\pi
 $$<p>where $m$ and $b$ are the usual slope and intercept of the line, $x_n$ and $y_n$ are the observations, $S_n$ is the uncertainty tensor of the $n$-th data point:</p>
 $$
 S_n = \left(\begin{array}{cc}
-    {\sigma_{x,n}}^2 & {\sigma_{xy,n}} \\
-    {\sigma_{xy,n}} & {\sigma_{y,n}}^2 \\
+    {\sigma_{x,n}}^2 &amp; {\sigma_{xy,n}} \\
+    {\sigma_{xy,n}} &amp; {\sigma_{y,n}}^2 \\
 \end{array}\right) \quad,
 $$<p>and $\vec{r}_n$ is the residual vector:</p>
 $$
@@ -1452,15 +1452,13 @@ Here's the model in code:</p>
     <span class="k">return</span> <span class="n">ll</span> <span class="o">+</span> <span class="n">log_prior</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's use <a href="http://dan.iel.fm/emcee">emcee</a> to sample this density:</p>
 
@@ -1486,15 +1484,13 @@ Here's the model in code:</p>
 <span class="n">samples_naive</span> <span class="o">=</span> <span class="n">sampler_naive</span><span class="o">.</span><span class="n">flatchain</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We'll look at the integrated autocorrelation time to judge convergence:</p>
 
@@ -1512,7 +1508,7 @@ Here's the model in code:</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:.0f}</span><span class="s2"> independent samples of b&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nsamples</span> <span class="o">/</span> <span class="n">tau</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1521,7 +1517,9 @@ Here's the model in code:</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>2217 independent samples of m
@@ -1534,10 +1532,8 @@ Here's the model in code:</p>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And plot the posterior constraints on $m$ and $b$:</p>
 
@@ -1555,7 +1551,7 @@ Here's the model in code:</p>
               <span class="nb">range</span><span class="o">=</span><span class="n">rng</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1564,7 +1560,9 @@ Here's the model in code:</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -3291,10 +3289,8 @@ height=515
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Cool.
 That looks fine, but the problem here is that this won't really scale well to large datasets because we'll need a parameter $\hat{x}_n$ for each data point.
@@ -3303,8 +3299,8 @@ It turns out (thanks to the magic of Gaussians) that we can analytically margina
 The integral that we need to compute is:</p>
 $$
 \begin{eqnarray}
-p(y_n,\,x_n\,|\,m,\,b,\,S_n) &=& \int_{-x_\mathrm{min}}^{x_\mathrm{max}} p(\hat{x}_n) \, p(y_n,\,x_n\,|\,m,\,b,\,\hat{x}_n,\,S_n)\,\mathrm{d}\hat{x}_n \\
-&=& \frac{1}{x_\mathrm{max} - x_\mathrm{min}} \int_{-x_\mathrm{min}}^{x_\mathrm{max}} p(y_n,\,x_n\,|\,m,\,b,\,\hat{x}_n,\,S_n)\,\mathrm{d}\hat{x}_n
+p(y_n,\,x_n\,|\,m,\,b,\,S_n) &amp;=&amp; \int_{-x_\mathrm{min}}^{x_\mathrm{max}} p(\hat{x}_n) \, p(y_n,\,x_n\,|\,m,\,b,\,\hat{x}_n,\,S_n)\,\mathrm{d}\hat{x}_n \\
+&amp;=&amp; \frac{1}{x_\mathrm{max} - x_\mathrm{min}} \int_{-x_\mathrm{min}}^{x_\mathrm{max}} p(y_n,\,x_n\,|\,m,\,b,\,\hat{x}_n,\,S_n)\,\mathrm{d}\hat{x}_n
 \end{eqnarray}
 $$<p>In order to simplify the math, I'll be a little sloppy here and send $x_\mathrm{min} \to -\infty$ and $x_\mathrm{max} \to \infty$, but ignore the fact that this makes the constant $1/(x_\mathrm{max} - x_\mathrm{min})$ zero.
 This inconsistency is caused by the fact that we used an improper prior above and there are more rigorous ways to derive and interpret this result—by putting a broad Gaussian prior on $\hat{x}_n$, for example—but this won't change the results.
@@ -3371,7 +3367,7 @@ The main thing to note about this equation is that you <em>must</em> include the
 <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">samples_marg</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -3380,7 +3376,9 @@ The main thing to note about this equation is that you <em>must</em> include the
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>4402 independent samples of m
@@ -3390,7 +3388,9 @@ The main thing to note about this equation is that you <em>must</em> include the
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -5520,10 +5520,8 @@ height=515
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, you see the same results from before (in black) when we sampled in $m$, $b$, and $\hat{x}_n$.
 The green contours are what we got when we sampled the analytically marginalized probability density.
@@ -5553,7 +5551,7 @@ As expected, these results are indistinguishable within the sampling error, but 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -5562,7 +5560,9 @@ As expected, these results are indistinguishable within the sampling error, but 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -10531,10 +10531,8 @@ height=462
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, the true model is shown as the black line and several posterior samples are shown as light green lines.</p>
 <h2 id="Intrinsic-scatter">Intrinsic scatter<a class="anchor-link" href="#Intrinsic-scatter">&#182;</a></h2><p>Now, let's generalize our derivation from above to include an intrinsic width to the line.
@@ -10551,8 +10549,8 @@ $$<p>where $\Lambda$ is a 2x2 tensor describing the width of the line, and we ha
 In this case, we can multiply this Gaussian by the Gaussian defined in <a href="#Naïve-sampling">the first equation in the first section</a> and integrate out $\hat{x}_n$ and $\hat{y}_n$ (Section 8.1.8 of <a href="http://compbio.fmph.uniba.sk/vyuka/ml/old/2008/handouts/matrix-cookbook.pdf">this document</a> might come in handy) to find:</p>
 $$
 \begin{eqnarray}
-&&p(\{y_n,\,x_n\}\,|\,m,\,b,\,\{\tilde{x}_n,\,S_n\},\,\Lambda) \\
-&=& \prod_{n=1}^N \frac{1}{2\,\pi\,\sqrt{\det (S_n+\Lambda)}}
+&amp;&amp;p(\{y_n,\,x_n\}\,|\,m,\,b,\,\{\tilde{x}_n,\,S_n\},\,\Lambda) \\
+&amp;=&amp; \prod_{n=1}^N \frac{1}{2\,\pi\,\sqrt{\det (S_n+\Lambda)}}
 \exp\left(-\frac{1}{2}\,{\tilde{r}_n}^\mathrm{T}\,({S_n} + \Lambda)^{-1}\,{\tilde{r}_n}\right)
 \end{eqnarray}
 $$<p>where</p>
@@ -10568,15 +10566,15 @@ $$<p>where $\Delta_n$ is defined above and ${\tilde{\Sigma}_n}^2 = \vec{v}^\math
 <li>If the scatter is perpendicular to the line with some variance $\lambda^2$, then
 $$
 \Lambda = \frac{\lambda^2}{1+m^2}\,\left(\begin{array}{cc}
-m^2 & -m \\
--m & 1
+m^2 &amp; -m \\
+-m &amp; 1
 \end{array}\right)
 $$</li>
 <li>If the scatter is only in the $y$ direction, then
 $$
 \Lambda = \lambda^2\,\left(\begin{array}{cc}
-0 & 0 \\
-0 & 1
+0 &amp; 0 \\
+0 &amp; 1
 \end{array}\right)
 $$</li>
 </ol>
@@ -10617,7 +10615,7 @@ In this case, $\vec{v}^\mathrm{T}\,\Lambda\,\vec{v}$ simplifies to $\lambda^2$.<
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -10626,7 +10624,9 @@ In this case, $\vec{v}^\mathrm{T}\,\Lambda\,\vec{v}$ simplifies to $\lambda^2$.<
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -11882,10 +11882,8 @@ height=462
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This is the same kind of figure that we had before but now I'm indicating the extra scatter that was added to each data point with the black lines.
 You can see that all of these offsets are in the $y$ direction.</p>
@@ -11893,8 +11891,8 @@ You can see that all of these offsets are in the $y$ direction.</p>
 It's useful to choose a proper prior in this case so I'll choose (somewhat arbitrarily) a log-uniform prior between $e^{-5}$ and $e^5$:</p>
 $$
 p(\ln\lambda) \propto \left\{\begin{array}{ll}
-1 & \mathrm{if\,-5 < \ln\lambda < 5} \\
-0 & \mathrm{otherwise}
+1 &amp; \mathrm{if\,-5 &lt; \ln\lambda &lt; 5} \\
+0 &amp; \mathrm{otherwise}
 \end{array}\right.
 $$
 </div>
@@ -11940,7 +11938,7 @@ $$
               <span class="n">truths</span><span class="o">=</span><span class="p">[</span><span class="n">m_true</span><span class="p">,</span> <span class="n">b_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_true</span><span class="p">)]);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -11949,7 +11947,9 @@ $$
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>7734 independent samples of m
@@ -11960,7 +11960,9 @@ $$
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -16337,10 +16339,8 @@ height=725
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We can compare this sampling to the previous on (without scatter) by plotting some samples of the model in the "data" space.
 You can see that the constaints are wider than previously, but things seemed to have worked well.</p>
@@ -16368,7 +16368,7 @@ You can see that the constaints are wider than previously, but things seemed to 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -16377,7 +16377,9 @@ You can see that the constaints are wider than previously, but things seemed to 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -22512,10 +22514,8 @@ height=462
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Generalizing-to-higher-dimensions">Generalizing to higher dimensions<a class="anchor-link" href="#Generalizing-to-higher-dimensions">&#182;</a></h2><p>Now let's extend our discussion to fitting a plane to data in $D$ dimensions.
 Some people might have just been able to intuit the correct result here, but I wanted to derive it to make sure that I was happy so here it goes...</p>
@@ -22523,21 +22523,21 @@ Some people might have just been able to intuit the correct result here, but I w
 The observations are now $\{\vec{x}_n,\,y_n,\,S_n\}$ where $\vec{x}_n$ is a $D-1$ vector ${\boldsymbol{x}_n}^\mathrm{T} = (x_{1,n},\,\cdots,x_{d-1,n})$ and $S_n$ is a $D \times D$ matrix that we can write, without loss of generality, as the block matrix</p>
 $$
 S_n = \left(\begin{array}{cc}
-S_{x,n} & s_{xy,n} \\
-s_{xy,n}^\mathrm{T} & s_{y,n}
+S_{x,n} &amp; s_{xy,n} \\
+s_{xy,n}^\mathrm{T} &amp; s_{y,n}
 \end{array}\right)
 $$<p>where $S_{x,n}$ is the $D-1 \times D-1$ covariance for the $\vec{x}$s, $\vec{s}_{xy,n}$ is the $D-1$ covariance between $\vec{x}_n$ and $y_n$, and $s_{y,n} = {\sigma_{y,n}}^2$ is the (scalar) uncertainty variance for $y$.</p>
 <p>In this space, we can rewrite the likelihood in the first equation from <a href="#Naïve-sampling">Section 1</a> as</p>
 $$\begin{eqnarray}
-&&p(\{y_n,\,\vec{x}_n\}\,|\,\vec{m},\,b,\,\{\boldsymbol{\hat{x}}_n,\,S_n\}) \\
-&=& \prod_{n=1}^N \frac{1}{(2\,\pi)^{D/2}\,\sqrt{\det S_n}}
+&amp;&amp;p(\{y_n,\,\vec{x}_n\}\,|\,\vec{m},\,b,\,\{\boldsymbol{\hat{x}}_n,\,S_n\}) \\
+&amp;=&amp; \prod_{n=1}^N \frac{1}{(2\,\pi)^{D/2}\,\sqrt{\det S_n}}
 \exp\left(-\frac{1}{2}\,{(\vec{z}_n-M\,\boldsymbol{\hat{x}}_n-\vec{b})}^\mathrm{T}\,{S_n}^{-1}\,{(\vec{z}_n-M\,\boldsymbol{\hat{x}}_n-\vec{b})}\right)
 \end{eqnarray}
 $$<p>where ${\vec{z}_n}^\mathrm{T} = (x_{1,n},\,\ldots,\,x_{D-1,n},\,y_n)$, ${\boldsymbol{\hat{x}}_n}^\mathrm{T} = (\hat{x}_{1,n},\,\ldots,\,\hat{x}_{D-1,n},\,0)$, ${\vec{b}}^\mathrm{T} = (0,\,\ldots,\,b)$, and $M$ is the $D \times D$ matrix</p>
 $$
 M = \left(\begin{array}{cc}
-I_{D-1} & -\vec{m} \\
-\vec{m}^\mathrm{T} & 1
+I_{D-1} &amp; -\vec{m} \\
+\vec{m}^\mathrm{T} &amp; 1
 \end{array}\right)
 $$<p>where $I_{D-1}$ is the $D-1$ dimensional identity and $\vec{m}^\mathrm{T} = (m_1,\,\ldots,\,m_{D-1})$.</p>
 <p>Now that we have that notation out of the way, we now want to complete the square and marginalize over $\boldsymbol{\hat{x}}_n$.
@@ -22546,9 +22546,9 @@ Then the marginalized likelihood will be a one dimensional Gaussian with mean gi
 To manipulate this equation, let's write the argument of the exponential as follows</p>
 $$
 \begin{eqnarray}
-&& {(z_n-M\,\hat{x}_n-\vec{b})}^\mathrm{T}\,{S_n}^{-1}\,(\vec{z}_n-M\,\boldsymbol{\hat{x}}_n-\vec{b})\\
-&=& {\left[M\,M^{-1}\,(\vec{z}_n-M\,\boldsymbol{\hat{x}}_n-\vec{b})\right]}^\mathrm{T}\,{S_n}^{-1}\,\left[M\,M^{-1}\,(z_n-M\,\hat{x}_n-\vec{b})\right]\\
-&=& {\left[M^{-1}\,(\vec{z}_n - \vec{b}) - \boldsymbol{\hat{x}}_n\right]}^\mathrm{T}\,M^\mathrm{T}\,{S_n}^{-1}\,M\,\left[M^{-1}\,(\vec{z}_n - \vec{b}) - \boldsymbol{\hat{x}}_n\right]
+&amp;&amp; {(z_n-M\,\hat{x}_n-\vec{b})}^\mathrm{T}\,{S_n}^{-1}\,(\vec{z}_n-M\,\boldsymbol{\hat{x}}_n-\vec{b})\\
+&amp;=&amp; {\left[M\,M^{-1}\,(\vec{z}_n-M\,\boldsymbol{\hat{x}}_n-\vec{b})\right]}^\mathrm{T}\,{S_n}^{-1}\,\left[M\,M^{-1}\,(z_n-M\,\hat{x}_n-\vec{b})\right]\\
+&amp;=&amp; {\left[M^{-1}\,(\vec{z}_n - \vec{b}) - \boldsymbol{\hat{x}}_n\right]}^\mathrm{T}\,M^\mathrm{T}\,{S_n}^{-1}\,M\,\left[M^{-1}\,(\vec{z}_n - \vec{b}) - \boldsymbol{\hat{x}}_n\right]
 \end{eqnarray}
 $$<p>to find that each term in the likelihood is a $D$ dimensional Gaussian for $\boldsymbol{\hat{x}}_n$ with mean</p>
 $$
@@ -22559,8 +22559,8 @@ C_n = M^{-1}\,S_n\,(M^{-1})^\mathrm{T} \quad.
 $$<p>Using <a href="https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_inversion">the block matrix inverse equations</a>, we can  find the inverse of $M$ to be</p>
 $$
 M^{-1} = \frac{1}{1+\vec{m}^\mathrm{T}\,\vec{m}}\left(\begin{array}{cc}
-I_{D-1} - \vec{m}\,\vec{m}^\mathrm{T} & \vec{m} \\
--\vec{m}^\mathrm{T} & 1
+I_{D-1} - \vec{m}\,\vec{m}^\mathrm{T} &amp; \vec{m} \\
+-\vec{m}^\mathrm{T} &amp; 1
 \end{array}\right) \quad.
 $$<p>Armed with these equations and some patience, we can derive the general expressions for the mean $\mu$ and covariance $C$, but I'll spare you the details and just give the results for the relevant values.
 After marginalizing over $\hat{x}_n$, the marginalized likelihood resembles the previous one</p>
@@ -22573,8 +22573,8 @@ $$
 $$<p>and</p>
 $$
 \begin{eqnarray}
-{\Sigma_{D,n}}^2 &=& \vec{m}^\mathrm{T}\,S_{x,n}\,\vec{m} - 2\,\vec{m}^\mathrm{T}\,\vec{s}_{xy,n} + s_y \\
-&=& \vec{v}^\mathrm{T}\,S_n\,\vec{v}
+{\Sigma_{D,n}}^2 &amp;=&amp; \vec{m}^\mathrm{T}\,S_{x,n}\,\vec{m} - 2\,\vec{m}^\mathrm{T}\,\vec{s}_{xy,n} + s_y \\
+&amp;=&amp; \vec{v}^\mathrm{T}\,S_n\,\vec{v}
 \end{eqnarray}
 $$<p>where I have redefined $\vec{v}^\mathrm{T} = (-\vec{m},\,1)$.
 As you might hope, this looks pretty much identical to the result that we got for the two-dimensional case (this is why you might have just been able to intuit this result) .</p>
@@ -22655,7 +22655,7 @@ It's a bit trickier to plot the simulated data in higher dimensions so we'll plo
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -22664,7 +22664,9 @@ It's a bit trickier to plot the simulated data in higher dimensions so we'll plo
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -25536,7 +25538,7 @@ height=462
               <span class="n">truths</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_true</span><span class="p">,</span> <span class="p">[</span><span class="n">b_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lambda_true</span><span class="p">)]));</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -25545,7 +25547,9 @@ height=462
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>11514 independent samples of m1
@@ -25557,7 +25561,9 @@ height=462
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -38985,10 +38991,8 @@ height=935
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>If you made it this far, you might notice that I don't really have a reasonable prior for the slopes.
 The current prior (uniform in $\vec{m}$) will have the same problems that <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/#Prior-on-Slope-and-Intercept">Jake VanderPlas talks about on his blog</a>, but I decided that there's already too much in this post so I'll leave the generalization of that prior as an exercise for the reader :-)</p>
@@ -39007,7 +39011,7 @@ Hope this is helpful and please let me know of any mistakes in my work via the c
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 

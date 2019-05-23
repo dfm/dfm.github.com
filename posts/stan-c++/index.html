@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/stan-c++.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this blog post, I'll demonstrate how to use a custom C++ function in a <a href="http://mc-stan.org/">Stan</a> model using the Python interface <a href="http://mc-stan.org/interfaces/pystan.html">PyStan</a>. This was previously only possible using the R interface <a href="http://mc-stan.org/interfaces/rstan.html">RStan</a> (see <a href="https://cran.r-project.org/web/packages/rstan/vignettes/external.html">an example here</a>) so I hacked PyStan to make this possible in Python as well. You'll need to install <a href="https://github.com/dfm/pystan/tree/feature-external-c++">the 'feature-external-c++' branch of my fork of PyStan</a> to make this work. This is unlikely to get merged into PyStan because there is a hope that this will one day be a feature of the core Stan language, but if you're impatient and need this now, read on!</p>
 <p>Since I'm an astronomer, I'll motivate this demo using a specific example from astronomy but I expect that this is more broadly applicable. The basic motivation is that I have some existing C++ code that implements my model and its derivatives so I don't want to have to re-write the model in the Stan language. Furthermore, part of the model requires solving a transcendental equation numerically; it's not obvious that applying autodiff to an iterative solver is a great idea, but the analytic gradients are trivial to evaluate.</p>
@@ -114,7 +112,7 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -123,7 +121,9 @@
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -1005,10 +1005,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="The-problem-statement:-a-Kepler-solver-in-C++">The problem statement: a Kepler solver in C++<a class="anchor-link" href="#The-problem-statement:-a-Kepler-solver-in-C++">&#182;</a></h2><p>We want to fit this dataset using a Keplerian model where the radial velocity is given by</p>
 $$
@@ -1074,15 +1072,13 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 <span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The main difference between this implementation and the one above is that the function takes an extra <code>std::ostream*</code> argument. This stream can be used for logging if your method needs to print anything to the terminal and any function that you expose to Stan <em>must</em> have this as the last argument. This function also checks for the allowed domain (0 to 1) for the eccentricity and it will throw an error (and set the probability of the model to zero) if the eccentricity is outside of this allowed range.</p>
 <p>Next, we must implement the derivatives of this function using overloading with the <code>stan::math::var</code> type. This is the type that is used by Stan to compute derivatives in their automatic differentiation library (see <a href="https://arxiv.org/abs/1509.07164">Carpenter et al. (2015)</a> for details) and I've found that the easiest way to use them is with the <code>precomp_v_vari</code> and <code>precomp_vv_vari</code> wrapper classes. For example, to provide the derivatives with respect to both $M(t)$ and $e$, we will use the following code:</p>
@@ -1119,15 +1115,13 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 <span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We now go on to implement versions of this function for fixed $M(t)$ and $e$. I don't <em>think</em> that these extra functions are strictly needed in our case because $M(t)$ and $e$ will always be functions of parameters, but it doesn't hurt to implement all of the permutations in case we decide to fix any parameters. In these cases, we use the <code>precomp_v_vari</code> class because the derivatives are only taken with repect to a single parameter:</p>
 
@@ -1157,15 +1151,13 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 <span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally, we'll save this to a C++ header file in the current directory:</p>
 
@@ -1181,15 +1173,13 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cpp_code</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="The-Stan-model">The Stan model<a class="anchor-link" href="#The-Stan-model">&#182;</a></h2><p>Now, let's build our model in Stan. Describing the Stan language is beyond the scope of this post so you should check out <a href="http://mc-stan.org/documentation/">the official docs</a> if you're new to Stan. The only non-standard addition in our model is a <code>functions</code> block at the beginning with the interface for our Kepler solver:</p>
 
@@ -1281,7 +1271,7 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compilation took </span><span class="si">{0:.1f}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">strt</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1290,7 +1280,9 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_8a556093ae546532f90fa3f7e850eea0 NOW.
@@ -1299,7 +1291,9 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Compilation took 43.6 seconds
@@ -1311,10 +1305,8 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Inference-&amp;-parameter-estimation">Inference &amp; parameter estimation<a class="anchor-link" href="#Inference-&amp;-parameter-estimation">&#182;</a></h2><p>To start, we need to initialize the parameters of our model. In this case, it would be pretty inefficient to optimize with random restarts within the prior because some of the parameters are very well constrained (e.g. period) and we probably already have a good initial guess for the values of these parameters. Instead, we will use a custom initialization function and the <code>L-BFGS</code> implementation built into Stan to find the maximum <em>a postieriori</em> (MAP) parameters.</p>
 
@@ -1356,7 +1348,7 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Maximum log-probability: </span><span class="si">{0:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1365,7 +1357,9 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Maximum log-probability: -629.137
@@ -1377,10 +1371,8 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>To make sure that we're not totally off to start, let's plot the prediction of the model at the MAP.</p>
 
@@ -1420,7 +1412,7 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1429,7 +1421,9 @@ $$<p>In the following few cells, we'll implement this method with a syntax that 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -2904,10 +2898,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now, starting from the MAP coordinates, we'll run 4 parallel MCMC chains of 2000 steps using the default settings in Stan. By default, Stan discards 50% of the chain as "warmup" so we'll end up with 4000 samples (1000 from each chain).</p>
 
@@ -2924,7 +2916,7 @@ height=386
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sampling took </span><span class="si">{0:.1f}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">strt</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -2933,7 +2925,9 @@ height=386
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Sampling took 568.4 seconds
@@ -2945,10 +2939,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>PyStan doesn't really provide a very flexible interface for looking at convergence diagnostics of the MCMC chains and if we use the default method, the output would be longer than this whole blog post! So the following cell hacks the standard diagnostics output to only show the first couple of lines. This is enough for us to get a sense for how things went.</p>
 
@@ -2964,7 +2956,7 @@ height=386
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[:</span><span class="mi">19</span><span class="p">]</span> <span class="o">+</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -2973,7 +2965,9 @@ height=386
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Inference for Stan model: anon_model_8a556093ae546532f90fa3f7e850eea0.
@@ -3008,10 +3002,8 @@ convergence, Rhat=1).
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>From this, we can see that the sampling for most of the parameters has converged. I think that the <code>Rhat = nan</code> for the log period is OK and it has something to do with the precision with which <code>Rhat</code> is computed compared to the fractional posterior uncertainty on the period.</p>
 <p>Now, let's make some plots of our results. First, let's make a <a href="http://corner.readthedocs.io/">corner plot</a> of the posterior samples.</p>
@@ -3032,7 +3024,7 @@ convergence, Rhat=1).
 <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -3041,7 +3033,9 @@ convergence, Rhat=1).
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -7380,10 +7374,8 @@ height=761
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Another good plot is the posterior model predictions overplotted on the data. In the following figure, the green "line" is actually a <em>contour</em> showing the 68% credible region for the model RV as a function of phase.</p>
 
@@ -7414,7 +7406,7 @@ height=761
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7423,7 +7415,9 @@ height=761
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -8677,10 +8671,8 @@ height=386
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Results-&amp;-summary">Results &amp; summary<a class="anchor-link" href="#Results-&amp;-summary">&#182;</a></h2><p>Now that we have a sufficiently converged MCMC chain, we can compare our results to the literature values. In particular, let's look at the measured period and semi-amplitude. The literature values of these properties are (<a href="http://adsabs.harvard.edu/abs/2006ApJ...646..505B">Butler et al. 2006</a>):</p>
 $$
@@ -8701,7 +8693,7 @@ $$<p>The constraints that we get based on our MCMC chains are:</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;K = </span><span class="si">{0:.2f}</span><span class="s2"> ± </span><span class="si">{1:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">amps</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">amps</span><span class="p">)))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -8710,7 +8702,9 @@ $$<p>The constraints that we get based on our MCMC chains are:</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>P = 4.230783 ± 0.000038
@@ -8723,10 +8717,8 @@ K = 55.66 ± 0.52
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>These results are in good agreement with the published values based on the same dataset. The error bars on the semi-amplitude are somewhat smaller based on our analysis, but I haven't had a chance to track down exactly why that might be and it's probably beyond the scope of this post.</p>
 <p>The fact that we get consistent results does indicate that this method is working, but the real point of this blog post was to demonstrate how to use external C++ functions for MCMC sampling with PyStan. I imagine this feature being useful in a few situations and the lack of this feature was the main reason why I've been hesitant to use Stan in the past. The two main use cases that I see are:</p>
@@ -8739,10 +8731,8 @@ K = 55.66 ± 0.52
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Postscript:-Using-Stan-autodiff-in-the-external-function">Postscript: Using Stan autodiff in the external function<a class="anchor-link" href="#Postscript:-Using-Stan-autodiff-in-the-external-function">&#182;</a></h2><p>In the previous discussion, we assumed that you could easily compute the gradient of your external C++ function. I expect that this will probably be the most common situation because you could probably write your function in Stan directly instead of C++ if that's not what you want. But, for completeness, I wanted to include a demonstration of how you can use Stan's autodiff library to compute the gradients of your function automatically. Here's how we would update our example from above to use autodiff instead of analytic gradients:</p>
 
@@ -8788,7 +8778,7 @@ K = 55.66 ± 0.52
                                   <span class="n">include_dirs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">])</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -8797,7 +8787,9 @@ K = 55.66 ± 0.52
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_8a556093ae546532f90fa3f7e850eea0 NOW.
@@ -8817,7 +8809,7 @@ K = 55.66 ± 0.52
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 

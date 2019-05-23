@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/pymc-tensorflow.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this tutorial, I will describe a hack that let's us use <a href="http://docs.pymc.io/">PyMC3</a> to sample a probability density defined using <a href="https://www.tensorflow.org/">TensorFlow</a>.
 This isn't necessarily a Good Idea™, but I've found it useful for a few projects so I wanted to share the method.
@@ -236,15 +234,13 @@ Like Theano, TensorFlow has support for reverse-mode automatic differentiation, 
             <span class="n">outputs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>We can test that our op works for some simple test cases.
 For example, we can add a simple (read: silly) op that uses TensorFlow to perform an elementwise square of a vector.</p>
@@ -273,15 +269,13 @@ For example, we can add a simple (read: silly) op that uses TensorFlow to perfor
 <span class="n">utt</span><span class="o">.</span><span class="n">verify_grad</span><span class="p">(</span><span class="n">square_op</span><span class="p">,</span> <span class="n">pt</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This is obviously a silly example because Theano already has this functionality, but this can also be generalized to more complicated models.</p>
 <p>This <code>TensorFlowOp</code> implementation will be sufficient for our purposes, but it has some limitations including:</p>
@@ -294,10 +288,8 @@ For example, we can add a simple (read: silly) op that uses TensorFlow to perfor
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="An-example">An example<a class="anchor-link" href="#An-example">&#182;</a></h2><p>For this demonstration, we'll fit a <em>very</em> simple model that would actually be much easier to just fit using vanilla PyMC3, but it'll still be useful for demonstrating what we're trying to do.
 We'll fit a line to data with the likelihood function:</p>
@@ -335,7 +327,7 @@ We'll choose uniform priors on $m$ and $b$, and a log-uniform prior for $s$.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -344,7 +336,9 @@ We'll choose uniform priors on $m$ and $b$, and a log-uniform prior for $s$.</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -1100,10 +1094,8 @@ height=401
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Next, define the log-likelihood function in TensorFlow:</p>
 
@@ -1132,15 +1124,13 @@ height=401
 <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And then we can fit for the maximum likelihood parameters using an optimizer from TensorFlow:</p>
 
@@ -1157,7 +1147,7 @@ height=401
 <span class="n">opt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1166,7 +1156,9 @@ height=401
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>INFO:tensorflow:Optimization terminated with:
@@ -1182,10 +1174,8 @@ height=401
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Here is the maximum likelihood solution compared to the data and the true relation:</p>
 
@@ -1205,7 +1195,7 @@ height=401
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1214,7 +1204,9 @@ height=401
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -2106,10 +2098,8 @@ height=401
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally, let's use PyMC3 to generate posterior samples for this model:</p>
 
@@ -2149,7 +2139,7 @@ height=401
     <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nuts_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">target_accept</span><span class="o">=</span><span class="mf">0.9</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -2158,7 +2148,9 @@ height=401
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Auto-assigning NUTS sampler...
@@ -2175,10 +2167,8 @@ NUTS: [logs, b, m]
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>After sampling, we can make the usual diagnostic plots.
 First, the trace plots:</p>
@@ -2194,7 +2184,7 @@ First, the trace plots:</p>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -2203,7 +2193,9 @@ First, the trace plots:</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -7524,10 +7516,8 @@ height=558
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Then the <a href="http://corner.readthedocs.io">"corner" plot</a>:</p>
 
@@ -7546,7 +7536,7 @@ height=558
 <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;log(s)&quot;</span><span class="p">]);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7555,7 +7545,9 @@ height=558
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -10708,10 +10700,8 @@ height=728
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And finally the posterior predictions for the line:</p>
 
@@ -10737,7 +10727,7 @@ height=728
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -10746,7 +10736,9 @@ height=728
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -12974,10 +12966,8 @@ height=401
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>In this post, I demonstrated a hack that allows us to use PyMC3 to sample a model defined using TensorFlow.
 This might be useful if you already have an implementation of your model in TensorFlow and don't want to learn how to port it it Theano, but it also presents an example of the small amount of work that is required to support non-standard probabilistic modeling languages with PyMC3.

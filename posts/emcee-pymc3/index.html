@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/emcee-pymc3.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this post, I will demonstrate how you can use <a href="https://emcee.readthedocs.io/en/latest/">emcee</a> to sample models defined using <a href="https://docs.pymc.io/">PyMC3</a>.
 Thomas Wiecki <a href="http://twiecki.github.io/blog/2013/09/23/emcee-pymc/">wrote about how to do this this with an earlier version of PyMC</a>, but I needed an update since I wanted to do a comparison and PyMC's interface has changed a lot since he wrote his post.
@@ -96,7 +94,7 @@ This isn't necessarily something that you'll <em>want</em> to do (and I definite
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -105,7 +103,9 @@ This isn't necessarily something that you'll <em>want</em> to do (and I definite
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -861,10 +861,8 @@ height=401
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Then, we can code up the model in PyMC3 following <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/">Jake VanderPlas' notation</a>, and sample it using PyMC3's NUTS[sic] sampler:</p>
 
@@ -897,7 +895,7 @@ height=401
     <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">draws</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -906,7 +904,9 @@ height=401
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Auto-assigning NUTS sampler...
@@ -922,10 +922,8 @@ Sampling 2 chains: 100%|██████████| 8000/8000 [00:04&lt;00:0
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And we can take a look at the <a href="https://corner.readthedocs.io/en/latest/">corner plot</a>:</p>
 
@@ -942,7 +940,7 @@ Sampling 2 chains: 100%|██████████| 8000/8000 [00:04&lt;00:0
 <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">truths</span><span class="o">=</span><span class="n">true_params</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -951,7 +949,9 @@ Sampling 2 chains: 100%|██████████| 8000/8000 [00:04&lt;00:0
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -4901,10 +4901,8 @@ height=721
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Sampling-the-PyMC3-model-using-emcee">Sampling the PyMC3 model using emcee<a class="anchor-link" href="#Sampling-the-PyMC3-model-using-emcee">&#182;</a></h2><p>To sample this using emcee, we'll need to do a little bit of bookkeeping.
 I've coded this up using version 3 of emcee that is currently available as <a href="https://github.com/dfm/emcee">the master branch on GitHub</a> or as <a href="https://pypi.org/project/emcee/3.0rc1/">a pre-release on PyPI</a>, so you'll need to install that version to run this.</p>
@@ -4931,15 +4929,13 @@ There is a version of this built into PyMC3, but I also want to return the value
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And now we can run the sampler:</p>
 
@@ -4967,7 +4963,7 @@ There is a version of this built into PyMC3, but I also want to return the value
     <span class="n">sampler</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -4976,7 +4972,9 @@ There is a version of this built into PyMC3, but I also want to return the value
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>logp = -63.46, ||grad|| = 386.74: 100%|██████████| 28/28 [00:00&lt;00:00, 4362.09it/s]
@@ -4989,10 +4987,8 @@ There is a version of this built into PyMC3, but I also want to return the value
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And we can use this to make the same corner plot as above:</p>
 
@@ -5009,7 +5005,7 @@ There is a version of this built into PyMC3, but I also want to return the value
 <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;logs&quot;</span><span class="p">]],</span> <span class="n">truths</span><span class="o">=</span><span class="n">true_params</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -5018,7 +5014,9 @@ There is a version of this built into PyMC3, but I also want to return the value
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -9009,10 +9007,8 @@ height=753
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The last thing that we might want to look at is <a href="/posts/autocorr/">the integrated autocorrelation time</a> for each method.
 First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):</p>
@@ -9028,7 +9024,7 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">emcee</span><span class="o">.</span><span class="n">autocorr</span><span class="o">.</span><span class="n">integrated_time</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">))</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">free_RVs</span><span class="p">]</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9037,7 +9033,9 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[8]:</div>
+
+    <div class="prompt output_prompt">Out[8]:</div>
+
 
 
 
@@ -9051,10 +9049,8 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>And, the autocorrelation for emcee is about 40 steps:</p>
 
@@ -9069,7 +9065,7 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">sampler</span><span class="o">.</span><span class="n">get_autocorr_time</span><span class="p">(</span><span class="n">discard</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9078,7 +9074,9 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 
 
 <div class="output_area">
-<div class="prompt output_prompt">Out[9]:</div>
+
+    <div class="prompt output_prompt">Out[9]:</div>
+
 
 
 
@@ -9092,10 +9090,8 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>If you want to compare these results in detail, you'll want to make sure that you take into account the fact that each step of NUTS is significantly more expensive than one step with emcee, but that's way beyond the scope of this post...</p>
 <p><em>11/22/18: This post has been updated with suggestions from Thomas Wiecki. The <code>find_MAP</code> call has been removed from the PyMC sampling, and <code>model.bijection</code> is now used to map between arrays and dicts of parameters.</em></p>
@@ -9111,7 +9107,7 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 

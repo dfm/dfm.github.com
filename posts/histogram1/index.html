@@ -59,10 +59,8 @@
 It is the first in a series about hierarchical inference in astronomy.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>When I was writing <a href="http://arxiv.org/abs/1406.3020">my recent paper</a> where I infer the population of exoplanets from an incomplete catalog of noisy measurements, I spent a lot of time thinking about histograms and I came across a few cute results that I wanted to share.
 Histograms are commonly used as simple "non-parametric" estimates of probability distributions but they get something of a bad rap (<em>binning is sinning</em>) because it's easy to use them inappropriately!
@@ -75,19 +73,15 @@ For all the results in this post, we will fix the bin locations and widths <em>a
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="The-Maximum-Likelihood-Histogram">The Maximum-Likelihood Histogram<a class="anchor-link" href="#The-Maximum-Likelihood-Histogram">&#182;</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The act of making a histogram is often thought of as a (very intuitive) <em>procedure</em>: count the number of points that fall in each bin and normalize by the bin volume to get the bin heights.
 It can be difficult to generalize a procedure like this to deal with more complicated models so I prefer to think of data analysis in terms of <em>probabilities</em>.
@@ -103,19 +97,17 @@ A good starting place is Section 3.2 of <a href="http://arxiv.org/abs/astro-ph/0
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Note that the derivation up to this point isn't specific to a histogram model and you can (and should) use a physical model for $\Gamma_\theta$ if you have one and fit for $\theta$ numerically.
 But now, for the purposes of today's discussion, let's model $\Gamma_\theta$ as a piecewise constant step function</p>
 $$ \Gamma_\theta (w) = \left\{\begin{array}{ll}
-    \theta_1 & w \in \Delta_1 \\
-    \theta_2 & w \in \Delta_2 \\
-    \vdots & \\
-    \theta_N & w \in \Delta_N \\
-    0 & \mathrm{otherwise}
+    \theta_1 &amp; w \in \Delta_1 \\
+    \theta_2 &amp; w \in \Delta_2 \\
+    \vdots &amp; \\
+    \theta_N &amp; w \in \Delta_N \\
+    0 &amp; \mathrm{otherwise}
 \end{array}\right. $$<p>where the $N$ parameters $\theta_n$ are the step heights and the step volumes $\Delta_n$ have been fixed in advance.
 When we use this model for the rate density in the likelihood expression above (Equation $\ref{eq:poisson}$), we find</p>
 $$ \ell(\theta) = -\sum_{n=1}^N \Delta_n\,\theta_n + \sum_{k=1}^K \,\sum_{n=1}^N \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \quad.$$<p>where $\Delta_n$ is the volume of the $n$-th bin and the function $\mathbf{1}[\cdot]$ is one if its argument evaluates to true and zero otherwise.</p>
@@ -123,10 +115,8 @@ $$ \ell(\theta) = -\sum_{n=1}^N \Delta_n\,\theta_n + \sum_{k=1}^K \,\sum_{n=1}^N
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The maximum-likelihood parameters $\theta$ are the values that maximize the log-likelihood $\ell(\theta)$.
 To find these, we can just compute the derivative of $\ell(\theta)$, set it to zero, and solve.
@@ -137,44 +127,36 @@ $$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\Delta_m + \frac{N_m}{\th
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we can go one step further and estimate the uncertainty $\sigma_{\theta_m^*}$ on $\theta_m^*$ using the second derivative of $\ell (\theta)$</p>
 $$\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2} = -\frac{N_m}{{\theta_m}^2}$$<p>giving</p>
 $$\begin{eqnarray}
-\sigma_{\theta_m^*}^2 &=& -\left[\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2}\right]_{\theta_m = \theta_m^*}^{-1} \\
-&=& \frac{N_m}{\Delta_m^2}
+\sigma_{\theta_m^*}^2 &amp;=&amp; -\left[\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2}\right]_{\theta_m = \theta_m^*}^{-1} \\
+&amp;=&amp; \frac{N_m}{\Delta_m^2}
 \end{eqnarray}$$<p>the familiar $\sqrt{N}$ counting statistics.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Okay. Now that we've done all this work to derive this trivial and familiar result, let's get on to generalizing it!</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="The-Censored-Histogram">The Censored Histogram<a class="anchor-link" href="#The-Censored-Histogram">&#182;</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The generalization that we'll work through in this post is relevant for a lot of projects in astronomy and I expect that it occurs in many other fields too.
 Suppose that you have a censored dataset where the completeness or detection efficiency $Q(w)$ is a function of the parameters $w$ and you want to determine the underlying population, not the observed distribution.
@@ -186,10 +168,8 @@ Unfortunately the result of this joint inference will no longer be analytic and,
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Inverse detection efficiency (IDE)</strong> &nbsp;
 The standard practice in these fields is to make the <em>weighted</em> histogram of the points where each point is counted with a weight inversely proportional to the detection efficiency at that point.
@@ -198,7 +178,7 @@ $$ \theta_m^* = \frac{1}{\Delta_m} \, \sum_{k=1}^K \frac{\mathbf{1}[w_k \in \Del
 <strong>Don't do this!</strong>
 As you'll see in a moment, while this procedure seems intuitively correct, it gives biased results and the maximum-likelihood result is actually <em>very simple</em>.</p>
 <p>To see qualitatively why this procedure will, in general, yield biased inferences, let's consider a slightly pathological example.
-In this example, there is a single bin $(0 <= w < 1)$ where the completeness function is</p>
+In this example, there is a single bin $(0 &lt;= w &lt; 1)$ where the completeness function is</p>
 $$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$<p>The following figure shows a plot of this example:</p>
 
 </div>
@@ -237,7 +217,7 @@ $$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$<p>The following figure show
 <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$w$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -246,7 +226,9 @@ $$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$<p>The following figure show
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -881,10 +863,8 @@ height=391
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, the black points show the locations of the points that get detected and the red points indicate points that would have been observed with a perfectly complete sample but were missed because of $Q(w)$.
 If you look at the code above, you'll see that the true step height should be 50 but, if you evaluate the IDE approximation, you'll find that it gives</p>
@@ -902,7 +882,7 @@ If you look at the code above, you'll see that the true step height should be 50
 <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2"> ± </span><span class="si">{1:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">sigma_th</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -911,7 +891,9 @@ If you look at the code above, you'll see that the true step height should be 50
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>28.5 ± 5.5
@@ -923,10 +905,8 @@ If you look at the code above, you'll see that the true step height should be 50
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This result is about <em>half</em> of what it should be and if you look at the figure above, I think you'll see what went wrong: only about half of the points were observed and each of those points was in a region where $Q(w) \approx 1$, meaning that each point gets a weight of 1.
 It's clear that in this case each point should get a weight of 2 (or one-over-a-half) but let's see if we can derive this intuition more formally.</p>
@@ -934,10 +914,8 @@ It's clear that in this case each point should get a weight of 2 (or one-over-a-
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>The maximum-likelihood (ML) solution</strong> &nbsp;
 The first thing to note is that when we have an incomplete catalog, the likelihood of the data given the population is exactly the same as our previous expression (Equation $\ref{eq:poisson}$) but the rate $\Gamma_\theta (w)$ is replaced by the <em>observable rate</em> $\hat{\Gamma}_\theta(w) = Q(w)\,\Gamma_\theta (w)$.
@@ -946,10 +924,8 @@ $$ \ell(\theta) = -\sum_{n=1}^N \theta_n \int_{\Delta_n} Q(w)\,\mathrm{d}w + \su
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As before, let's take the derivative of this with respect to a specific step height $\theta_m$ to find</p>
 $$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\int_{\Delta_m} Q(w)\,\mathrm{d}w + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\int_{\Delta_m}Q(w)\,\mathrm{d}w}$$<p>with uncertainty</p>
@@ -957,10 +933,8 @@ $$\sigma_{\theta_m^*} = \frac{\sqrt{N_m}}{\int_{\Delta_m}Q(w)\,\mathrm{d}w} \qua
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This result shows that the maximum-likelihood result is also a weighted histogram but instead of weighting the points by their <em>per-object</em> completeness, the weight of each point should be the <em>mean completeness in that bin</em>.
 In the limit of a constant completeness function, the IDE procedure will give the correct result but whenever the detection efficiency varies across the bin (or if there are latent dimensions; I'll come back to this in the next example), <strong>the IDE result is just plain wrong!</strong>
@@ -969,10 +943,8 @@ To make matters worse, as you collect more data, the IDE result gets more precis
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Luckily, the ML solution will probably be easy to compute, even if you need to compute the weighting integrals numerically.
 For our extreme example from above, the integral becomes $\sim 0.5$ and the maximum-likelihood estimate of the step height is</p>
@@ -994,7 +966,7 @@ For our extreme example from above, the integral becomes $\sim 0.5$ and the maxi
 <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">{0:.1f}</span><span class="s2"> ± </span><span class="si">{1:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">sigma_th</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1003,7 +975,9 @@ For our extreme example from above, the integral becomes $\sim 0.5$ and the maxi
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>54.0 ± 10.4
@@ -1015,29 +989,23 @@ For our extreme example from above, the integral becomes $\sim 0.5$ and the maxi
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>which is consistent with the correct result: 50.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="A-More-Realistic-Example">A More Realistic Example<a class="anchor-link" href="#A-More-Realistic-Example">&#182;</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now that we've derived a formalism and developed some intuition for working with censored datasets, let's work through a more realistic example to see whether or not this machinery matters.
 In this example, we'll add another level of complexity that is especially relevant in the study of exoplanets: latent dimensions.</p>
@@ -1049,10 +1017,8 @@ We won't work through exactly this example but instead, we'll use a simpler two-
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>The setup</strong> &nbsp;
 For this example, we'll consider a two-dimensional problem with parameters $a \in [1,\,2]$ and $b \in [1,\,10]$ where the detection efficiency is given by</p>
@@ -1082,7 +1048,7 @@ $$Q(a,\,b) = 0.8 \, \left[ 1+ \exp \left(10\,\frac{a^2}{\sqrt{b}} - 10\right) \r
 <span class="n">pl</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$Q(a,\,b)$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1091,7 +1057,9 @@ $$Q(a,\,b) = 0.8 \, \left[ 1+ \exp \left(10\,\frac{a^2}{\sqrt{b}} - 10\right) \r
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -1803,10 +1771,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>A synthetic dataset</strong> &nbsp;
 Now let's generate a sample dataset and censor it using this completeness function.
@@ -1846,7 +1812,7 @@ For simplicity, we'll use a <em>uniform</em> population where a complete sample 
 <span class="n">pl</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$Q(a,\,b)$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1855,7 +1821,9 @@ For simplicity, we'll use a <em>uniform</em> population where a complete sample 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -9127,10 +9095,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, the blue points are objects that passed the completeness cut and made it into the catalog and the red points were missed even though they would have been detected in a complete catalog.</p>
 <p><strong>Using inverse detection efficiency</strong> &nbsp;
@@ -9170,7 +9136,7 @@ To start, let's look at the IDE result</p>
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">800</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9179,7 +9145,9 @@ To start, let's look at the IDE result</p>
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -9650,10 +9618,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, the <em>correct</em> result (the rate that was used to generate the dataset) is shown as the thick gray line and the IDE estimate of this function is shown as the step function with error bars.
 As expected, the estimate is noisy and the error bars seem to be overly confident (especially in the regions of lower detection efficiency).</p>
@@ -9661,15 +9627,13 @@ As expected, the estimate is noisy and the error bars seem to be overly confiden
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>The maximum-likelihood</strong> &nbsp;
 For comparison, let's use the same dataset and apply the maximum-likelihood method that we derived above.
 First, we need to integrate (numerically) the completeness function over the bins where the $n$-th bin is the two-dimensional area defined by</p>
-$$b_n \le b < b_{n+1} \quad \mathrm{and} \quad 1 \le a < 2 \quad.$$
+$$b_n \le b &lt; b_{n+1} \quad \mathrm{and} \quad 1 \le a &lt; 2 \quad.$$
 </div>
 </div>
 </div>
@@ -9693,7 +9657,7 @@ $$b_n \le b < b_{n+1} \quad \mathrm{and} \quad 1 \le a < 2 \quad.$$
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9702,7 +9666,9 @@ $$b_n \le b < b_{n+1} \quad \mathrm{and} \quad 1 \le a < 2 \quad.$$
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -10109,10 +10075,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Using this integrated detection efficiency function, we can easily compute the ML step function given the prescription derived above and compare it to the IDE result.</p>
 
@@ -10133,7 +10097,7 @@ height=404
 <span class="n">pl</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">800</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -10142,7 +10106,9 @@ height=404
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -10766,10 +10732,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this figure, the IDE result is shown as a dotted line and the ML result is given by the solid black line with error bars.
 As before, the correct result is shown as the thick gray line.
@@ -10778,19 +10742,15 @@ It's clear from this comparison that the ML result is <em>much</em> better than 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Summary-&amp;-Conclusions">Summary &amp; Conclusions<a class="anchor-link" href="#Summary-&amp;-Conclusions">&#182;</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this post, we've derived a simple, maximum-likelihood method for making histograms of incomplete datasets.
 This method should <em>always</em> give less biased results—at minimal extra computational cost—than the standard techniques used in astronomy and in some cases the results will be <em>drastically different</em>.
@@ -10811,10 +10771,8 @@ Therefore, in my next post, I'll relax the assumption of negligible uncertaintie
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Acknowledgments</strong> &nbsp;
 <em>I'd like to thank <a href="http://ruthang.us">Ruth Angus</a> and <a href="https://twitter.com/mfouesneau">Morgan Fouesneau</a> for useful comments.</em></p>
@@ -10830,7 +10788,7 @@ Therefore, in my next post, I'll relax the assumption of negligible uncertaintie
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 

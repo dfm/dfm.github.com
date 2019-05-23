@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/travis-latex.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>It's becoming more common for astronomers to use continuous integration services like <a href="https://travis-ci.org">Travis CI</a> to automatically test their code but, as much as I hate to say it, a big part of our job is writing papers.
 I am always in search of new procrastination tasks, especially if they can be justified as work, so I was pretty excited to figure out that it is possible to use Travis CI for writing too.
@@ -83,13 +81,13 @@ Copy this token and go to the settings page for your repository on Travis and ad
 While you're in the settings, you might also want to enable the "Build only if .travis.yml is present" option (this will save you from some annoying emails later).</li>
 </ol>
 <p>Now that you have Travis set up, here's the minimal <code>.travis.yml</code> file that we'll need:</p>
-<div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sudo</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">generic</span>
-<span class="l l-Scalar l-Scalar-Plain">matrix</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">include</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">os</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">linux</span>
-      <span class="l l-Scalar l-Scalar-Plain">env</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">TEST_LANG=&#39;paper&#39;</span>
-<span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">|</span>
+<div class="highlight"><pre><span></span><span class="nt">sudo</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">generic</span>
+<span class="nt">matrix</span><span class="p">:</span>
+  <span class="nt">include</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">os</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">linux</span>
+      <span class="nt">env</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">TEST_LANG=&#39;paper&#39;</span>
+<span class="nt">script</span><span class="p">:</span> <span class="p p-Indicator">|</span>
   <span class="no">if [[ $TEST_LANG == paper ]]</span>
   <span class="no">then</span>
     <span class="no">source .ci/build-paper.sh</span>
@@ -148,7 +146,7 @@ Then you'll get something that looks like this:</p>
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 

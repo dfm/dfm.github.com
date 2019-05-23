@@ -58,10 +58,8 @@
 <a href="/downloads/notebooks/exopop.ipynb">here</a>.</p>
 </blockquote>
 <p>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Warning</strong> <em>this is an extremely technical blog post (even for me) but I think that it's an interesting experiment so I thought I would post it anyways!</em></p>
 <p>The <em>Kepler</em> Mission has been a great success story for open science. The recent data releases have been on a fast and regular schedule and the data products are sometimes made public before the science office publishes their papers. Therefore, when the most recent installment in the "rate of Earths" saga—a discussion <a href="http://arxiv.org/abs/1406.3020">close to my heart</a>—hit the ArXiv as <a href="http://arxiv.org/abs/1506.04175">Burke et al. (2015)</a>, I decided to see if I could reproduce their results by following the steps described in their paper. Crazy, right?</p>
@@ -105,22 +103,20 @@ $$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\ri
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we will make the cuts on the stellar sample to select the G and K dwarfs:</p>
 <ul>
 <li>$4200\,K \le T_\mathrm{eff} \le 6100\,K$,</li>
 <li>$R_\star \le 1.15\,R_\odot$,</li>
-<li>$T_\mathrm{obs} > 2\,\mathrm{yr}$,</li>
-<li>$f_\mathrm{duty} > 0.6$, and</li>
+<li>$T_\mathrm{obs} &gt; 2\,\mathrm{yr}$,</li>
+<li>$f_\mathrm{duty} &gt; 0.6$, and</li>
 <li>$\mathrm{robCDPP7.5} \le 1000\,\mathrm{ppm}$.</li>
 </ul>
 
@@ -154,7 +150,7 @@ $$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\ri
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected </span><span class="si">{0}</span><span class="s2"> targets after cuts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stlr</span><span class="p">)))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -163,7 +159,9 @@ $$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\ri
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Selected 91446 targets after cuts
@@ -175,10 +173,8 @@ $$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\ri
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>After applying these same cuts to a pre-release version of this catalog, Burke et al. found 91,567 targets.</p>
 <p>[<em>Using the machine readable version of their Table 1, I tried to work out the reason for this difference and I couldn't reverse engineer any cause. Some of the targets missing from our catalog are just artificially fixed at Solar values so they seem reasonable to skip. This effect explains about half the difference between the results.</em>]</p>
@@ -202,7 +198,7 @@ $$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\ri
 <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;$T_\mathrm</span><span class="si">{eff}</span><span class="s2">$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -211,7 +207,9 @@ $$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\ri
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -3009,10 +3007,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Next up, let's make the cuts on the KOI list:</p>
 <ul>
@@ -3048,7 +3044,7 @@ height=404
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected </span><span class="si">{0}</span><span class="s2"> KOIs after cuts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kois</span><span class="p">)))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -3057,7 +3053,9 @@ height=404
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Selected 154 KOIs after cuts
@@ -3069,10 +3067,8 @@ height=404
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Burke et al. find 156 KOIs instead of our 154 again because of their pre-release version of the catalog and changing dispositions. As we'll see, this doesn't have a huge effect on the results even though there's some risk of being dominated by small number statistics.</p>
 <p>Now, let's plot the distribution of measured physical parameters in this catalog of KOIs. Unlike most versions of this plot, here we'll include the error bars on the radii as a reminder that many of the radii are very poorly constrained!</p>
@@ -3096,7 +3092,7 @@ height=404
 <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;$R_p \, [R_\oplus]$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -3105,7 +3101,9 @@ height=404
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -4031,10 +4029,8 @@ height=407
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="The-detection-efficiency-model">The detection efficiency model<a class="anchor-link" href="#The-detection-efficiency-model">&#182;</a></h2><p>For this problem of population inference, an important ingredient is a detailed model of the efficiency with which the transit search pipeline detects transit signals. Burke et al. implement an analytic model for the detection efficiency that has been calibrated using simulations in a (submitted but unavailable) paper by Jessie Christiansen. The details of this model are given in the Burke et al. paper so I'll just go ahead and implement it and if you're interested, check out <a href="http://arxiv.org/abs/1506.04175">the paper</a>.</p>
 
@@ -4187,15 +4183,13 @@ height=407
     <span class="k">return</span> <span class="n">pdet</span> <span class="o">*</span> <span class="n">pwin</span> <span class="o">*</span> <span class="n">pgeom</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Using this model, lets reproduce Figure 1 from the Burke paper. If you closely compare the figures, you'll find that they're not quite the same but the one in the paper was generated with an older (incomplete) version of the code (Burke, priv. comm.) and the model used is actually the same as this one so we'll roll with it!</p>
 
@@ -4224,7 +4218,7 @@ height=407
 <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;det. eff. for KIC10593626&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -4233,7 +4227,9 @@ height=407
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -5685,10 +5681,8 @@ height=424
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In practice, the only detection efficiency function that enters our analysis is <em>integrated across the stellar sample</em>. In fact, the function $Q(w)$ needs to be integrated (marginalized) over <em>all the parameters that affect it but aren't of interest</em>, for example, <a href="http://arxiv.org/abs/1408.1393">we should include eccentricity</a>. For now, following Burke et al., we'll ignore eccentricity and integrate only over the stellar parameters. This cell takes a minute or two to run because it must loop over every star in the sample and compute the completeness on a grid.</p>
 
@@ -5708,15 +5702,13 @@ height=424
     <span class="n">comp</span> <span class="o">+=</span> <span class="n">get_completeness</span><span class="p">(</span><span class="n">star</span><span class="p">,</span> <span class="n">period_grid</span><span class="p">,</span> <span class="n">rp_grid</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">with_geom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In the target range, here is the completeness function (including the geometric transit probability):</p>
 
@@ -5737,7 +5729,7 @@ height=424
 <span class="n">pl</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;$R_p \, [R_\oplus]$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -5746,7 +5738,9 @@ height=424
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -7522,10 +7516,8 @@ height=424
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Population-inference">Population inference<a class="anchor-link" href="#Population-inference">&#182;</a></h2><p>Now that we have our sample and our completeness model, we need to specify the underlying population model. Like Burke et al., I've found that the data don't support a broken power law in planet radius so let's just model the population as the product of indpendent power laws in $P$ and $R_p$.</p>
 
@@ -7576,15 +7568,13 @@ height=424
     <span class="k">return</span> <span class="o">-</span><span class="n">ll</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ll</span><span class="p">)</span> <span class="k">else</span> <span class="mf">1e15</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>To start, let's find the maximum likelihood solution for the population parameters by minimizing the negative log-likelihood.</p>
 
@@ -7602,7 +7592,7 @@ height=424
 <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7611,7 +7601,9 @@ height=424
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>  status: 0
@@ -7630,10 +7622,8 @@ height=424
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>...and plot it:</p>
 
@@ -7717,7 +7707,7 @@ height=424
 <span class="nb">print</span><span class="p">(</span><span class="n">plot_results</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">x</span><span class="p">));</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -7726,7 +7716,9 @@ height=424
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>[ 0.58431325]
@@ -7735,7 +7727,9 @@ height=424
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -9757,10 +9751,8 @@ height=717
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally, let's sample from the posterior probability for the population parameters using <a href="http://dfm.io/emcee">emcee</a>.</p>
 
@@ -9786,7 +9778,7 @@ height=717
 <span class="n">pos</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">run_mcmc</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="mi">4000</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9800,7 +9792,7 @@ height=717
 <span class="n">triangle</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">flatchain</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="sa">r</span><span class="s2">&quot;$\ln F$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\alpha$&quot;</span><span class="p">]);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -9809,7 +9801,9 @@ height=717
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -17192,7 +17186,7 @@ height=724
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">gamma_earth</span> <span class="o">=</span> <span class="n">plot_results</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">flatchain</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -17201,7 +17195,9 @@ height=724
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -20076,10 +20072,8 @@ height=717
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Comparing this to Figures 6--9 in Burke et al., you'll see that the results are more or less consistent and the predicted observations are good. For radii smaller than $R_\oplus$, the results start to diverge since I chose to use a single power law in radius instead of the double power law. When I tried to use a double power law, I found that the break radius was immediately pushed below $0.95\,R_\oplus$ (the smallest radius in the dataset) and the slope of the smaller radius power law was set only by the prior so it didn't seem necessary to include it here. In practice the final results are still consistent.</p>
 <p>I would now claim this as a successful reproduction of the results from Burke et al. using only public datasets and their description of their method. One last interesting plot (that you might have noticed I computed in the <code>plot_results</code> function) is Figure 17 showing the rate of Earth-analogs defined (following <a href="http://arxiv.org/abs/1406.3020">my definition</a>) as:</p>
@@ -20099,7 +20093,7 @@ $$\Gamma_\oplus = \left.\frac{\mathrm{d} N}{\mathrm{d}\ln R_p\,\mathrm{d}\ln P} 
 <span class="n">pl</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\log_</span><span class="si">{10}</span><span class="s2">\Gamma_\oplus = \left. \log_</span><span class="si">{10}</span><span class="s2">\mathrm</span><span class="si">{d}</span><span class="s2">N / \mathrm</span><span class="si">{d}</span><span class="s2">\ln P \, \mathrm</span><span class="si">{d}</span><span class="s2">\ln R_p \right |_\oplus$&quot;</span><span class="p">);</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -20108,7 +20102,9 @@ $$\Gamma_\oplus = \left.\frac{\mathrm{d} N}{\mathrm{d}\ln R_p\,\mathrm{d}\ln P} 
 
 
 <div class="output_area">
-<div class="prompt"></div>
+
+    <div class="prompt"></div>
+
 
 
 
@@ -20566,10 +20562,8 @@ height=428
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This plot is consistent with Figure 17 from <a href="http://arxiv.org/abs/1506.04175">Burke et al. (2015)</a> so we'll leave it here and call this a success for open science! Some of you might notice that this result is inconsistent with many previous estimates of this number (including my own!) but the discussion of this discrepancy is a topic for another day (or maybe a scientific publication).</p>
 <p><em>Thanks to Ruth Angus for reading through and catching some typos!</em></p>
@@ -20585,7 +20579,7 @@ height=428
 <div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
