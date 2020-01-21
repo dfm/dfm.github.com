@@ -1,19 +1,21 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
-<meta charset="utf-8">
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>PyMC3 + PyTorch by Dan Foreman-Mackey</title>
-<meta id="viewport" name="viewport" content="width=500" />
-<meta name="description" content="Dan Foreman-Mackey is a Sagan Fellow in the Astronomy Department at the University of Washington" />
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>PyMC3 + PyTorch by Dan Foreman-Mackey</title>
+    <meta id="viewport" name="viewport" content="width=500" />
+    <meta name="description"
+        content="Dan Foreman-Mackey is an Associate Research Scientist at the Center for Computational Astrophysics in the Flatiron Institute at the Simons Foundation." />
 
 
-<link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
-<link rel="stylesheet" href="../../theme/css/base.css" type="text/css" />
-<link rel="stylesheet" href="../../theme/css/code.css" type="text/css" />
+    <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
+    <link rel="stylesheet" href="../../theme/css/base.css" type="text/css" />
+    <link rel="stylesheet" href="../../theme/css/code.css" type="text/css" />
 
-<link rel="icon" type="image/png" href="../../theme/images/avatar.png" sizes="200x200">
-<link rel="icon" type="image/png" href="../../theme/images/favicon.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="../../theme/images/avatar.png" sizes="200x200">
+    <link rel="icon" type="image/png" href="../../theme/images/favicon.png" sizes="32x32">
 
     
 
@@ -30,21 +32,21 @@
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 </head>
+
 <body>
 
-<div class="content">
+    <div class="content">
 
-    <header>
-        <img src="../../theme/images/avatar.png" alt="me">
-        <h1><a href="../../">Dan Foreman-Mackey</a></h1>
-        <ul>
-            <li><a href="../../#pubs">Publications</a></li>
-            <li><a href="../../#talks">Talks</a></li>
-            <li><a href="../../#code">Code</a></li>
-            <li><a href="https://github.com/dfm/cv/raw/master-pdf/cv_pubs.pdf">CV</a></li>
-            <li><a href="../../posts/">Blog</a></li>
-        </ul>
-    </header>
+        <header>
+            <img src="../../theme/images/avatar.png" alt="me">
+            <h1><a href="../../">Dan Foreman-Mackey</a></h1>
+            <ul>
+                <li><a href="../../#code">Code</a></li>
+                <li><a href="../../#pubs">Publications</a></li>
+                <li><a href="https://github.com/dfm/cv">CV</a></li>
+                <li><a href="../../posts/">Blog</a></li>
+            </ul>
+        </header>
 
 
 
@@ -57,7 +59,6 @@
 <p>This post was generated from an IPython notebook that can be downloaded
 <a href="/downloads/notebooks/pymc-pytorch.ipynb">here</a>.</p>
 </blockquote>
-<p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -152,7 +153,7 @@ height=401
 
 <span class="k">class</span> <span class="nc">LinearModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LinearModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
@@ -189,7 +190,7 @@ It would be possible to extend this work for arbitrary PyTorch tensors, but it w
 
 <span class="k">class</span> <span class="nc">TorchOp</span><span class="p">(</span><span class="n">tt</span><span class="o">.</span><span class="n">Op</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">module</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -596,9 +597,6 @@ Either way, I'd love to hear if you have any feedback, tips, questions, pictures
 </div>
 
 </div>
- 
-
-</p>
 </section>
 
 <section>
@@ -624,16 +622,16 @@ Either way, I'd love to hear if you have any feedback, tips, questions, pictures
 </section>
 
 
-    <footer>
+        <footer>
 
-    Copyright 2014, 2015, 2016, 2017 Dan Foreman-Mackey unless otherwise noted.<br>
-    Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><b>Creative Commons</b></a>.<br>
-    Find me on <a href="https://twitter.com/exoplaneteer">Twitter</a> or
-    <a href="mailto:foreman.mackey@gmail.com">drop me a line</a>.
+            Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Dan Foreman-Mackey unless otherwise noted.<br>
+            Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><b>Creative Commons</b></a>.<br>
+            Find me on <a href="https://twitter.com/exoplaneteer">Twitter</a> or
+            <a href="mailto:foreman.mackey@gmail.com">drop me a line</a>.
 
-    </footer>
+        </footer>
 
-</div>
+    </div>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -645,4 +643,5 @@ Either way, I'd love to hear if you have any feedback, tips, questions, pictures
   ga('send', 'pageview');
 </script>
 </body>
+
 </html>
