@@ -1,21 +1,22 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Python modules in C by Dan Foreman-Mackey</title>
     <meta id="viewport" name="viewport" content="width=500" />
-    <meta name="description"
-        content="Dan Foreman-Mackey is an Associate Research Scientist at the Center for Computational Astrophysics in the Flatiron Institute at the Simons Foundation." />
+    <meta
+      name="description"
+      content="Dan Foreman-Mackey is an Associate Research Scientist at the Center for Computational Astrophysics in the Flatiron Institute at the Simons Foundation."
+    />
 
 
     <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
-    <link rel="stylesheet" href="../../theme/css/base.css" type="text/css" />
+    <link rel="stylesheet" href="../../theme/css/base.css?v=2" type="text/css" />
     <link rel="stylesheet" href="../../theme/css/code.css" type="text/css" />
 
-    <link rel="icon" type="image/png" href="../../theme/images/avatar.png" sizes="200x200">
-    <link rel="icon" type="image/png" href="../../theme/images/favicon.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="../../theme/images/avatar.png" sizes="200x200" />
+    <link rel="icon" type="image/png" href="../../theme/images/favicon.png" sizes="32x32" />
 
     
 
@@ -30,23 +31,38 @@
         });
     </script>
     <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
 
-</head>
-
-<body>
+  <body>
+    <div class="icon-set">
+      <ul>
+        <li>
+          <a href="https://github.com/dfm"><img class="hdr-icon" src="../../theme/images/github.svg"/></a>
+        </li>
+        <li>
+          <a href="https://twitter.com/exoplaneteer"
+            ><img class="hdr-icon" src="../../theme/images/twitter.svg"
+          /></a>
+        </li>
+        <li>
+          <a href="mailto:foreman.mackey@gmail.com"
+            ><img class="hdr-icon" src="../../theme/images/gmail.svg"
+          /></a>
+        </li>
+      </ul>
+    </div>
 
     <div class="content">
-
-        <header>
-            <img src="../../theme/images/avatar.png" alt="me">
-            <h1><a href="../../">Dan Foreman-Mackey</a></h1>
-            <ul>
-                <li><a href="../../#code">Code</a></li>
-                <li><a href="../../#pubs">Publications</a></li>
-                <li><a href="https://github.com/dfm/cv">CV</a></li>
-                <li><a href="../../posts/">Blog</a></li>
-            </ul>
-        </header>
+      <header>
+        <img src="../../theme/images/avatar.png" alt="me" />
+        <h1><a href="../../">Dan Foreman-Mackey</a></h1>
+        <ul>
+          <li><a href="../../#code">Code</a></li>
+          <li><a href="../../#pubs">Publications</a></li>
+          <li><a href="https://github.com/dfm/cv">CV</a></li>
+          <li><a href="../../posts/">Blog</a></li>
+        </ul>
+      </header>
 
 
 
@@ -99,7 +115,7 @@ $$</p>
 <p>It's probably overkill to write this function in C but it'll do for our
 purposes today. In C, the file <code>chi2.c</code> containing our function should look
 something like:</p>
-<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
 
 <span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
@@ -112,12 +128,12 @@ something like:</p>
 
     <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>And the corresponding header file <code>chi2.h</code> is simply:</p>
-<div class="highlight"><pre><span></span><span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">);</span>
-</pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">);</span>
+</code></pre></div>
 
 
 <p>Now, our goal is to wrap this function so that we can call it from directly
@@ -132,25 +148,25 @@ just a minute ago).</p>
 the first thing that we need to do is import the Python header. I also
 expect that we'll want to interact with <code>numpy</code> arrays and our <code>chi2</code>
 function as well so let's import those headers too:</p>
-<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;numpy/arrayobject.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Next, we should write the
 <a href="http://www.python.org/dev/peps/pep-0257/">docstrings</a> for our module and
 the function that we're wrapping:</p>
-<div class="highlight"><pre><span></span><span class="k">static</span> <span class="kt">char</span> <span class="n">module_docstring</span><span class="p">[]</span> <span class="o">=</span>
+<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="kt">char</span> <span class="n">module_docstring</span><span class="p">[]</span> <span class="o">=</span>
     <span class="s">&quot;This module provides an interface for calculating chi-squared using C.&quot;</span><span class="p">;</span>
 <span class="k">static</span> <span class="kt">char</span> <span class="n">chi2_docstring</span><span class="p">[]</span> <span class="o">=</span>
     <span class="s">&quot;Calculate the chi-squared of some data given a model.&quot;</span><span class="p">;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>and declare the function:</p>
-<div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">);</span>
-</pre></div>
+<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">);</span>
+</code></pre></div>
 
 
 <p>This is the first time that we're seeing anything Python-specific. The
@@ -176,11 +192,11 @@ specification but let's not get into that here.</p>
 <p>Now, we'll specify what the members of this module will be. In this case
 there is only going to be one function (called <code>chi2</code>) so the "method
 definition" looks like:</p>
-<div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">module_methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">module_methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="p">{</span><span class="s">&quot;chi2&quot;</span><span class="p">,</span> <span class="n">chi2_chi2</span><span class="p">,</span> <span class="n">METH_VARARGS</span><span class="p">,</span> <span class="n">chi2_docstring</span><span class="p">},</span>
     <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span>
 <span class="p">};</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>More functions can be added by adding more lines like the second one. This
@@ -195,7 +211,7 @@ METH_KEYWORDS</code></a>.</p>
 <p>The final step in initializing your new C module is to write an <code>init{name}</code>
 function. This function <strong>must</strong> be called <code>init_chi2</code> where <code>_chi2</code> is
 (of course) the name of the module.</p>
-<div class="highlight"><pre><span></span><span class="n">PyMODINIT_FUNC</span> <span class="nf">init_chi2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">PyMODINIT_FUNC</span> <span class="nf">init_chi2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span> <span class="o">=</span> <span class="n">Py_InitModule3</span><span class="p">(</span><span class="s">&quot;_chi2&quot;</span><span class="p">,</span> <span class="n">module_methods</span><span class="p">,</span> <span class="n">module_docstring</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
@@ -204,7 +220,7 @@ function. This function <strong>must</strong> be called <code>init_chi2</code> w
     <span class="cm">/* Load `numpy` functionality. */</span>
     <span class="n">import_array</span><span class="p">();</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Everything that's going on here should be fairly self explanatory by this
@@ -222,7 +238,7 @@ and y-intercept of our model) and three <code>numpy</code> arrays for the <em>x<
 and uncertainties that constitute the "data" that we're trying to model.
 Let's just throw down the whole function here and then dissect it line-by-line
 below:</p>
-<div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">x_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">y_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">yerr_obj</span><span class="p">;</span>
@@ -272,7 +288,7 @@ below:</p>
     <span class="n">PyObject</span> <span class="o">*</span><span class="n">ret</span> <span class="o">=</span> <span class="n">Py_BuildValue</span><span class="p">(</span><span class="s">&quot;d&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
     <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
 <span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>I know that that was a lot in one go so let's break things down a little bit.
@@ -376,30 +392,30 @@ way to do this is to use the built-in Python <a href="http://docs.python.org/dis
 utilities</a>. Traditionally,
 the build script is called <code>setup.py</code> and for our example, the file
 is actually extremely simple:</p>
-<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
 <span class="kn">import</span> <span class="nn">numpy.distutils.misc_util</span>
 
 <span class="n">setup</span><span class="p">(</span>
     <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s2">&quot;_chi2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;_chi2.c&quot;</span><span class="p">,</span> <span class="s2">&quot;chi2.c&quot;</span><span class="p">])],</span>
     <span class="n">include_dirs</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">distutils</span><span class="o">.</span><span class="n">misc_util</span><span class="o">.</span><span class="n">get_numpy_include_dirs</span><span class="p">(),</span>
 <span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>and you can call it using the command:</p>
-<div class="highlight"><pre><span></span>python setup.py build_ext --inplace
-</pre></div>
+<div class="highlight"><pre><span></span><code>python setup.py build_ext --inplace
+</code></pre></div>
 
 
 <p>which will compile and link you source code and create a shared object
 called <code>_chi2.so</code> in the same directory. Then, from Python, you can do
 the following:</p>
-<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">_chi2</span>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">_chi2</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span> <span class="n">_chi2</span><span class="o">.</span><span class="n">chi2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">30.6</span><span class="p">],</span>
 <span class="o">...</span>                            <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">63.0</span><span class="p">],</span>
 <span class="o">...</span>                            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
 <span class="mf">2.89888888889</span>
-</pre></div>
+</code></pre></div>
 
 
 <h2>Summary</h2>
@@ -415,10 +431,10 @@ yet.</p>
 <p>To see all the source code for this tutorial in one place, you can
 check out <a href="https://gist.github.com/3247796">the gist</a> or clone the
 repository using <code>git</code>:</p>
-<div class="highlight"><pre><span></span>git clone git://gist.github.com/3247796.git c_ext
+<div class="highlight"><pre><span></span><code>git clone git://gist.github.com/3247796.git c_ext
 <span class="nb">cd</span> c_ext
 python setup.py build_ext --inplace
-</pre></div>
+</code></pre></div>
 
 
 <p>If you have any comments, suggestions or questions, <a href="https://github.com/dfm/dfm.io">fork this
@@ -449,15 +465,13 @@ me</a>.</p>
 </section>
 
 
-        <footer>
-
-            Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Dan Foreman-Mackey unless otherwise noted.<br>
-            Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><b>Creative Commons</b></a>.<br>
-            Find me on <a href="https://twitter.com/exoplaneteer">Twitter</a> or
-            <a href="mailto:foreman.mackey@gmail.com">drop me a line</a>.
-
-        </footer>
-
+      <footer>
+        Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Dan Foreman-Mackey unless otherwise noted.<br />
+        Licensed under
+        <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><b>Creative Commons</b></a
+        >.<br />
+        Icons from <a href="https://simpleicons.org">simpleicons.org</a>.
+      </footer>
     </div>
 
 <script>
@@ -468,7 +482,5 @@ me</a>.</p>
   ga('create', 'UA-22909046-1', 'auto');
   ga('require', 'displayfeatures');
   ga('send', 'pageview');
-</script>
-</body>
-
+</script>  </body>
 </html>
