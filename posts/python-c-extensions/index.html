@@ -130,11 +130,9 @@ something like:</p>
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>And the corresponding header file <code>chi2.h</code> is simply:</p>
 <div class="highlight"><pre><span></span><code><span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p>Now, our goal is to wrap this function so that we can call it from directly
 within Python.</p>
@@ -153,7 +151,6 @@ function as well so let's import those headers too:</p>
 <span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
 </code></pre></div>
 
-
 <p>Next, we should write the
 <a href="http://www.python.org/dev/peps/pep-0257/">docstrings</a> for our module and
 the function that we're wrapping:</p>
@@ -163,11 +160,9 @@ the function that we're wrapping:</p>
     <span class="s">&quot;Calculate the chi-squared of some data given a model.&quot;</span><span class="p">;</span>
 </code></pre></div>
 
-
 <p>and declare the function:</p>
 <div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p>This is the first time that we're seeing anything Python-specific. The
 type <code>PyObject</code> refers to all Python types. Any communication between the
@@ -198,7 +193,6 @@ definition" looks like:</p>
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p>More functions can be added by adding more lines like the second one. This
 second line contains all the info that the interpreter needs to link a Python
 call to the correct C function and call it in the right way. The
@@ -221,7 +215,6 @@ function. This function <strong>must</strong> be called <code>init_chi2</code> w
     <span class="n">import_array</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></div>
-
 
 <p>Everything that's going on here should be fairly self explanatory by this
 point but it's important to note that if you want to use any of the
@@ -289,7 +282,6 @@ below:</p>
     <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
 
 <p>I know that that was a lot in one go so let's break things down a little bit.
 The first thing that we did was parse the input tuple using the
@@ -401,11 +393,9 @@ is actually extremely simple:</p>
 <span class="p">)</span>
 </code></pre></div>
 
-
 <p>and you can call it using the command:</p>
 <div class="highlight"><pre><span></span><code>python setup.py build_ext --inplace
 </code></pre></div>
-
 
 <p>which will compile and link you source code and create a shared object
 called <code>_chi2.so</code> in the same directory. Then, from Python, you can do
@@ -416,7 +406,6 @@ the following:</p>
 <span class="o">...</span>                            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
 <span class="mf">2.89888888889</span>
 </code></pre></div>
-
 
 <h2>Summary</h2>
 <p>Hopefully, after going through this tutorial, you should be able to write
@@ -435,7 +424,6 @@ repository using <code>git</code>:</p>
 <span class="nb">cd</span> c_ext
 python setup.py build_ext --inplace
 </code></pre></div>
-
 
 <p>If you have any comments, suggestions or questions, <a href="https://github.com/dfm/dfm.io">fork this
 page</a> or <a href="https://twitter.com/exoplaneteer">tweet at
