@@ -133,7 +133,7 @@
 
   (() => {
     var codeTemplate = document.getElementById("code-template").innerHTML;
-    fetch("https://raw.githubusercontent.com/dfm/cv/master/repos.json")
+    fetch("https://raw.githubusercontent.com/dfm/cv/main/data/repos.json")
       .then(response => response.json())
       .then(data => {
         data = data.data.user.pinnedItems.edges.map(value => value.node);
@@ -146,7 +146,7 @@
       });
 
     var pubTemplate = document.getElementById("pub-template").innerHTML;
-    fetch("https://raw.githubusercontent.com/dfm/cv/master/pubs.json")
+    fetch("https://raw.githubusercontent.com/dfm/cv/main/data/pubs.json")
       .then(response => response.json())
       .then(data => {
         // Only first author
