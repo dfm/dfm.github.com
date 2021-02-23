@@ -109,42 +109,29 @@
           </header>
           <article class="post__content">
               
+
+
 <p>In my work I often come across probabilistic models where there are strong correlations between parameters.
 This certainly isn&rsquo;t a special feature of the problems that I work on, and the general advice from MCMC practitioners is that we should reparameterize our models in some form that removes the covariances, but this isn&rsquo;t always practical.
-One of the reasons why <a href="https://emcee.readthedocs.io" 
-  
-   target="_blank" rel="noreferrer noopener" 
->emcee</a>
- has been popular in astrophysics (I think) is that it uses an &ldquo;affine invariant&rdquo; algorithm.
+One of the reasons why <a href="https://emcee.readthedocs.io">emcee</a> has been popular in astrophysics (I think) is that it uses an &ldquo;affine invariant&rdquo; algorithm.
 This means that when you use emcee, the performance will be (more-or-less) the same for any problems that are affine transformations of each other.
 In other words, it doesn&rsquo;t care about translations, rotations, or scalings of the parameters.</p>
-<p>Standard <a href="https://en.wikipedia.org/wiki/Hamiltonian_Monte_Carlo" 
-  
-   target="_blank" rel="noreferrer noopener" 
->HMC</a>
- methods such as the <a href="https://arxiv.org/abs/1111.4246" 
-  
-   target="_blank" rel="noreferrer noopener" 
->NUTS</a>
- algorithm implemented in state-of-the-art libraries like <a href="https://docs.pymc.io/" 
-  
-   target="_blank" rel="noreferrer noopener" 
->PyMC3</a>
- and <a href="http://mc-stan.org/" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Stan</a>
- do not have this property.
+
+<p>Standard <a href="https://en.wikipedia.org/wiki/Hamiltonian_Monte_Carlo">HMC</a> methods such as the <a href="https://arxiv.org/abs/1111.4246">NUTS</a> algorithm implemented in state-of-the-art libraries like <a href="https://docs.pymc.io/">PyMC3</a> and <a href="http://mc-stan.org/">Stan</a> do not have this property.
 [Note: it is actually possible to construct an affine invariant NUTS sampler using some of the ideas from emcee, but there are some limitations and this will hopefully be the topic of a paper that I write someday&hellip;]
 The performance of this method is generally very sensitive to the &ldquo;metric&rdquo; or &ldquo;mass matrix&rdquo; that is used and changes in parameterization can make a huge difference in the efficiency of sampling using these packages.
 To deal with covariances, Stan has support for learning the off-diagonal elements of the mass matrix during burn-in.
 The basic idea is that (in the Gaussian case) the optimal mass matrix will be equal to the inverse covariance of the posterior.
 Therefore, you can estimate the sample covariance of burn-in chains and use that as the inverse mass matrix in subsequent samplings.
 While PyMC3 has the machinery to support this, out of the box it only supports learning of the <em>diagonal</em> elements of the mass matrix during the tuning phase (as far as I can tell - please correct me if I&rsquo;m wrong!).</p>
+
 <p>In this blog post, I demonstrate how covariances can cause serious problems for PyMC3 on a simple (but not contrived) toy problem and then I show a way that you can use the existing features in PyMC3 to implement a tuning schedule similar to the one used by Stan and fit for the full dense mass matrix.
 I have found that this can have a <em>huge</em> effect (a few orders of magnitude in the example shown here) on the computational efficiency of PyMC3 on the types of problems that are common in astrophysics.</p>
+
 <h2 id="sampling-an-isotropic-gaussian">Sampling an isotropic Gaussian<a class="anchor" href="#sampling-an-isotropic-gaussian">#</a></h2>
+
 <p>First, let&rsquo;s look at how fast PyMC3 can sample an isotropic 5-D Gaussian.</p>
+
 <pre><code class="language-python">import time
 import pymc3 as pm
 print(&quot;PyMC3 version {0}&quot;.format(pm.__version__))
@@ -165,6 +152,7 @@ stats = pm.summary(simple_trace)
 simple_time_per_eff = simple_time / stats.n_eff.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(simple_time_per_eff * 1000))
 </code></pre>
+
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
 
@@ -179,15 +167,15 @@ Sampling 2 chains: 100%|██████████| 12000/12000 [00:04&lt;00
 
 time per effective sample: 0.26766 ms
 </code></pre>
+
 <p>On my laptop with two CPUs, I find that the computational cost per effective sample is a fraction of a millisecond.
 That&rsquo;s how things should be!</p>
+
 <h2 id="sampling-a-covariant-gaussian">Sampling a covariant Gaussian<a class="anchor" href="#sampling-a-covariant-gaussian">#</a></h2>
+
 <p>Now let&rsquo;s try an example where the dimensions of our Gaussian are correlated and see how the default performance of PyMC3 compares.
-First, let&rsquo;s take a look at a <a href="https://corner.readthedocs.io" 
-  
-   target="_blank" rel="noreferrer noopener" 
->corner plot</a>
- of the posterior that we&rsquo;re targeting.</p>
+First, let&rsquo;s take a look at a <a href="https://corner.readthedocs.io">corner plot</a> of the posterior that we&rsquo;re targeting.</p>
+
 <pre><code class="language-python">import numpy as np
 
 import corner  # https://corner.readthedocs.io
@@ -203,10 +191,13 @@ cov = np.dot(L, L.T)
 samples = np.random.multivariate_normal(np.zeros(ndim), cov, size=5000)
 corner.corner(samples, labels=[&quot;$x_{{{0}}}$&quot;.format(i) for i in range(1, ndim+1)]);
 </code></pre>
-<p><img src="output_5_0.png" alt="png"></p>
+
+<p><img src="output_5_0.png" alt="png" /></p>
+
 <p>This plot will look familiar to any astronomers reading this (and probably some readers from other fields) because our parameters are often correlated and the dynamic range of the parameters can vary drastically.
 If you used emcee to sample this posterior and the isotropic case above, you would get identical performance (albeit somewhat worse performance than PyMC3) but, as we&rsquo;ll see, the same is not true of PyMC3.
 Let&rsquo;s try to sample this probability density using PyMC3&rsquo;s default settings.</p>
+
 <pre><code class="language-python">with pm.Model() as model:
     pm.MvNormal(&quot;x&quot;, mu=np.zeros(ndim), chol=L, shape=(ndim,))
 
@@ -219,6 +210,7 @@ stats = pm.summary(default_trace)
 default_time_per_eff = default_time / stats.n_eff.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(default_time_per_eff * 1000))
 </code></pre>
+
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
 Multiprocess sampling (2 chains in 2 jobs)
@@ -231,16 +223,16 @@ The number of effective samples is smaller than 10% for some parameters.
 
 time per effective sample: 1719.01749 ms
 </code></pre>
+
 <p>Yes, the units here are the same and the computational efficiency is orders of magnitude worse than the isotropic case.
 The standard recommendation would be to re-parameterize (we can see that that&rsquo;s what PyMC3 is telling us to do here too), but I&rsquo;m not really clever or patient enough to do that in every case.
 So, let&rsquo;s automate this following the procedure from Stan.</p>
+
 <h2 id="learning-the-mass-matrix-in-pymc3">Learning the mass matrix in PyMC3<a class="anchor" href="#learning-the-mass-matrix-in-pymc3">#</a></h2>
+
 <p>In this section, I will demonstrate how we can use the machinery included in the current release of PyMC3 to fit for a dense mass matrix during burn-in.
-First, let&rsquo;s choose a tuning schedule roughly following section 34.2 from the <a href="https://github.com/stan-dev/stan/releases/download/v2.17.0/stan-reference-2.17.0.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Stan manual</a>
-.</p>
+First, let&rsquo;s choose a tuning schedule roughly following section 34.2 from the <a href="https://github.com/stan-dev/stan/releases/download/v2.17.0/stan-reference-2.17.0.pdf">Stan manual</a>.</p>
+
 <pre><code class="language-python">n_start = 25
 n_burn = 500
 n_tune = 5000
@@ -248,7 +240,9 @@ n_window = n_start * 2 ** np.arange(np.floor(np.log2((n_tune - n_burn) / n_start
 n_window = np.append(n_window, n_tune - n_burn - np.sum(n_window))
 n_window = n_window.astype(int)
 </code></pre>
+
 <p>Next, here&rsquo;s a function that takes in a MultiTrace object from PyMC3, estimates the sample covariance, and builds a NUTS step for use in the <code>sample</code> method.</p>
+
 <pre><code class="language-python">from pymc3.step_methods.hmc.quadpotential import QuadPotentialFull
 
 def get_step_for_trace(trace=None, model=None,
@@ -288,7 +282,9 @@ def get_step_for_trace(trace=None, model=None,
     potential = QuadPotentialFull(cov)
     return pm.NUTS(potential=potential, **kwargs)
 </code></pre>
+
 <p>Finally, we can combine our tuning schedule with this proposal estimator to automatically learn the mass matrix during burn-in.</p>
+
 <pre><code class="language-python">np.random.seed(42)
 
 strt = time.time()
@@ -311,6 +307,7 @@ stats = pm.summary(dense_trace)
 dense_time_per_eff = dense_time / stats.n_eff.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(dense_time_per_eff * 1000))
 </code></pre>
+
 <pre><code>Only 2 samples in chain.
 Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
@@ -351,7 +348,9 @@ Sampling 2 chains: 100%|██████████| 11000/11000 [00:09&lt;00
 
 time per effective sample: 0.75394 ms
 </code></pre>
+
 <p>The computational efficiency of this method is similar to PyMC3&rsquo;s default performance on an isotropic Gaussian (within a factor of a few) and corresponds to an improvement of more than <em>three orders of magnitude</em> over the default PyMC3 performance on a correlated Gaussian.</p>
+
 <p>While I&rsquo;ve found that this procedure can substantially improve the sampling efficiency in many real world scenerios (especially during exploratory phases of a project), you shouldn&rsquo;t forget about reparameterization because that can provide even better performance and help identify problems with your model specification.
 Futhermore, this method might run into numerical issues for high dimensional problems because more samples will be needed to reliably estimate the off-diagonal elements of the mass matrix.
 Either way, hopefully this is helpful to folks until PyMC3 includes native support for this type of procedure.</p>

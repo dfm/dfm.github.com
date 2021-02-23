@@ -109,94 +109,107 @@
           </header>
           <article class="post__content">
               
-<p><em>This is a cross post from the new</em> <a href="http://emcee.readthedocs.io" 
-  
-   target="_blank" rel="noreferrer noopener" 
->emcee documentation</a>
-.</p>
+
+
+<p><em>This is a cross post from the new</em> <a href="http://emcee.readthedocs.io">emcee documentation</a>.</p>
+
 <p>In this tutorial, we will discuss a method for convincing yourself that your chains are sufficiently converged.
 This can be a difficult subject to discuss because it isn&rsquo;t formally possible to guarantee convergence for any but the simplest models, and therefore any argument that you make will be circular and heuristic.
 However, some discussion of autocorrelation analysis is (or should be!) a necessary part of any publication using MCMC.</p>
-<p>With emcee, we follow <a href="http://msp.berkeley.edu/camcos/2010/5-1/p04.xhtml" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Goodman &amp; Weare (2010)</a>
- and recommend using the <em>integrated autocorrelation time</em> to quantify the effects of sampling error on your results.
+
+<p>With emcee, we follow <a href="http://msp.berkeley.edu/camcos/2010/5-1/p04.xhtml">Goodman &amp; Weare (2010)</a> and recommend using the <em>integrated autocorrelation time</em> to quantify the effects of sampling error on your results.
 The basic idea is that the samples in your chain are not independent and you must estimate the effective number of independent samples.
-There are other convergence diagnostics like the <a href="http://digitalassets.lib.berkeley.edu/sdtr/ucb/text/305.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Gelman–Rubin statistic</a>
- (<em>Note: you should not compute the G–R statistic using multiple chains in the same emcee ensemble because the chains are not independent!</em>) but, since the integrated autocorrelation time directly quantifies the Monte Carlo error (and hence the efficiency of the sampler) on any integrals computed using the MCMC results, it is the natural quantity of interest when judging the robustness of an MCMC analysis.</p>
+There are other convergence diagnostics like the <a href="http://digitalassets.lib.berkeley.edu/sdtr/ucb/text/305.pdf">Gelman–Rubin statistic</a> (<em>Note: you should not compute the G–R statistic using multiple chains in the same emcee ensemble because the chains are not independent!</em>) but, since the integrated autocorrelation time directly quantifies the Monte Carlo error (and hence the efficiency of the sampler) on any integrals computed using the MCMC results, it is the natural quantity of interest when judging the robustness of an MCMC analysis.</p>
+
 <h2 id="monte-carlo-error">Monte Carlo error<a class="anchor" href="#monte-carlo-error">#</a></h2>
+
 <p>The goal of every MCMC analysis is to evaluate integrals of the form</p>
+
 <p>$$
-\mathrm{E}_{p(\theta)}[f(\theta)] = \int f(\theta),p(\theta),\mathrm{d}\theta \quad.
+\mathrm{E}_{p(\theta)}[f(\theta)] = \int f(\theta)\,p(\theta)\,\mathrm{d}\theta \quad.
 $$</p>
+
 <p>If you had some way of generating $N$ samples $\theta^{(n)}$ from the probability density $p(\theta)$, then you could approximate this integral as</p>
+
 <p>$$
 \mathrm{E}<em>{p(\theta)}[f(\theta)] \approx \frac{1}{N} \sum</em>{n=1}^N f(\theta^{(n)})
 $$</p>
+
 <p>where the sum is over the samples from $p(\theta)$.
 If these samples are independent, then the sampling variance on this estimator is</p>
+
 <p>$$
-\sigma^2 = \frac{1}{N},\mathrm{Var}_{p(\theta)}[f(\theta)]
+\sigma^2 = \frac{1}{N}\,\mathrm{Var}_{p(\theta)}[f(\theta)]
 $$</p>
+
 <p>and the error decreses as $1/\sqrt{N}$ as you generate more samples.
 In the case of MCMC, the samples are not independent and the error is actually given by</p>
+
 <p>$$
-\sigma^2 = \frac{\tau_f}{N},\mathrm{Var}_{p(\theta)}[f(\theta)]
+\sigma^2 = \frac{\tau<em>f}{N}\,\mathrm{Var}</em>{p(\theta)}[f(\theta)]
 $$</p>
+
 <p>where $\tau_f$ is the <em>integrated autocorrelation time</em> for the chain $f(\theta^{(n)})$.
 In other words, $N/\tau_f$ is the effective number of samples and $\tau_f$ is the number of steps that are needed before the chain &ldquo;forgets&rdquo; where it started.
 This means that, if you can estimate $\tau_f$, then you can estimate the number of samples that you need to generate to reduce the relative error on your target integral to (say) a few percent.</p>
+
 <p><strong>Note:</strong> It is important to remember that $\tau_f$ depends on the specific function $f(\theta)$.
 This means that there isn&rsquo;t just <em>one</em> integrated autocorrelation time for a given Markov chain.
 Instead, you must compute a different $\tau_f$ for any integral you estimate using the samples.</p>
+
 <h2 id="computing-autocorrelation-times">Computing autocorrelation times<a class="anchor" href="#computing-autocorrelation-times">#</a></h2>
-<p>There is a great discussion of methods for autocorrelation estimation in <a href="https://pdfs.semanticscholar.org/0bfe/9e3db30605fe2d4d26e1a288a5e2997e7225.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
->a set of lecture notes by Alan Sokal</a>
- and the interested reader should take a look at that for a more formal discussion, but I&rsquo;ll include a summary of some of the relevant points here.
+
+<p>There is a great discussion of methods for autocorrelation estimation in <a href="https://pdfs.semanticscholar.org/0bfe/9e3db30605fe2d4d26e1a288a5e2997e7225.pdf">a set of lecture notes by Alan Sokal</a> and the interested reader should take a look at that for a more formal discussion, but I&rsquo;ll include a summary of some of the relevant points here.
 The integrated autocorrelation time is defined as</p>
+
 <p>$$
-\tau_f = \sum_{\tau=-\infty}^\infty \rho_f(\tau)
+\tau<em>f = \sum</em>{\tau=-\infty}^\infty \rho_f(\tau)
 $$</p>
+
 <p>where $\rho_f(\tau)$ is the normalized autocorrelation function of the stochastic process that generated the chain for $f$.
-You can estimate $\rho_f(\tau)$ using a finite chain ${f_n}_{n=1}^N$ as</p>
+You can estimate $\rho_f(\tau)$ using a finite chain ${f<em>n}</em>{n=1}^N$ as</p>
+
 <p>$$
 \hat{\rho}_f(\tau) = \hat{c}_f(\tau) / \hat{c}_f(0)
 $$</p>
+
 <p>where</p>
+
 <p>$$
-\hat{c}<em>f(\tau) = \frac{1}{N - \tau} \sum</em>{n=1}^{N-\tau} (f_n - \mu_f),(f_{n+\tau}-\mu_f)
+\hat{c}<em>f(\tau) = \frac{1}{N - \tau} \sum</em>{n=1}^{N-\tau} (f_n - \mu<em>f)\,(f</em>{n+\tau}-\mu_f)
 $$</p>
+
 <p>and</p>
+
 <p>$$
-\mu_f = \frac{1}{N}\sum_{n=1}^N f_n \quad.
+\mu<em>f = \frac{1}{N}\sum</em>{n=1}^N f_n \quad.
 $$</p>
+
 <p>(Note: In practice, it is actually more computationally efficient to compute $\hat{c}_f(\tau)$ using a fast Fourier transform than summing it directly.)</p>
+
 <p>Now, you might expect that you can estimate $\tau_f$ using this estimator for $\rho_f(\tau)$ as</p>
+
 <p>$$
-\hat{\tau}<em>f \stackrel{?}{=} \sum</em>{\tau=-N}^{N} \hat{\rho}<em>f(\tau) = 1 + 2,\sum</em>{\tau=1}^N \hat{\rho}_f(\tau)
+\hat{\tau}<em>f \stackrel{?}{=} \sum</em>{\tau=-N}^{N} \hat{\rho}<em>f(\tau) = 1 + 2\,\sum</em>{\tau=1}^N \hat{\rho}_f(\tau)
 $$</p>
+
 <p>but this isn&rsquo;t actually a very good idea.
 At longer lags, $\hat{\rho}_f(\tau)$ starts to contain more noise than signal and summing all the way out to $N$ will result in a very noisy estimate of $\tau_f$.
 Instead, we want to estimate $\tau_f$ as</p>
+
 <p>$$
-\hat{\tau}<em>f (M) = 1 + 2,\sum</em>{\tau=1}^M \hat{\rho}_f(\tau)
+\hat{\tau}<em>f (M) = 1 + 2\,\sum</em>{\tau=1}^M \hat{\rho}_f(\tau)
 $$</p>
+
 <p>for some $M \ll N$.
-As discussed by Sokal in the notes linked above, the introduction of $M$ decreases the variance of the estimator at the cost of some added bias and he suggests choosing the smallest value of $M$ where $M \ge C,\hat{\tau}_f (M)$ for a constant $C \sim 5$.
-Sokal says that he finds this procedure to work well for chains longer than $1000,\tau_f$, but the situation is a bit better with emcee because we can use the parallel chains to reduce the variance and we&rsquo;ve found that chains longer than about $50,\tau$ are often sufficient.</p>
+As discussed by Sokal in the notes linked above, the introduction of $M$ decreases the variance of the estimator at the cost of some added bias and he suggests choosing the smallest value of $M$ where $M \ge C\,\hat{\tau}_f (M)$ for a constant $C \sim 5$.
+Sokal says that he finds this procedure to work well for chains longer than $1000\,\tau_f$, but the situation is a bit better with emcee because we can use the parallel chains to reduce the variance and we&rsquo;ve found that chains longer than about $50\,\tau$ are often sufficient.</p>
+
 <h2 id="a-toy-problem">A toy problem<a class="anchor" href="#a-toy-problem">#</a></h2>
+
 <p>To demonstrate this method, we&rsquo;ll start by generating a set of &ldquo;chains&rdquo; from a process with known autocorrelation structure.
-To generate a large enough dataset, we&rsquo;ll use <a href="http://celerite.readthedocs.io" 
-  
-   target="_blank" rel="noreferrer noopener" 
->celerite</a>
-:</p>
+To generate a large enough dataset, we&rsquo;ll use <a href="http://celerite.readthedocs.io">celerite</a>:</p>
+
 <pre><code class="language-python">import numpy as np
 import matplotlib.pyplot as plt
 
@@ -226,8 +239,11 @@ plt.xlabel(&quot;step number&quot;)
 plt.ylabel(&quot;$f$&quot;)
 plt.title(&quot;$\\tau_\mathrm{{true}} = {0:.0f}$&quot;.format(true_tau), fontsize=14);
 </code></pre>
-<p><img src="output_6_0.png" alt="png"></p>
+
+<p><img src="output_6_0.png" alt="png" /></p>
+
 <p>Now we&rsquo;ll estimate the empirical autocorrelation function for each of these parallel chains and compare this to the true function.</p>
+
 <pre><code class="language-python">def next_pow_two(n):
     i = 1
     while i &lt; n:
@@ -270,11 +286,15 @@ axes[-1].set_xlim(0, window / true_tau)
 axes[-1].set_ylim(-0.05, 1.05)
 axes[-1].legend(fontsize=14);
 </code></pre>
-<p><img src="output_8_0.png" alt="png"></p>
+
+<p><img src="output_8_0.png" alt="png" /></p>
+
 <p>This figure shows how the empirical estimate of the normalized autocorrelation function changes as more samples are generated.
 In each panel, the true autocorrelation function is shown as a black curve and the empricial estimator is shown as a blue line.</p>
+
 <p>Instead of estimating the autocorrelation function using a single chain, we can assume that each chain is sampled from the same stochastic process and average the estimate over ensemble members to reduce the variance.
 It turns out that we&rsquo;ll actually do this averaging later in the process below, but it can be useful to show the mean autocorrelation function for visualization purposes.</p>
+
 <pre><code class="language-python">fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharex=True, sharey=True)
 for n, ax in zip([10, 100, 1000], axes):
     nn = int(true_tau * n)
@@ -291,16 +311,16 @@ axes[-1].set_xlim(0, window / true_tau)
 axes[-1].set_ylim(-0.05, 1.05)
 axes[-1].legend(fontsize=14);
 </code></pre>
-<p><img src="output_10_0.png" alt="png"></p>
+
+<p><img src="output_10_0.png" alt="png" /></p>
+
 <p>Now let&rsquo;s estimate the autocorrelation time using these estimated autocorrelation functions.
 Goodman &amp; Weare (2010) suggested averaging the ensemble over walkers and computing the autocorrelation function of the mean chain to lower the variance of the estimator and that was what was originally implemented in emcee.
-Since then, @fardal on GitHub <a href="https://github.com/dfm/emcee/issues/209" 
-  
-   target="_blank" rel="noreferrer noopener" 
->suggested that other estimators might have lower variance</a>
-.
+Since then, @fardal on GitHub <a href="https://github.com/dfm/emcee/issues/209">suggested that other estimators might have lower variance</a>.
 This is absolutely correct and, instead of the Goodman &amp; Weare method, we now recommend computing the autocorrelation time for each walker (it&rsquo;s actually possible to still use the ensemble to choose the appropriate window) and then average these estimates.</p>
+
 <p>Here is an implementation of each of these methods and a plot showing the convergence as a function of the chain length:</p>
+
 <pre><code class="language-python"># Automated windowing procedure following Sokal (1989)
 def auto_window(taus, c):
     m = np.arange(len(taus)) &lt; c * taus
@@ -343,16 +363,21 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_12_0.png" alt="png"></p>
+
+<p><img src="output_12_0.png" alt="png" /></p>
+
 <p>In this figure, the true autocorrelation time is shown as a horizontal line and it should be clear that both estimators give outrageous results for the short chains.
 It should also be clear that the new algorithm has lower variance than the original method based on Goodman &amp; Weare.
 In fact, even for moderately long chains, the old method can give dangerously over-confident estimates.
 For comparison, we have also plotted the $\tau = N/50$ line to show that, once the estimate crosses that line, The estimates are starting to get more reasonable.
 This suggests that you probably shouldn&rsquo;t trust any estimate of $\tau$ unless you have more than $F\times\tau$ samples for some $F \ge 50$.
 Larger values of $F$ will be more conservative, but they will also (obviously) require longer chains.</p>
+
 <h2 id="a-more-realistic-example">A more realistic example<a class="anchor" href="#a-more-realistic-example">#</a></h2>
+
 <p>Now, let&rsquo;s run an actual Markov chain and test these methods using those samples.
 So that the sampling isn&rsquo;t completely trivial, we&rsquo;ll sample a multimodal density in three dimensions.</p>
+
 <pre><code class="language-python">import emcee
 
 def log_prob(p):
@@ -363,9 +388,12 @@ sampler.run_mcmc(np.concatenate((np.random.randn(16, 3),
                                  4.0+np.random.randn(16, 3)), axis=0),
                  500000, progress=True);
 </code></pre>
+
 <pre><code>100%|██████████| 500000/500000 [08:08&lt;00:00, 1023.55it/s]
 </code></pre>
+
 <p>Here&rsquo;s the marginalized density in the first dimension.</p>
+
 <pre><code class="language-python">chain = sampler.get_chain()[:, :, 0].T
 
 plt.hist(chain.flatten(), 100)
@@ -373,8 +401,11 @@ plt.gca().set_yticks([])
 plt.xlabel(r&quot;$\theta$&quot;)
 plt.ylabel(r&quot;$p(\theta)$&quot;);
 </code></pre>
-<p><img src="output_17_0.png" alt="png"></p>
+
+<p><img src="output_17_0.png" alt="png" /></p>
+
 <p>And here&rsquo;s the comparison plot showing how the autocorrelation time estimates converge with longer chains.</p>
+
 <pre><code class="language-python"># Compute the estimators for a few different chain lengths
 N = np.exp(np.linspace(np.log(100), np.log(chain.shape[1]), 10)).astype(int)
 gw2010 = np.empty(len(N))
@@ -393,23 +424,21 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_19_0.png" alt="png"></p>
+
+<p><img src="output_19_0.png" alt="png" /></p>
+
 <p>As before, the short chains give absurd estimates of $\tau$, but the new method converges faster and with lower variance than the old method.
 The $\tau = N/50$ line is also included as above as an indication of where we might start trusting the estimates.</p>
+
 <h2 id="what-about-shorter-chains">What about shorter chains?<a class="anchor" href="#what-about-shorter-chains">#</a></h2>
+
 <p>Sometimes it just might not be possible to run chains that are long enough to get a reliable estimate of $\tau$ using the methods described above.
 In these cases, you might be able to get an estimate using parametric models for the autocorrelation.
-One example would be to fit an <a href="https://en.wikipedia.org/wiki/Autoregressive_model" 
-  
-   target="_blank" rel="noreferrer noopener" 
->autoregressive model</a>
- to the chain and using that to estimate the autocorrelation time.</p>
-<p>As an example, we&rsquo;ll use <a href="http://celerite.readthdocs.io" 
-  
-   target="_blank" rel="noreferrer noopener" 
->celerite</a>
- to fit for the maximum likelihood autocorrelation function and then compute an estimate of $\tau$ based on that model.
+One example would be to fit an <a href="https://en.wikipedia.org/wiki/Autoregressive_model">autoregressive model</a> to the chain and using that to estimate the autocorrelation time.</p>
+
+<p>As an example, we&rsquo;ll use <a href="http://celerite.readthdocs.io">celerite</a> to fit for the maximum likelihood autocorrelation function and then compute an estimate of $\tau$ based on that model.
 The celerite model that we&rsquo;re using is equivalent to a second-order ARMA model and it appears to be a good choice for this example, but we&rsquo;re not going to promise anything here about the general applicability and we caution care whenever estimating autocorrelation times using short chains.</p>
+
 <pre><code class="language-python">from scipy.optimize import minimize
 
 def autocorr_ml(y, thin=1, c=5.0):
@@ -460,6 +489,7 @@ for j, n in enumerate(N[1:8]):
     thin = max(1, int(0.05*new[i]))
     ml[i] = autocorr_ml(chain[:, :n], thin=thin)
 </code></pre>
+
 <pre><code class="language-python"># Plot the comparisons
 plt.loglog(N, gw2010, &quot;o-&quot;, label=&quot;G\&amp;W 2010&quot;)
 plt.loglog(N, new, &quot;o-&quot;, label=&quot;DFM 2017&quot;)
@@ -471,7 +501,9 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_23_0.png" alt="png"></p>
+
+<p><img src="output_23_0.png" alt="png" /></p>
+
 <p>This figure is the same as the previous one, but we&rsquo;ve added the maximum likelihood estimates for $\tau$ in green.
 In this case, this estimate seems to be robust even for very short chains with $N \sim \tau$.</p>
 

@@ -109,18 +109,18 @@
           </header>
           <article class="post__content">
               
+
+
 <blockquote>
-<p>The primary version of this post can be found on GitHub: <a href="https://github.com/dfm/extending-jax" 
-  
-   target="_blank" rel="noreferrer noopener" 
->dfm/extending-jax</a>
-</p>
+<p>The primary version of this post can be found on GitHub: <a href="https://github.com/dfm/extending-jax">dfm/extending-jax</a></p>
 </blockquote>
+
 <p>This repository is meant as a tutorial demonstrating the infrastructure required
 to provide custom ops in JAX when you have an existing implementation in C++
 and, optionally, CUDA. I originally wanted to write this as a blog post, but
 there&rsquo;s enough boilerplate code that I ended up deciding that it made more sense
 to just share it as a repo with the tutorial in the README, so here we are!</p>
+
 <p>The motivation for this is that in my work I want to use libraries like JAX to
 fit models to data in astrophysics. In these models, there is often at least one
 part of the model specification that is physically motivated and while there are
@@ -130,131 +130,104 @@ Instead, I want to expose a well-tested and optimized implementation in C
 directly to JAX. In my work, this often includes things like iterative
 algorithms or special functions that are not well suited to implementation using
 JAX directly.</p>
-<p>So, as part of updating my <a href="https://docs.exoplanet.codes" 
-  
-   target="_blank" rel="noreferrer noopener" 
->exoplanet</a>
- library to
+
+<p>So, as part of updating my <a href="https://docs.exoplanet.codes">exoplanet</a> library to
 interface with JAX, I had to learn what infrastructure was required to support
 this use case, and since I couldn&rsquo;t find a tutorial that covered all the pieces
 that I needed in one place, I wanted to put this together. Pretty much
 everything that I&rsquo;ll talk about is covered in more detail somewhere else (even
 if that somewhere is just a comment in some source code), but hopefully this
 summary can point you in the right direction if you have a use case like this.</p>
+
 <p><strong>A warning</strong>: I&rsquo;m writing this in January 2021 and much of what I&rsquo;m talking
 about is based on essentially undocumented APIs that are likely to change.
 Furthermore, I&rsquo;m not affiliated with the JAX project and I&rsquo;m far from an expert
 so I&rsquo;m sure there are wrong things that I say. I&rsquo;ll try to update this if I
 notice things changing or if I learn of issues, but no promises! So, MIT license
 and all that: use at your own risk.</p>
+
 <h2 id="related-reading">Related reading<a class="anchor" href="#related-reading">#</a></h2>
+
 <p>As I mentioned previously, this tutorial is built on a lot of existing
 literature and I won&rsquo;t reproduce all the details of those documents here, so I
 wanted to start by listing the key resources that I found useful:</p>
+
 <ol>
-<li>
-<p>The <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html"  title="How primitives work" 
-  
-   target="_blank" rel="noreferrer noopener" 
->How primitives work</a>
- tutorial in the JAX documentation
+<li><p>The <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html" title="How primitives work">How primitives work</a> tutorial in the JAX documentation
 includes almost all the details about how to expose a custom op to JAX and
 spending some quality time with that tutorial is not wasted time. The only
 thing missing from that document is a description of how to use the XLA
-CustomCall interface.</p>
-</li>
-<li>
-<p>Which brings us to the <a href="https://www.tensorflow.org/xla/custom_call"  title="XLA custom calls" 
-  
-   target="_blank" rel="noreferrer noopener" 
->XLA custom calls</a>
- documentation. This
+CustomCall interface.</p></li>
+
+<li><p>Which brings us to the <a href="https://www.tensorflow.org/xla/custom_call" title="XLA custom calls">XLA custom calls</a> documentation. This
 page is pretty telegraphic, but it includes a description of the interface
 that your custom call functions need to support. In particular, this is where
 the differences in interface between the CPU and GPU are described, including
-things like the &ldquo;opaque&rdquo; parameter and how multiple outputs are handled.</p>
-</li>
-<li>
-<p>I originally learned how to write the pybind11 interface for an XLA custom
-call from the <a href="https://github.com/danieljtait/jax_xla_adventures"  title="JAX XLA adventures" 
-  
-   target="_blank" rel="noreferrer noopener" 
->danieljtait/jax_xla_adventures</a>
- repository by
+things like the &ldquo;opaque&rdquo; parameter and how multiple outputs are handled.</p></li>
+
+<li><p>I originally learned how to write the pybind11 interface for an XLA custom
+call from the <a href="https://github.com/danieljtait/jax_xla_adventures" title="JAX XLA adventures">danieljtait/jax_xla_adventures</a> repository by
 Dan Tait on GitHub. Again, this doesn&rsquo;t include very many details, but that&rsquo;s
 really a benefit here because it really distills the infrastructure to a
-place where I could understand what was going on.</p>
-</li>
-<li>
-<p>Finally, much of what I know about this topic, I learned from spelunking in
-the <a href="https://github.com/google/jax/tree/master/jaxlib"  title="jaxlib source code" 
-  
-   target="_blank" rel="noreferrer noopener" 
->jaxlib source code</a>
- on GitHub. That code is pretty readable and
+place where I could understand what was going on.</p></li>
+
+<li><p>Finally, much of what I know about this topic, I learned from spelunking in
+the <a href="https://github.com/google/jax/tree/master/jaxlib" title="jaxlib source code">jaxlib source code</a> on GitHub. That code is pretty readable and
 includes good comments most of the time so that&rsquo;s a good place to look if you
-get stuck since folks there might have already faced the issue.</p>
-</li>
+get stuck since folks there might have already faced the issue.</p></li>
 </ol>
+
 <h2 id="what-is-an-op">What is an &ldquo;op&rdquo;<a class="anchor" href="#what-is-an-op">#</a></h2>
+
 <p>In frameworks like JAX (or Theano, or TensorFlow, or PyTorch, to name a few),
 models are defined as a collection of operations or &ldquo;ops&rdquo; that can be chained,
 fused, or differentiated in clever ways. For our purposes, an op defines a
 function that knows:</p>
+
 <ol>
 <li>how the input and output parameter shapes and types are related,</li>
 <li>how to compute the output from a set of inputs, and</li>
 <li>how to propagate derivatives using the chain rule.</li>
 </ol>
+
 <p>There are a lot of choices about where you draw the lines around a single op and
 there will be tradeoffs in terms of performance, generality, ease of use, and
 other factors when making these decisions. In my experience, it is often best to
 define the minimal scope ops and then allow your framework of choice to combine
 it efficiently with the rest of your model, but there will always be counter
 examples.</p>
-<h2 id="our-example-application-solving-keplers-equation">Our example application: solving Kepler&rsquo;s equation<a class="anchor" href="#our-example-application-solving-keplers-equation">#</a></h2>
+
+<h2 id="our-example-application-solving-kepler-s-equation">Our example application: solving Kepler&rsquo;s equation<a class="anchor" href="#our-example-application-solving-kepler-s-equation">#</a></h2>
+
 <p>In this section I&rsquo;ll describe the application presented in this project. Feel
 free to skip this if you just want to get to the technical details.</p>
+
 <p>This project exposes a single jit-able and differentiable JAX operation to solve
-<a href="https://en.wikipedia.org/wiki/Kepler%27s_equation"  title="Kepler&#39;s equation" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Kepler&rsquo;s equation</a>
-, a tool that is used for computing
+<a href="https://en.wikipedia.org/wiki/Kepler%27s_equation" title="Kepler's equation">Kepler&rsquo;s equation</a>, a tool that is used for computing
 gravitational orbits in astronomy. This is basically the &ldquo;hello world&rdquo; example
 that I use whenever learning about something like this. For example, I have
-previously written <a href="https://dfm.io/posts/stan-c&#43;&#43;/"  title="Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets" 
-  
-   target="_blank" rel="noreferrer noopener" 
->about how to expose such an op when using Stan</a>
-.
+previously written <a href="https://dfm.io/posts/stan-c++/" title="Using external C++ functions with PyStan &amp; radial velocity exoplanets">about how to expose such an op when using Stan</a>.
 The implementation used in that post and the one used here are not meant to be
 the most robust or efficient, but it is relatively simple and it exposes some of
 the interesting issues that one might face when writing custom JAX ops. If
-you&rsquo;re interested in the mathematical details, take a look at <a href="https://dfm.io/posts/stan-c&#43;&#43;/"  title="Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets" 
-  
-   target="_blank" rel="noreferrer noopener" 
->my blog
-post</a>
-, but the key point for now is that this operation involves
+you&rsquo;re interested in the mathematical details, take a look at <a href="https://dfm.io/posts/stan-c++/" title="Using external C++ functions with PyStan &amp; radial velocity exoplanets">my blog
+post</a>, but the key point for now is that this operation involves
 solving a transcendental equation, and in this tutorial we&rsquo;ll use a simple
-iterative method that you&rsquo;ll find in the <a href="https://github.com/dfm/extending-jax/blob/main/lib/kepler.h" 
-  
-   target="_blank" rel="noreferrer noopener" 
->kepler.h</a>
- header file. Then,
+iterative method that you&rsquo;ll find in the <a href="https://github.com/dfm/extending-jax/blob/main/lib/kepler.h">kepler.h</a> header file. Then,
 the derivatives of this operation can be evaluated using implicit
 differentiation. Unlike in the previously mentioned blog post, our operation
 will actually return the sine and cosine of the eccentric anomaly, since that&rsquo;s
 what most high performance versions of this function would return and because
 the way XLA handles ops with multiple outputs is a little funky.</p>
-<h2 id="the-costbenefit-analysis">The cost/benefit analysis<a class="anchor" href="#the-costbenefit-analysis">#</a></h2>
+
+<h2 id="the-cost-benefit-analysis">The cost/benefit analysis<a class="anchor" href="#the-cost-benefit-analysis">#</a></h2>
+
 <p>One important question to answer first is: &ldquo;should I actually write a custom JAX
 extension?&rdquo; If you&rsquo;re here, you&rsquo;ve probably already thought about that, but I
 wanted to emphasize a few points to consider.</p>
+
 <ol>
-<li>
-<p><strong>Performance</strong>: The main reason why you might want to implement a custom op
+<li><p><strong>Performance</strong>: The main reason why you might want to implement a custom op
 for JAX is performance. JAX&rsquo;s JIT compiler can get great performance in a
 broad range of applications, but for some of the problems I work on,
 finely-tuned C++ can be much faster. In my experience, iterative algorithms,
@@ -262,10 +235,9 @@ other special functions, or code with complicated logic are all examples of
 places where a custom op might greatly improve performance. I&rsquo;m not always
 good at doing this, but it&rsquo;s probably worth benchmarking performance of a
 version of your code implemented directly in high-level JAX against your
-custom op.</p>
-</li>
-<li>
-<p><strong>Autodiff</strong>: One thing that is important to realize is that the extension
+custom op.</p></li>
+
+<li><p><strong>Autodiff</strong>: One thing that is important to realize is that the extension
 that we write won&rsquo;t magically know how to propagate derivatives. Instead,
 we&rsquo;ll be required to provide a JAX interface for applying the chain rule to
 out op. In other words, if you&rsquo;re setting out to wrap that huge Fortran
@@ -280,62 +252,60 @@ away with and then implement most of my models directly in JAX. In our demo
 application, for example, I could have chosen to make an XLA op generating a
 full radial velocity model, instead of just solving Kepler&rsquo;s equation, and
 that might (or might not) give better performance. But, the differentiation
-rules are <em>much</em> simpler the way it is implemented.</p>
-</li>
+rules are <em>much</em> simpler the way it is implemented.</p></li>
 </ol>
+
 <h2 id="summary-of-the-relevant-files">Summary of the relevant files<a class="anchor" href="#summary-of-the-relevant-files">#</a></h2>
+
 <p>The files in this repo come in three categories:</p>
+
 <ol>
-<li>
-<p>In the root directory, there are the standard packaging files like a
+<li><p>In the root directory, there are the standard packaging files like a
 <code>setup.py</code> and <code>pyproject.toml</code>. Most of this setup is pretty standard, but
 I&rsquo;ll highlight some of the unique elements in the packaging section below.
-For example, we&rsquo;ll use a slightly strange combination of PEP-517/518 and
+For example, we&rsquo;ll use a slightly strange combination of PEP-<sup>517</sup>&frasl;<sub>518</sub> and
 CMake to build the extensions. This isn&rsquo;t strictly necessary, but it&rsquo;s the
-easiest packaging setup that I&rsquo;ve been able to put together.</p>
-</li>
-<li>
-<p>Next, the <code>src/kepler_jax</code> directory is a Python module with the definition
-of our JAX primitive roughly following the JAX <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html"  title="How primitives work" 
-  
-   target="_blank" rel="noreferrer noopener" 
->How primitives
-work</a>
- tutorial.</p>
-</li>
-<li>
-<p>Finally, the C++ and CUDA code implementing our XLA op live in the <code>lib</code>
+easiest packaging setup that I&rsquo;ve been able to put together.</p></li>
+
+<li><p>Next, the <code>src/kepler_jax</code> directory is a Python module with the definition
+of our JAX primitive roughly following the JAX <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html" title="How primitives work">How primitives
+work</a> tutorial.</p></li>
+
+<li><p>Finally, the C++ and CUDA code implementing our XLA op live in the <code>lib</code>
 directory. The <code>pybind11_kernel_helpers.h</code> and <code>kernel_helpers.h</code> headers are
 boilerplate necessary for building in the interface. The rest of the files
 include the code specific for this implementation, but I&rsquo;ll describe this in
-more detail below.</p>
-</li>
+more detail below.</p></li>
 </ol>
+
 <h2 id="defining-an-xla-custom-call-on-the-cpu">Defining an XLA custom call on the CPU<a class="anchor" href="#defining-an-xla-custom-call-on-the-cpu">#</a></h2>
+
 <p>The algorithm for our example problem is is implemented in the <code>lib/kepler.h</code>
 header and I won&rsquo;t go into details about the algorithm here, but the main point
 is that this could be an implementation built on any external library that you
 can call from C++ and, if you want to support GPU usage, CUDA. That header file
 includes a single function <code>compute_eccentric_anomaly</code> with the following
 signature:</p>
+
 <pre><code class="language-c++">template &lt;typename T&gt;
 void compute_eccentric_anomaly(
    const T&amp; mean_anom, const T&amp; ecc, T* sin_ecc_anom, T* cos_ecc_anom
 );
 </code></pre>
+
 <p>This is the function that we want to expose to JAX.</p>
-<p>As described in the <a href="https://www.tensorflow.org/xla/custom_call"  title="XLA custom calls" 
-  
-   target="_blank" rel="noreferrer noopener" 
->XLA documentation</a>
-, the signature for a CPU XLA
+
+<p>As described in the <a href="https://www.tensorflow.org/xla/custom_call" title="XLA custom calls">XLA documentation</a>, the signature for a CPU XLA
 custom call in C++ is:</p>
+
 <pre><code class="language-c++">void custom_call(void* out, const void** in);
 </code></pre>
+
 <p>where, as you might expect, the elements of <code>in</code> point to the input values. So,
 in our case, the inputs are an integer giving the dimension of the problem
 <code>size</code>, an array with the mean anomalies <code>mean_anomaly</code>, and an array of
 eccentricities <code>ecc</code>. Therefore, we might parse the input as follows:</p>
+
 <pre><code class="language-c++">#include &lt;cstdint&gt;  // int64_t
 
 template &lt;typename T&gt;
@@ -345,17 +315,22 @@ void cpu_kepler(void *out, const void **in) {
   const T *ecc = reinterpret_cast&lt;const T *&gt;(in[2]);
 }
 </code></pre>
+
 <p>Here we have used a template so that we can support both single and double
 precision version of the op.</p>
+
 <p>The output parameter is somewhat more complicated. If your op only has one
 output, you would access it using</p>
+
 <pre><code class="language-c++">T *result = reinterpret_cast&lt;T *&gt;(out);
 </code></pre>
+
 <p>but when you have multiple outputs, things get a little hairy. In our example,
 we have two outputs, the sine <code>sin_ecc_anom</code> and cosine <code>cos_ecc_anom</code> of the
 eccentric anomaly. Therefore, our <code>out</code> parameter &ndash; even though it looks like a
 <code>void*</code> &ndash; is actually a <code>void**</code>! Therefore, we will access the output as
 follows:</p>
+
 <pre><code class="language-c++">template &lt;typename T&gt;
 void cpu_kepler(void *out_tuple, const void **in) {
   // ...
@@ -364,8 +339,10 @@ void cpu_kepler(void *out_tuple, const void **in) {
   T *cos_ecc_anom = reinterpret_cast&lt;T *&gt;(out[1]);
 }
 </code></pre>
+
 <p>Then finally, we actually apply the op and the full implementation, which you
 can find in <code>lib/cpu_ops.cc</code> is:</p>
+
 <pre><code class="language-c++">// lib/cpu_ops.cc
 #include &lt;cstdint&gt;
 
@@ -384,45 +361,35 @@ void cpu_kepler(void *out_tuple, const void **in) {
   }
 }
 </code></pre>
+
 <p>and that&rsquo;s it!</p>
-<h2 id="building--packaging-for-the-cpu">Building &amp; packaging for the CPU<a class="anchor" href="#building--packaging-for-the-cpu">#</a></h2>
+
+<h2 id="building-packaging-for-the-cpu">Building &amp; packaging for the CPU<a class="anchor" href="#building-packaging-for-the-cpu">#</a></h2>
+
 <p>Now that we have an implementation of our XLA custom call target, we need to
 expose it to JAX. This is done by compiling a CPython module that wraps this
-function as a <a href="https://docs.python.org/3/c-api/capsule.html"  title="Capsules" 
-  
-   target="_blank" rel="noreferrer noopener" 
-><code>PyCapsule</code></a>
- type. This can be done using pybind11,
+function as a <a href="https://docs.python.org/3/c-api/capsule.html" title="Capsules"><code>PyCapsule</code></a> type. This can be done using pybind11,
 Cython, SWIG, or the Python C API directly, but for this example we&rsquo;ll use
-pybind11 since that&rsquo;s what I&rsquo;m most familiar with. The <a href="https://github.com/google/jax/blob/master/jaxlib/lapack.pyx"  title="jax/lapack.pyx" 
-  
-   target="_blank" rel="noreferrer noopener" 
->LAPACK ops in
-jaxlib</a>
- are implemented using Cython if you&rsquo;d like to see an
+pybind11 since that&rsquo;s what I&rsquo;m most familiar with. The <a href="https://github.com/google/jax/blob/master/jaxlib/lapack.pyx" title="jax/lapack.pyx">LAPACK ops in
+jaxlib</a> are implemented using Cython if you&rsquo;d like to see an
 example of how to do that.</p>
-<p>Another choice that I&rsquo;ve made is to use <a href="https://cmake.org" 
-  
-   target="_blank" rel="noreferrer noopener" 
->CMake</a>
- to build the
+
+<p>Another choice that I&rsquo;ve made is to use <a href="https://cmake.org">CMake</a> to build the
 extensions. It would be totally possible (and perhaps preferable if you only
 support CPU usage) to stick to just using setuptools directly, but setuptools
 doesn&rsquo;t seem to have great support for compiling CUDA extensions so that&rsquo;s why I
 settled on CMake. In the end, it&rsquo;s not too painful since CMake can be included
 as a build dependency in <code>pyproject.toml</code> so users won&rsquo;t have to install it
-separately. Another build option would be to use <a href="https://bazel.build" 
-  
-   target="_blank" rel="noreferrer noopener" 
->bazel</a>
- to
+separately. Another build option would be to use <a href="https://bazel.build">bazel</a> to
 compile the code, like the JAX project, but I don&rsquo;t have any experience with it
 so I decided to stick with what I know. <em>The key point is that we&rsquo;re just
 compiling a regular old Python module so you can use whatever infrastructure
 you&rsquo;re familiar with!</em></p>
+
 <p>With these choices out of the way, the boilerplate code required to define the
 interface is, using the <code>cpu_kepler</code> function defined in the previous section as
 follows:</p>
+
 <pre><code class="language-c++">// lib/cpu_ops.cc
 #include &lt;pybind11/pybind11.h&gt;
 
@@ -442,83 +409,76 @@ pybind11::dict Registrations() {
 
 PYBIND11_MODULE(cpu_ops, m) { m.def(&quot;registrations&quot;, &amp;Registrations); }
 </code></pre>
+
 <p>In this case, we&rsquo;re exporting a separate function for both single and double
 precision. Another option would be to pass the data type to the function and
 perform the dispatch logic directly in C++, but I find it cleaner to do it like
 this.</p>
+
 <p>With that out of the way, the actual build routine is defined in the following
 files:</p>
+
 <ul>
-<li>
-<p>In <code>./pyproject.toml</code>, we specify that <code>pybind11</code> and <code>cmake</code> are required
+<li><p>In <code>./pyproject.toml</code>, we specify that <code>pybind11</code> and <code>cmake</code> are required
 build dependencies and that we&rsquo;ll use <code>setuptools.build_meta</code> as the build
-backend.</p>
-</li>
-<li>
-<p><code>setup.py</code> is a pretty typical setup file with a custom class for building the
+backend.</p></li>
+
+<li><p><code>setup.py</code> is a pretty typical setup file with a custom class for building the
 extensions that executes CMake for the actual compilation step. This does
 include some extra configuration arguments for CMake to make sure that it uses
 the correct Python libraries and installs the compiled objects to the right
-place. It might be possible to use something like <a href="https://scikit-build.readthedocs.io/"  title="scikit-build" 
-  
-   target="_blank" rel="noreferrer noopener" 
->scikit-build</a>
+place. It might be possible to use something like <a href="https://scikit-build.readthedocs.io/" title="scikit-build">scikit-build</a>
+to replace this step, but I struggled to get it working.</p></li>
 
-to replace this step, but I struggled to get it working.</p>
-</li>
-<li>
-<p>Finally, <code>CMakeLists.txt</code> defines the build process for CMake using
-<a href="https://pybind11.readthedocs.io/en/stable/compiling.html#building-with-cmake"  title="Building with CMake" 
-  
-   target="_blank" rel="noreferrer noopener" 
->pybind11&rsquo;s support for CMake builds</a>
-. This will also,
-optionally, build the GPU ops as discussed below.</p>
-</li>
+<li><p>Finally, <code>CMakeLists.txt</code> defines the build process for CMake using
+<a href="https://pybind11.readthedocs.io/en/stable/compiling.html#building-with-cmake" title="Building with CMake">pybind11&rsquo;s support for CMake builds</a>. This will also,
+optionally, build the GPU ops as discussed below.</p></li>
 </ul>
+
 <p>With these files in place, we can now compile our XLA custom call ops using</p>
+
 <pre><code class="language-bash">pip install .
 </code></pre>
+
 <p>The final thing that I wanted to reiterate in this section is that
 <code>kepler_jax.cpu_ops</code> is just a regular old CPython extension module, so anything
 that you already know about packaging C extensions or any other resources that
 you can find on that topic can be applied. This wasn&rsquo;t obvious when I first
 started learning about this so I definitely went down some rabbit holes that
 hopefully you can avoid.</p>
+
 <h2 id="exposing-this-op-as-a-jax-primitive">Exposing this op as a JAX primitive<a class="anchor" href="#exposing-this-op-as-a-jax-primitive">#</a></h2>
+
 <p>The main components that are required to now call our custom op from JAX are
-well covered by the <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html"  title="How primitives work" 
-  
-   target="_blank" rel="noreferrer noopener" 
->How primitives work</a>
- tutorial, so I won&rsquo;t
+well covered by the <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html" title="How primitives work">How primitives work</a> tutorial, so I won&rsquo;t
 reproduce all of that here. Instead I&rsquo;ll summarize the key points and then
 provide the missing part. If you haven&rsquo;t already, you should definitely read
 that tutorial before getting started on this part.</p>
+
 <p>In summary, we will define a <code>jax.core.Primitive</code> object with an &ldquo;abstract
 evaluation&rdquo; rule (see <code>src/kepler_jax/kepler_jax.py</code> for all the details)
 following the primitives tutorial. Then, we&rsquo;ll add a &ldquo;translation rule&rdquo; and a
 &ldquo;JVP rule&rdquo;. We&rsquo;re lucky in this case, and we don&rsquo;t need to add a &ldquo;transpose
 rule&rdquo;. JAX can actually work that out automatically, since our primitive is not
 itself used in the calculation of the output tangents. This won&rsquo;t always be
-true, and the <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html"  title="How primitives work" 
-  
-   target="_blank" rel="noreferrer noopener" 
->How primitives work</a>
- tutorial includes an example
+true, and the <a href="https://jax.readthedocs.io/en/latest/notebooks/How_JAX_primitives_work.html" title="How primitives work">How primitives work</a> tutorial includes an example
 of what to do in that case.</p>
+
 <p>Before defining these rules, we need to register the custom call target with
 JAX. To do that, we import our compiled <code>cpu_ops</code> extension module from above
 and use the <code>registrations</code> dictionary that we defined:</p>
+
 <pre><code class="language-python">from jax.lib import xla_client
 from kepler_jax import cpu_ops
 
 for _name, _value in cpu_ops.registrations().items():
     xla_client.register_cpu_custom_call_target(_name, _value)
 </code></pre>
+
 <p>Then, the <strong>translation rule</strong> is defined roughly as follows (the one you&rsquo;ll
 find in the source code is a little more complicated since it supports both CPU
 and GPU translation):</p>
+
 <pre><code class="language-python"># src/kepler_jax/kepler_jax.py
 import numpy as np
 
@@ -569,36 +529,38 @@ def _kepler_cpu_translation(c, mean_anom, ecc):
 
 xla.backend_specific_translations[&quot;cpu&quot;][_kepler_prim] = _kepler_cpu_translation
 </code></pre>
+
 <p>There appears to be a lot going on here, but most of it is just typechecking.
 The main meat of it is the <code>CustomCallWithLayout</code> function which, as far as I
 can tell, isn&rsquo;t documented anywhere. Here&rsquo;s a summary of its arguments, as best
 as I can tell:</p>
+
 <ul>
-<li>
-<p>The first argument is the XLA builder that you were passed when your
-translation rule was called.</p>
-</li>
-<li>
-<p>The second argument is the name (as <code>bytes</code>!) that you gave your <code>PyCapsule</code>
+<li><p>The first argument is the XLA builder that you were passed when your
+translation rule was called.</p></li>
+
+<li><p>The second argument is the name (as <code>bytes</code>!) that you gave your <code>PyCapsule</code>
 in the <code>registrations</code> dictionary in <code>lib/cpu_ops.cc</code>. You can check what
-names your capsules had by looking at <code>cpu_ops.registrations().keys()</code>.</p>
-</li>
-<li>
-<p>Then, the following arguments give the input arguments, and the &ldquo;shapes&rdquo; of
+names your capsules had by looking at <code>cpu_ops.registrations().keys()</code>.</p></li>
+
+<li><p>Then, the following arguments give the input arguments, and the &ldquo;shapes&rdquo; of
 the input and output arrays. In this context, a &ldquo;shape&rdquo; is specified by a data
 type, a tuple defining the size of each dimension (what I would normally call
 the shape), and a tuple defining the dimension order. In this case, we&rsquo;re
-requiring that all of our inputs and outputs are of the same &ldquo;shape&rdquo;.</p>
-</li>
+requiring that all of our inputs and outputs are of the same &ldquo;shape&rdquo;.</p></li>
 </ul>
+
 <p>It&rsquo;s worth remembering that we&rsquo;re expecting the first argument to our function
 to be the size of the arrays, and you&rsquo;ll see that that is included as a
 <code>ConstantLiteral</code> parameter (explicitly cast to <code>int64</code>).</p>
+
 <p>I&rsquo;m not going to talk about the <strong>JVP rule</strong> here since it&rsquo;s quite problem
 specific, but I&rsquo;ve tried to comment the code reasonably thoroughly so check out
 the code in <code>src/kepler_jax/kepler_jax.py</code> if you&rsquo;re interested, and open an
 issue if anything isn&rsquo;t clear.</p>
+
 <h2 id="defining-an-xla-custom-call-on-the-gpu">Defining an XLA custom call on the GPU<a class="anchor" href="#defining-an-xla-custom-call-on-the-gpu">#</a></h2>
+
 <p>The custom call on the GPU isn&rsquo;t terribly different from the CPU version above,
 but the syntax is somewhat different and there&rsquo;s a heck of a lot more
 boilerplate required. Since we need to compile and link CUDA code, there are
@@ -607,18 +569,22 @@ description in this section is a little all over the place, but the key files to
 look at to get more info are (a) <code>lib/gpu_ops.cc</code> for the dispatch functions
 called from Python, and (b) <code>lib/kernels.cc.cu</code> for the CUDA code implementing
 the kernel.</p>
+
 <p>The signature for the GPU custom call is:</p>
+
 <pre><code class="language-c++">// lib/kernels.cc.cu
 template &lt;typename T&gt;
 void gpu_kepler(
   cudaStream_t stream, void **buffers, const char *opaque, std::size_t opaque_len
 );
 </code></pre>
+
 <p>The first parameter is a CUDA stream, which I won&rsquo;t talk about at all because I
 don&rsquo;t really know very much about GPU programming and we don&rsquo;t really need to
 worry about it for now. Then you&rsquo;ll notice that the inputs and outputs are all
 provided as a single <code>void**</code> buffer. These will be ordered such that our access
 code from above is replaced by:</p>
+
 <pre><code class="language-c++">// lib/kernels.cc.cu
 template &lt;typename T&gt;
 void gpu_kepler(
@@ -630,21 +596,21 @@ void gpu_kepler(
   T *cos_ecc_anom = reinterpret_cast&lt;T *&gt;(buffers[3]);
 }
 </code></pre>
+
 <p>where you might notice that the <code>size</code> parameter is no longer one of the inputs.
 Instead the array size is passed using the <code>opaque</code> parameter since its value is
-required on the CPU and within the GPU kernel (see the <a href="https://www.tensorflow.org/xla/custom_call"  title="XLA custom calls" 
-  
-   target="_blank" rel="noreferrer noopener" 
->XLA custom
-calls</a>
- documentation for more details). To use this <code>opaque</code>
+required on the CPU and within the GPU kernel (see the <a href="https://www.tensorflow.org/xla/custom_call" title="XLA custom calls">XLA custom
+calls</a> documentation for more details). To use this <code>opaque</code>
 parameter, we will define a type to hold <code>size</code>:</p>
+
 <pre><code class="language-c++">// lib/kernels.h
 struct KeplerDescriptor {
   std::int64_t size;
 };
 </code></pre>
+
 <p>and then the following boilerplate to serialize it:</p>
+
 <pre><code class="language-c++">// lib/kernel_helpers.h
 #include &lt;string&gt;
 
@@ -663,7 +629,9 @@ pybind11::bytes PackDescriptor(const T&amp; descriptor) {
   return pybind11::bytes(PackDescriptorAsString(descriptor));
 }
 </code></pre>
+
 <p>This serialization procedure should then be exposed in the Python module using:</p>
+
 <pre><code class="language-c++">// lib/gpu_ops.cc
 #include &lt;pybind11/pybind11.h&gt;
 
@@ -675,7 +643,9 @@ PYBIND11_MODULE(gpu_ops, m) {
         });
 }
 </code></pre>
+
 <p>Then, to deserialize this descriptor, we can use the following procedure:</p>
+
 <pre><code class="language-c++">// lib/kernel_helpers.h
 template &lt;typename T&gt;
 const T* UnpackDescriptor(const char* opaque, std::size_t opaque_len) {
@@ -695,8 +665,10 @@ void gpu_kepler(
   const std::int64_t size = d.size;
 }
 </code></pre>
+
 <p>Once we have these parameters, the full procedure for launching the CUDA kernel
 is:</p>
+
 <pre><code class="language-c++">// lib/kernels.cc.cu
 template &lt;typename T&gt;
 void gpu_kepler(
@@ -723,7 +695,9 @@ void gpu_kepler(
   }
 }
 </code></pre>
+
 <p>Finally, the kernel itself is relatively simple:</p>
+
 <pre><code class="language-c++">// lib/kernels.cc.cu
 template &lt;typename T&gt;
 __global__ void kepler_kernel(
@@ -735,12 +709,15 @@ __global__ void kepler_kernel(
   }
 }
 </code></pre>
-<h2 id="building--packaging-for-the-gpu">Building &amp; packaging for the GPU<a class="anchor" href="#building--packaging-for-the-gpu">#</a></h2>
+
+<h2 id="building-packaging-for-the-gpu">Building &amp; packaging for the GPU<a class="anchor" href="#building-packaging-for-the-gpu">#</a></h2>
+
 <p>Since we&rsquo;re already using CMake to build our project, it&rsquo;s not too hard to add
 support for CUDA. I&rsquo;ve chosen to enable GPU builds by the environment variable
 <code>KEPLER_JAX_CUDA=yes</code> that you&rsquo;ll see in both <code>setup.py</code> and <code>CMakeLists.txt</code>.
 Other than conditionally adding an <code>Extension</code> in <code>setup.py</code>, everything else on
 the Python side is the same. In <code>CMakeLists.txt</code>, we also add a conditional:</p>
+
 <pre><code class="language-cmake">if (KEPLER_JAX_CUDA)
   enable_language(CUDA)
   # ...
@@ -748,7 +725,9 @@ else()
   message(STATUS &quot;Building without CUDA&quot;)
 endif()
 </code></pre>
+
 <p>Then, to expose this to JAX, we need to update the translation rule from above as follows:</p>
+
 <pre><code class="language-python"># src/kepler_jax/kepler_jax.py
 import numpy as np
 from jax.lib import xla_client
@@ -785,8 +764,11 @@ def _kepler_gpu_translation(c, mean_anom, ecc):
 
 xla.backend_specific_translations[&quot;gpu&quot;][_kepler_prim] = _kepler_gpu_translation
 </code></pre>
+
 <p>Otherwise, everything else from our CPU implementation doesn&rsquo;t need to change.</p>
+
 <h2 id="testing">Testing<a class="anchor" href="#testing">#</a></h2>
+
 <p>As usual, you should always test your code and this repo includes some unit
 tests in the <code>tests</code> directory for inspiration. You can also see an example of
 how to run these tests using the GitHub Actions CI service and the workflow in

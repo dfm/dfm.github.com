@@ -109,62 +109,28 @@
           </header>
           <article class="post__content">
               
-<p>It&rsquo;s becoming more common for astronomers to use continuous integration services like <a href="https://travis-ci.org" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Travis CI</a>
- to automatically test their code but, as much as I hate to say it, a big part of our job is writing papers.
+<p>It&rsquo;s becoming more common for astronomers to use continuous integration services like <a href="https://travis-ci.org">Travis CI</a> to automatically test their code but, as much as I hate to say it, a big part of our job is writing papers.
 I am always in search of new procrastination tasks, especially if they can be justified as work, so I was pretty excited to figure out that it is possible to use Travis CI for writing too.
 The basic idea is to build the LaTeX source on Travis and force push the PDF to a new branch on GitHub so that there is always a current version of the PDF available online.
-Now, before you tell me that I should just be using Authorea, Overleaf, etc., let me say that I am incapable of using a computer without <a href="https://github.com/dfm/dotfiles/blob/master/neovim/init.vim" 
-  
-   target="_blank" rel="noreferrer noopener" 
->my heavily customized (neo)vim setup</a>
-.</p>
-<p>I&rsquo;m sure that other people have done things like this before, but the first time I did it was at <a href="http://astrohackweek.org/2016/" 
-  
-   target="_blank" rel="noreferrer noopener" 
->AstroHackWeek 2016</a>
-.
-Since then, I&rsquo;ve started using it for <a href="https://github.com/dfm/celerite/blob/master-pdf/paper/ms.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
->the papers that I&rsquo;m writing</a>
-, <a href="https://github.com/dfm/imprs/blob/master-pdf/mcmc/mcmc.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
->lecture materials</a>
-, and <a href="https://github.com/dfm/cv/blob/master-pdf/cv_pubs.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
->my CV</a>
- – it comes in surprisingly handy!
-<a href="http://astrowizici.st/" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Andy Casey</a>
- and I have both iterated to come up with a streamlined procedure that doesn&rsquo;t use all of the resources provided by Travis so I wanted to document what I&rsquo;ve settled on.</p>
+Now, before you tell me that I should just be using Authorea, Overleaf, etc., let me say that I am incapable of using a computer without <a href="https://github.com/dfm/dotfiles/blob/master/neovim/init.vim">my heavily customized (neo)vim setup</a>.</p>
+
+<p>I&rsquo;m sure that other people have done things like this before, but the first time I did it was at <a href="http://astrohackweek.org/2016/">AstroHackWeek 2016</a>.
+Since then, I&rsquo;ve started using it for <a href="https://github.com/dfm/celerite/blob/master-pdf/paper/ms.pdf">the papers that I&rsquo;m writing</a>, <a href="https://github.com/dfm/imprs/blob/master-pdf/mcmc/mcmc.pdf">lecture materials</a>, and <a href="https://github.com/dfm/cv/blob/master-pdf/cv_pubs.pdf">my CV</a> – it comes in surprisingly handy!
+<a href="http://astrowizici.st/">Andy Casey</a> and I have both iterated to come up with a streamlined procedure that doesn&rsquo;t use all of the resources provided by Travis so I wanted to document what I&rsquo;ve settled on.</p>
+
 <p>To get started, choose a GitHub repository that has a paper in it.
 I&rsquo;ll assume that the paper is in a subdirectory called <code>paper</code> and that the TeX file is called <code>ms.tex</code>, but it shouldn&rsquo;t be too hard to change these assumptions for your use case.
-If your repository isn&rsquo;t already using Travis, you should create a <code>.travis.yml</code> file (at the top-level directory of your git repo), log into Travis (using your GitHub account), and enable builds for that repository (<a href="https://www.google.com/search?q=getting&#43;started&#43;with&#43;travis&#43;ci" 
-  
-   target="_blank" rel="noreferrer noopener" 
->there are resources online to get you started</a>
-).
+If your repository isn&rsquo;t already using Travis, you should create a <code>.travis.yml</code> file (at the top-level directory of your git repo), log into Travis (using your GitHub account), and enable builds for that repository (<a href="https://www.google.com/search?q=getting+started+with+travis+ci">there are resources online to get you started</a>).
 You&rsquo;ll also need to give Travis push access to your repository.
-To do this, <a href="https://github.com/settings/tokens" 
-  
-   target="_blank" rel="noreferrer noopener" 
->go to your GitHub settings and create a new personal access token</a>
-.
+To do this, <a href="https://github.com/settings/tokens">go to your GitHub settings and create a new personal access token</a>.
 Give it a good name and make sure that you enable <code>repo</code> access.
-Copy this token and go to the settings page for your repository on Travis and add two environment variables:</p>
-<ol>
-<li><code>GITHUB_API_KEY</code> - this should be set to the personal access token that you created above, and</li>
-<li><code>GITHUB_USER</code> - this should be set to your username.
-While you&rsquo;re in the settings, you might also want to enable the &ldquo;Build only if .travis.yml is present&rdquo; option (this will save you from some annoying emails later).</li>
-</ol>
+Copy this token and go to the settings page for your repository on Travis and add two environment variables:
+1. <code>GITHUB_API_KEY</code> - this should be set to the personal access token that you created above, and
+2. <code>GITHUB_USER</code> - this should be set to your username.
+While you&rsquo;re in the settings, you might also want to enable the &ldquo;Build only if .travis.yml is present&rdquo; option (this will save you from some annoying emails later).</p>
+
 <p>Now that you have Travis set up, here&rsquo;s the minimal <code>.travis.yml</code> file that we&rsquo;ll need:</p>
+
 <pre><code class="language-yaml">sudo: false
 language: generic
 matrix:
@@ -177,18 +143,13 @@ script: |
     source .ci/build-paper.sh
   fi
 </code></pre>
+
 <p>It should be possible to combine this with any other tests that you&rsquo;re already running.
-For <a href="https://github.com/dfm/celerite/blob/master/.travis.yml" 
-  
-   target="_blank" rel="noreferrer noopener" 
->one of my projects</a>
-, I have combined this with testing C++ and several versions of Python and NumPy.</p>
-<p>The (yet non-existant) script <code>build-paper.sh</code> will check if any changes have been made in the <code>paper</code> subdirectory and, if they have, install the <a href="https://tectonic-typesetting.github.io" 
-  
-   target="_blank" rel="noreferrer noopener" 
->Tectonic</a>
- typesetting package using <code>conda</code>, compile the paper from source, and force-push the paper to a new branch called <code>master-pdf</code> (assuming you&rsquo;re currently on the <code>master</code> branch).
+For <a href="https://github.com/dfm/celerite/blob/master/.travis.yml">one of my projects</a>, I have combined this with testing C++ and several versions of Python and NumPy.</p>
+
+<p>The (yet non-existant) script <code>build-paper.sh</code> will check if any changes have been made in the <code>paper</code> subdirectory and, if they have, install the <a href="https://tectonic-typesetting.github.io">Tectonic</a> typesetting package using <code>conda</code>, compile the paper from source, and force-push the paper to a new branch called <code>master-pdf</code> (assuming you&rsquo;re currently on the <code>master</code> branch).
 To make this happen, create the file <code>.ci/build-paper.sh</code> (at the top-level directory of your git repo; that is, the subdir <code>.ci</code> should be at the top level), make <code>build-paper.sh</code> executable (<code>chmod +x .ci/build-paper.sh</code>), and add the following contents:</p>
+
 <pre><code class="language-bash">#!/bin/bash -x
 
 if git diff --name-only $TRAVIS_COMMIT_RANGE | grep 'paper/'
@@ -218,22 +179,19 @@ then
   git push -q -f https://$GITHUB_USER:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH-pdf
 fi
 </code></pre>
+
 <p>Now, if you git-add <code>.ci/build-paper.sh</code> and push, and if everything went as planned, you should get a new branch called <code>master-pdf</code> on GitHub with one file <code>paper/ms.pdf</code>.
 As the icing on the cake, you can add a badge to your <code>README</code> with the image
 <code>https://img.shields.io/badge/PDF-latest-orange.svg?style=flat</code> pointing to the URL <code>https://github.com/USERNAME/REPONAME/blob/master-pdf/paper/ms.pdf</code>
 Then you&rsquo;ll get something that looks like this:</p>
-<p><a href="https://github.com/dfm/celerite/blob/master-pdf/paper/ms.pdf" 
-  
-   target="_blank" rel="noreferrer noopener" 
-><img src="https://img.shields.io/badge/PDF-latest-orange.svg?style=flat" alt=""></a>
-</p>
+
+<p><a href="https://github.com/dfm/celerite/blob/master-pdf/paper/ms.pdf"><img src="https://img.shields.io/badge/PDF-latest-orange.svg?style=flat" alt="" /></a></p>
+
 <p><em>(You can click on that to read the most up-to-date version of my most recent paper!)</em></p>
+
 <p>If you run into any issues, put them in the comments and let&rsquo;s try to debug.</p>
-<p>Thanks to <a href="https://github.com/dfm/dfm.io/pull/1" 
-  
-   target="_blank" rel="noreferrer noopener" 
->David W. Hogg for clarifications</a>
-.</p>
+
+<p>Thanks to <a href="https://github.com/dfm/dfm.io/pull/1">David W. Hogg for clarifications</a>.</p>
 
 
               

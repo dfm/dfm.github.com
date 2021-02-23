@@ -14,7 +14,8 @@
       <pubDate>Mon, 11 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://dfm.io/posts/extending-jax/</guid>
-      <description>The primary version of this post can be found on GitHub: dfm/extending-jax  This repository is meant as a tutorial demonstrating the infrastructure required to provide custom ops in JAX when you have an existing implementation in C++ and, optionally, CUDA. I originally wanted to write this as a blog post, but there&amp;rsquo;s enough boilerplate code that I ended up deciding that it made more sense to just share it as a repo with the tutorial in the README, so here we are!</description>
+      <description>The primary version of this post can be found on GitHub: dfm/extending-jax
+ This repository is meant as a tutorial demonstrating the infrastructure required to provide custom ops in JAX when you have an existing implementation in C++ and, optionally, CUDA. I originally wanted to write this as a blog post, but there&amp;rsquo;s enough boilerplate code that I ended up deciding that it made more sense to just share it as a repo with the tutorial in the README, so here we are!</description>
     </item>
     
     <item>
@@ -140,7 +141,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://dfm.io/about/</guid>
-      <description>I&amp;rsquo;m an Associate Research Scientist at the Flatiron Institute &amp;rsquo;s Center for Computational Astrophysics . My main research interest is the application of probabilistic data analysis techniques to solve fundamental problems in astronomy. These days, I&amp;rsquo;m mostly using time domain surveys to discover new exoplanets, interpret the underlying population of these planets, and learn more about the variability of stars. I am also interested in the development of scientific software and open-source practices.</description>
+      <description>I&amp;rsquo;m an Associate Research Scientist at the Flatiron Institute&amp;rsquo;s Center for Computational Astrophysics. My main research interest is the application of probabilistic data analysis techniques to solve fundamental problems in astronomy. These days, I&amp;rsquo;m mostly using time domain surveys to discover new exoplanets, interpret the underlying population of these planets, and learn more about the variability of stars. I am also interested in the development of scientific software and open-source practices.</description>
     </item>
     
   </channel>
