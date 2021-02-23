@@ -13,17 +13,7 @@
   </url>
   
   <url>
-    <loc>https://dfm.io/tags/pymc/</loc>
-    <lastmod>2019-10-15T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://dfm.io/posts/pymc-pytorch/</loc>
-    <lastmod>2019-10-15T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://dfm.io/tags/</loc>
     <lastmod>2019-10-15T00:00:00+00:00</lastmod>
   </url>
   
@@ -93,6 +83,10 @@
   
   <url>
     <loc>https://dfm.io/about/</loc>
+  </url>
+  
+  <url>
+    <loc>https://dfm.io/tags/</loc>
   </url>
   
 </urlset>
