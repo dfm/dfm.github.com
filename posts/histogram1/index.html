@@ -38,7 +38,7 @@
     <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.b28521a87ec68f84dfffe1a2cedd427cce74b4f875bf4e2b0d93f640ca7d1736.css" integrity="sha256-soUhqH7Gj4Tf/&#43;Gizt1CfM50tPh1v04rDZP2QMp9FzY="/>
   
   
    
@@ -151,13 +151,15 @@ A good starting place is Section 3.2 of <a href="http://arxiv.org/abs/astro-ph/0
 .</p>
 <p>Note that the derivation up to this point isn&rsquo;t specific to a histogram model and you can (and should) use a physical model for $\Gamma_\theta$ if you have one and fit for $\theta$ numerically.
 But now, for the purposes of today&rsquo;s discussion, let&rsquo;s model $\Gamma_\theta$ as a piecewise constant step function</p>
-<p>$$ \Gamma_\theta (w) = \left{\begin{array}{ll}
+<p>$$
+\Gamma_\theta (w) = \left{\begin{array}{ll}
 \theta_1 &amp; w \in \Delta_1 \<br>
 \theta_2 &amp; w \in \Delta_2 \<br>
 \vdots &amp; \<br>
 \theta_N &amp; w \in \Delta_N \<br>
 0 &amp; \mathrm{otherwise}
-\end{array}\right. $$</p>
+\end{array}\right.
+$$</p>
 <p>where the $N$ parameters $\theta_n$ are the step heights and the step volumes $\Delta_n$ have been fixed in advance.
 When we use this model for the rate density in the likelihood expression above (Equation $\ref{eq:poisson}$), we find</p>
 <p>$$ \ell(\theta) = -\sum_{n=1}^N \Delta_n,\theta_n + \sum_{k=1}^K ,\sum_{n=1}^N \mathbf{1}[w_k \in \Delta_n],\ln \theta_n \quad.$$</p>
@@ -171,10 +173,12 @@ For a specific step $m$, this works out to give</p>
 <p>Now we can go one step further and estimate the uncertainty $\sigma_{\theta_m^*}$ on $\theta_m^*$ using the second derivative of $\ell (\theta)$</p>
 <p>$$\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2} = -\frac{N_m}{{\theta_m}^2}$$</p>
 <p>giving</p>
-<p>$$\begin{eqnarray}
+<p>$$
+\begin{eqnarray}
 \sigma_{\theta_m^*}^2 &amp;=&amp; -\left[\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2}\right]_{\theta_m = \theta_m^*}^{-1} \<br>
 &amp;=&amp; \frac{N_m}{\Delta_m^2}
-\end{eqnarray}$$</p>
+\end{eqnarray}
+$$</p>
 <p>the familiar $\sqrt{N}$ counting statistics.</p>
 <p>Okay. Now that we&rsquo;ve done all this work to derive this trivial and familiar result, let&rsquo;s get on to generalizing it!</p>
 <h2 id="the-censored-histogram">The Censored Histogram<a class="anchor" href="#the-censored-histogram">#</a></h2>
@@ -481,7 +485,7 @@ Therefore, in my next post, I&rsquo;ll relax the assumption of negligible uncert
      
 </div>
 
-            <p>© 2021</p>
+            <p>© 2014-2021 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

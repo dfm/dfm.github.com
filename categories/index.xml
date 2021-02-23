@@ -6,6 +6,6 @@
     <description>Recent content in Categories on Dan Foreman-Mackey</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>© {year}</copyright><atom:link href="https://dfm.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>© 2014-{year} Dan Foreman-Mackey</copyright><atom:link href="https://dfm.io/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
