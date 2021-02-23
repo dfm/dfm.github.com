@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Dan Foreman-Mackey</title>
+    <link>https://dfm.io/tags/</link>
+    <description>Recent content in Tags on Dan Foreman-Mackey</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© {year}</copyright>
+    <lastBuildDate>Tue, 15 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>pymc</title>
+      <link>https://dfm.io/tags/pymc/</link>
+      <pubDate>Tue, 15 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/tags/pymc/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

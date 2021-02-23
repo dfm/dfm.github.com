@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>PyMC3 &#43; TensorFlow | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="PyMC3 &#43; TensorFlow" />
+  <meta name="twitter:description" content=""/>
+  <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
+  <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/pymc-tensorflow\/",
+      "name": "PyMC3 \u002b TensorFlow",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/"> home</a>
+      </li>
+    
+      <li>
+        <a  href="/about">about</a>
+      </li>
+    
+      <li>
+        <a  href="/posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">PyMC3 &#43; TensorFlow</h1>
+            <time datetime="2018-08-02 00:00:00 &#43;0000 UTC" class="post__date">Aug 2 2018</time> 
+          </header>
+          <article class="post__content">
+              
+<p>In this tutorial, I will describe a hack that let&rsquo;s us use <a href="http://docs.pymc.io/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>PyMC3</a>
+ to sample a probability density defined using <a href="https://www.tensorflow.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>TensorFlow</a>
+.
+This isn&rsquo;t necessarily a Good Idea™, but I&rsquo;ve found it useful for a few projects so I wanted to share the method.
+To start, I&rsquo;ll try to motivate why I decided to attempt this mashup, and then I&rsquo;ll give a simple example to demonstrate how you might use this technique in your own work.</p>
+<h2 id="why-tensorflow">Why TensorFlow?<a class="anchor" href="#why-tensorflow">#</a></h2>
+<p>I recently started using TensorFlow as a framework for probabilistic modeling (and <a href="https://speakerdeck.com/dfm/tensorflow-for-astronomers" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>encouraging other astronomers to do the same</a>
+) because the API seemed stable and it was relatively easy to extend the language with custom operations written in C++.
+This second point is crucial in astronomy because we often want to fit realistic, physically motivated models to our data, and it can be inefficient to implement these algorithms within the confines of existing probabilistic programming languages.
+To this end, I have been working on developing various custom operations within TensorFlow to implement <a href="https://github.com/dfm/celeriteflow" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>scalable Gaussian processes</a>
+ and <a href="https://github.com/dfm/exoplanet" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>various special functions for fitting exoplanet data (Foreman-Mackey et al., in prep, ha!)</a>
+.
+These experiments have yielded promising results, but my ultimate goal has always been to combine these models with <a href="https://en.wikipedia.org/wiki/Hamiltonian_Monte_Carlo" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hamiltonian Monte Carlo</a>
+ sampling to perform posterior inference.
+I don&rsquo;t know of any Python packages with the capabilities of projects like PyMC3 or <a href="http://mc-stan.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Stan</a>
+ that support TensorFlow out of the box.
+I know that <a href="http://edwardlib.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Edward</a>
+/<a href="https://github.com/tensorflow/probability" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>TensorFlow probability</a>
+ has an HMC sampler, but it does not have a NUTS implementation, tuning heuristics, or any of the other niceties that the MCMC-first libraries provide.</p>
+<h2 id="why-hmc">Why HMC?<a class="anchor" href="#why-hmc">#</a></h2>
+<p>The benefit of HMC compared to some other MCMC methods (including <a href="http://emcee.readthedocs.io/en/stable/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>one that I wrote</a>
+) is that it is substantially more efficient (i.e. requires less computation time per independent sample) for models with large numbers of parameters.
+To achieve this efficiency, the sampler uses the gradient of the log probability function with respect to the parameters to generate good proposals.
+This means that it must be possible to compute the first derivative of your model with respect to the input parameters.
+To do this in a user-friendly way, most popular inference libraries provide a modeling framework that users must use to implement their model and then the code can <a href="https://en.wikipedia.org/wiki/Automatic_differentiation" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>automatically compute these derivatives</a>
+.</p>
+<h2 id="why-pymc3">Why PyMC3?<a class="anchor" href="#why-pymc3">#</a></h2>
+<p>As far as I can tell, there are two popular libraries for HMC inference in Python: <a href="http://docs.pymc.io/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>PyMC3</a>
+ and <a href="http://mc-stan.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Stan</a>
+ (via the <a href="http://pystan.readthedocs.io/en/latest/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>pystan</a>
+ interface).
+I have previously blogged about <a href="https://dfm.io/posts/stan-c&#43;&#43;/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>extending Stan using custom C++ code and a forked version of pystan</a>
+, but I haven&rsquo;t actually been able to use this method for my research because debugging any code more complicated than the one in that example ended up being far too tedious.
+Furthermore, since I generally want to do my initial tests and make my plots in Python, I always ended up implementing two version of my model (one in Stan and one in Python) and it was frustrating to make sure that these always gave the same results.
+PyMC3 is much more appealing to me because the models are actually Python objects so you can use the same implementation for sampling and pre/post-processing.
+The catch with PyMC3 is that you must be able to evaluate your model within the <a href="http://deeplearning.net/software/theano/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Theano</a>
+ framework and I wasn&rsquo;t so keen to learn Theano when I had already invested a substantial amount of time into TensorFlow and <a href="https://groups.google.com/forum/#!msg/theano-users/7Poq8BZutbY/rNCIfvAEAwAJ" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>since Theano has been deprecated</a>
+ as a general purpose modeling language.
+What I <em>really</em> want is a sampling engine that does all the tuning like PyMC3/Stan, but without requiring the use of a specific modeling framework.
+I imagine that this interface would accept two Python functions (one that evaluates the log probability, and one that evaluates its gradient) and then the user could choose whichever modeling stack they want.
+That being said, my dream sampler doesn&rsquo;t exist (despite <a href="https://github.com/dfm/hemcee" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>my weak attempt</a>
+ to start developing it) so I decided to see if I could hack PyMC3 to do what I wanted.</p>
+<h2 id="the-tensorflow--theano-mashup">The TensorFlow + Theano mashup<a class="anchor" href="#the-tensorflow--theano-mashup">#</a></h2>
+<p>To get started on implementing this, I reached out to <a href="https://twitter.com/twiecki" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Thomas Wiecki</a>
+ (one of the lead developers of PyMC3 <a href="http://twiecki.github.io/blog/2013/09/23/emcee-pymc/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>who has written about a similar MCMC mashups</a>
+) for tips,
+He came back with a few excellent suggestions, but the one that really stuck out was to &ldquo;&hellip;write your logp/dlogp as a theano op that you then use in your (very simple) model definition&rdquo;.
+The basic idea here is that, since PyMC3 models are implemented using Theano, it should be possible to write an extension to Theano that knows how to call TensorFlow.
+Then, this extension could be integrated seamlessly into the model.
+The two key pages of documentation are the <a href="http://deeplearning.net/software/theano/extending/extending_theano.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Theano docs for writing custom operations (ops)</a>
+ and the <a href="https://docs.pymc.io/advanced_theano.html#writing-custom-theano-ops" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>PyMC3 docs for using these custom ops</a>
+.
+After starting on this project, I also discovered <a href="https://github.com/pymc-devs/pymc3/issues/804" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>an issue on GitHub with a similar goal</a>
+ that ended up being very helpful.</p>
+<p>Based on these docs, my complete implementation for a custom Theano op that calls TensorFlow is given below.
+This implemetation requires two <code>theano.tensor.Op</code> subclasses, one for the operation itself (<code>TensorFlowOp</code>) and one for the gradient operation (<code>_TensorFlowGradOp</code>).
+Like Theano, TensorFlow has support for reverse-mode automatic differentiation, so we can use the <a href="https://www.tensorflow.org/api_docs/python/tf/gradients" 
+  
+   target="_blank" rel="noreferrer noopener" 
+><code>tf.gradients</code></a>
+ function to provide the gradients for the op.</p>
+<pre><code class="language-python">import numpy as np
+
+import tensorflow as tf
+session = tf.get_default_session()
+if session is None:
+    session = tf.InteractiveSession()
+
+import theano
+import theano.tensor as tt
+
+def _to_tensor_type(shape):
+    return tt.TensorType(dtype=&quot;float64&quot;, broadcastable=[False]*len(shape))
+
+
+class TensorFlowOp(tt.Op):
+    &quot;&quot;&quot;A custom Theano Op uses TensorFlow as the computation engine
+    
+    Args:
+        target (Tensor): The TensorFlow tensor defining the output of
+            this operation
+        parameters (list(Tensor)): A list of TensorFlow tensors that
+            are inputs to this operation
+        names (Optional(list)): A list of names for the parameters.
+            These are the names that will be used within PyMC3
+        feed_dict (Optional(dict)): A &quot;feed_dict&quot; that is provided to
+            the TensorFlow session when the operation is executed
+        session (Optional): A TensorFlow session that can be used to
+            evaluate the operation
+    
+    &quot;&quot;&quot;
+    def __init__(self, target, parameters, names=None, feed_dict=None, session=None):
+        self.parameters = parameters
+        self.names = names
+        self._feed_dict = dict() if feed_dict is None else feed_dict
+        self._session = session
+        self.target = target
+        
+        # Execute the operation once to work out the shapes of the
+        # parameters and the target
+        in_values, out_value = self.session.run(
+            [self.parameters, self.target], feed_dict=self._feed_dict)
+        self.shapes = [np.shape(v) for v in in_values]
+        self.output_shape = np.shape(out_value)
+        
+        # Based on this result, work out the shapes that the Theano op
+        # will take in and return
+        self.itypes = tuple([_to_tensor_type(shape) for shape in self.shapes])
+        self.otypes = tuple([_to_tensor_type(self.output_shape)])
+        
+        # Build another custom op to represent the gradient (see below)
+        self._grad_op = _TensorFlowGradOp(self)
+
+    @property
+    def session(self):
+        &quot;&quot;&quot;The TensorFlow session associated with this operation&quot;&quot;&quot;
+        if self._session is None:
+            self._session = tf.get_default_session()
+        return self._session
+    
+    def get_feed_dict(self, sample):
+        &quot;&quot;&quot;Get the TensorFlow feed_dict for a given sample
+        
+        This method will only work when a value for ``names`` was provided
+        during instantiation.
+        
+        sample (dict): The specification of a specific sample in the chain
+        
+        &quot;&quot;&quot;
+        if self.names is None:
+            raise RuntimeError(&quot;'names' must be set in order to get the feed_dict&quot;)
+        return dict(((param, sample[name])
+                     for name, param in zip(self.names, self.parameters)),
+                    **self._feed_dict)
+    
+    def infer_shape(self, node, shapes):
+        &quot;&quot;&quot;A required method that returns the shape of the output&quot;&quot;&quot;
+        return self.output_shape,
+
+    def perform(self, node, inputs, outputs):
+        &quot;&quot;&quot;A required method that actually executes the operation&quot;&quot;&quot;
+        # To execute the operation using TensorFlow we must map the inputs from
+        # Theano to the TensorFlow parameter using a &quot;feed_dict&quot;
+        feed_dict = dict(zip(self.parameters, inputs), **self._feed_dict)
+        outputs[0][0] = np.array(self.session.run(self.target, feed_dict=feed_dict))
+
+    def grad(self, inputs, gradients):
+        &quot;&quot;&quot;A method that returns Theano op to compute the gradient
+        
+        In this case, we use another custom op (see the definition below).
+        
+        &quot;&quot;&quot;
+        op = self._grad_op(*(inputs + gradients))
+        # This hack seems to be required for ops with a single input
+        if not isinstance(op, (list, tuple)):
+            return [op]
+        return op
+
+class _TensorFlowGradOp(tt.Op):
+    &quot;&quot;&quot;A custom Theano Op defining the gradient of a TensorFlowOp
+    
+    Args:
+        base_op (TensorFlowOp): The original Op
+    
+    &quot;&quot;&quot;
+    def __init__(self, base_op):
+        self.base_op = base_op
+        
+        # Build the TensorFlow operation to apply the reverse mode
+        # autodiff for this operation
+        # The placeholder is used to include the gradient of the
+        # output as a seed
+        self.dy = tf.placeholder(tf.float64, base_op.output_shape)
+        self.grad_target = tf.gradients(base_op.target,
+                                        base_op.parameters,
+                                        grad_ys=self.dy)
+
+        # This operation will take the original inputs and the gradient
+        # seed as input
+        types = [_to_tensor_type(shape) for shape in base_op.shapes]
+        self.itypes = tuple(types + [_to_tensor_type(base_op.output_shape)])
+        self.otypes = tuple(types)
+ 
+    def infer_shape(self, node, shapes):
+        return self.base_op.shapes
+
+    def perform(self, node, inputs, outputs):
+        feed_dict = dict(zip(self.base_op.parameters, inputs[:-1]),
+                         **self.base_op._feed_dict)
+        feed_dict[self.dy] = inputs[-1]
+        result = self.base_op.session.run(self.grad_target, feed_dict=feed_dict)
+        for i, r in enumerate(result):
+            outputs[i][0] = np.array(r)
+</code></pre>
+<p>We can test that our op works for some simple test cases.
+For example, we can add a simple (read: silly) op that uses TensorFlow to perform an elementwise square of a vector.</p>
+<pre><code class="language-python">from theano.tests import unittest_tools as utt
+np.random.seed(42)
+
+# Define the operation in TensorFlow
+x = tf.Variable(np.random.randn(5), dtype=tf.float64)
+sq = tf.square(x)
+session.run(tf.global_variables_initializer())
+
+# Define the Theano op
+square_op = TensorFlowOp(sq, [x])
+
+# Test that the gradient is correct
+pt = session.run(square_op.parameters)
+utt.verify_grad(square_op, pt)
+</code></pre>
+<p>This is obviously a silly example because Theano already has this functionality, but this can also be generalized to more complicated models.</p>
+<p>This <code>TensorFlowOp</code> implementation will be sufficient for our purposes, but it has some limitations including:</p>
+<ol>
+<li>By design, the output of the operation must be a single tensor. It shouldn&rsquo;t be too hard to generalize this to multiple outputs if you need to, but I haven&rsquo;t tried.</li>
+<li>The input and output variables must have fixed dimensions. When the <code>TensorFlowOp</code> is initialized, the input and output tensors will be evaluated using the current TensorFlow session to work out the shapes.</li>
+<li>etc., I&rsquo;m sure.</li>
+</ol>
+<h2 id="an-example">An example<a class="anchor" href="#an-example">#</a></h2>
+<p>For this demonstration, we&rsquo;ll fit a <em>very</em> simple model that would actually be much easier to just fit using vanilla PyMC3, but it&rsquo;ll still be useful for demonstrating what we&rsquo;re trying to do.
+We&rsquo;ll fit a line to data with the likelihood function:</p>
+<p>$$
+p({y_n},|,m,,b,,s) = \prod_{n=1}^N \frac{1}{\sqrt{2,\pi,s^2}},\exp\left(-\frac{(y_n-m,x_n-b)^2}{s^2}\right)
+$$</p>
+<p>where $m$, $b$, and $s$ are the parameters.
+We&rsquo;ll choose uniform priors on $m$ and $b$, and a log-uniform prior for $s$.</p>
+<p>To get started, generate some data:</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+true_params = np.array([0.5, -2.3, -0.23])
+
+N = 50
+t = np.linspace(0, 10, 2)
+x = np.random.uniform(0, 10, 50)
+y = x * true_params[0] + true_params[1]
+y_obs = y + np.exp(true_params[-1]) * np.random.randn(N)
+
+plt.plot(x, y_obs, &quot;.k&quot;, label=&quot;observations&quot;)
+plt.plot(t, true_params[0]*t + true_params[1], label=&quot;truth&quot;)
+plt.xlabel(&quot;x&quot;)
+plt.ylabel(&quot;y&quot;)
+plt.legend(fontsize=14);
+</code></pre>
+<p><img src="output_8_0.png" alt="png"></p>
+<p>Next, define the log-likelihood function in TensorFlow:</p>
+<pre><code class="language-python">m_tensor = tf.Variable(0.0, dtype=tf.float64, name=&quot;m&quot;)
+b_tensor = tf.Variable(0.0, dtype=tf.float64, name=&quot;b&quot;)
+logs_tensor = tf.Variable(0.0, dtype=tf.float64, name=&quot;logs&quot;)
+
+t_tensor = tf.constant(t, dtype=tf.float64)
+x_tensor = tf.constant(x, dtype=tf.float64)
+y_tensor = tf.constant(y_obs, dtype=tf.float64)
+
+mean = m_tensor * x_tensor + b_tensor
+pred = m_tensor * t_tensor + b_tensor
+
+loglike = -0.5 * tf.reduce_sum(tf.square(y_tensor - mean)) * tf.exp(-2*logs_tensor)
+loglike -= 0.5 * N * logs_tensor
+
+session.run(tf.global_variables_initializer())
+</code></pre>
+<p>And then we can fit for the maximum likelihood parameters using an optimizer from TensorFlow:</p>
+<pre><code class="language-python">params = [m_tensor, b_tensor, logs_tensor]
+opt = tf.contrib.opt.ScipyOptimizerInterface(-loglike, params)
+opt.minimize(session)
+</code></pre>
+<pre><code>INFO:tensorflow:Optimization terminated with:
+  Message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_&lt;=_PGTOL'
+  Objective function value: 12.980432
+  Number of iterations: 19
+  Number of functions evaluations: 22
+</code></pre>
+<p>Here is the maximum likelihood solution compared to the data and the true relation:</p>
+<pre><code class="language-python">plt.plot(x, y_obs, &quot;.k&quot;, label=&quot;observations&quot;)
+plt.plot(t, true_params[0]*t + true_params[1], label=&quot;truth&quot;)
+plt.plot(t, pred.eval(), label=&quot;max.\ like.&quot;)
+plt.xlabel(&quot;x&quot;)
+plt.ylabel(&quot;y&quot;)
+plt.legend(fontsize=14);
+</code></pre>
+<p><img src="output_14_0.png" alt="png"></p>
+<p>Finally, let&rsquo;s use PyMC3 to generate posterior samples for this model:</p>
+<pre><code class="language-python">import pymc3 as pm
+
+# First, expose the TensorFlow log likelihood implementation to Theano
+# so that PyMC3 can use it
+# NOTE: The &quot;names&quot; parameter refers to the names that will be used in
+# in the PyMC3 model (see below)
+tf_loglike = TensorFlowOp(loglike, [m_tensor, b_tensor, logs_tensor],
+                          names=[&quot;m&quot;, &quot;b&quot;, &quot;logs&quot;])
+
+# Test the gradient
+pt = session.run(tf_loglike.parameters)
+utt.verify_grad(tf_loglike, pt)
+
+# Set up the model as usual
+with pm.Model() as model:
+    # Uniform priors on all the parameters
+    m = pm.Uniform(&quot;m&quot;, -5, 5)
+    b = pm.Uniform(&quot;b&quot;, -5, 5)
+    logs = pm.Uniform(&quot;logs&quot;, -5, 5)
+    
+    # Define a custom &quot;potential&quot; to calculate the log likelihood
+    pm.Potential(&quot;loglike&quot;, tf_loglike(m, b, logs))
+    
+    # NOTE: You *must* use &quot;cores=1&quot; because TensorFlow can't deal
+    # with being pickled!
+    trace = pm.sample(1000, tune=2000, cores=1, nuts_kwargs=dict(target_accept=0.9))
+</code></pre>
+<pre><code>Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Sequential sampling (2 chains in 1 job)
+NUTS: [logs, b, m]
+100%|██████████| 3000/3000 [00:29&lt;00:00, 101.12it/s]
+100%|██████████| 3000/3000 [00:24&lt;00:00, 121.54it/s]
+</code></pre>
+<p>After sampling, we can make the usual diagnostic plots.
+First, the trace plots:</p>
+<pre><code class="language-python">pm.traceplot(trace);
+</code></pre>
+<p><img src="output_18_0.png" alt="png"></p>
+<p>Then the <a href="http://corner.readthedocs.io" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>&ldquo;corner&rdquo; plot</a>
+:</p>
+<pre><code class="language-python"># http://corner.readthedocs.io
+import corner
+
+samples = np.vstack([trace[k].flatten() for k in [&quot;m&quot;, &quot;b&quot;, &quot;logs&quot;]]).T
+corner.corner(samples, labels=[&quot;m&quot;, &quot;b&quot;, &quot;log(s)&quot;]);
+</code></pre>
+<p><img src="output_20_0.png" alt="png"></p>
+<p>And finally the posterior predictions for the line:</p>
+<pre><code class="language-python">plt.plot(x, y_obs, &quot;.k&quot;, label=&quot;observations&quot;)
+
+for j in np.random.randint(len(trace), size=25):
+    feed_dict = tf_loglike.get_feed_dict(trace[j])
+    plt.plot(t, pred.eval(feed_dict=feed_dict), color=&quot;C1&quot;, alpha=0.3)
+
+plt.plot(t, true_params[0]*t + true_params[1], label=&quot;truth&quot;)
+plt.plot([], [], color=&quot;C1&quot;, label=&quot;post.\ samples&quot;)
+
+plt.xlabel(&quot;x&quot;)
+plt.ylabel(&quot;y&quot;)
+plt.legend(fontsize=14);
+</code></pre>
+<p><img src="output_22_0.png" alt="png"></p>
+<h2 id="conclusion">Conclusion<a class="anchor" href="#conclusion">#</a></h2>
+<p>In this post, I demonstrated a hack that allows us to use PyMC3 to sample a model defined using TensorFlow.
+This might be useful if you already have an implementation of your model in TensorFlow and don&rsquo;t want to learn how to port it it Theano, but it also presents an example of the small amount of work that is required to support non-standard probabilistic modeling languages with PyMC3.
+It should be possible (easy?) to implement something similar for <a href="https://github.com/tensorflow/probability" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>TensorFlow probability</a>
+, <a href="https://pytorch.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>PyTorch</a>
+, <a href="https://github.com/HIPS/autograd" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>autograd</a>
+, or any of your other favorite modeling frameworks.</p>
+<p>I hope that you find this useful in your research and <a href="https://doi.org/10.7717/peerj-cs.55" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>don&rsquo;t forget to cite PyMC3</a>
+ in all your papers. Thanks for reading!</p>
+
+
+              
+                  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script>
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/autocorr/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">Autocorrelation time estimation</span>
+    </a>
+  
+
+  
+    <a class="pagination__item" href="https://dfm.io/posts/emcee-pymc3/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >emcee &#43; PyMC3</span>
+    </a>
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="GitHub"
+         href="https://github.com/dfm"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Email"
+         href="mailto:foreman.mackey@gmail.com"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2021</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>

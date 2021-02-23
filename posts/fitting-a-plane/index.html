@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>Fitting a plane to data | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Fitting a plane to data" />
+  <meta name="twitter:description" content=""/>
+  <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
+  <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/fitting-a-plane\/",
+      "name": "Fitting a plane to data",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/"> home</a>
+      </li>
+    
+      <li>
+        <a  href="/about">about</a>
+      </li>
+    
+      <li>
+        <a  href="/posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">Fitting a plane to data</h1>
+            <time datetime="2017-06-01 00:00:00 &#43;0000 UTC" class="post__date">Jun 1 2017</time> 
+          </header>
+          <article class="post__content">
+              
+<p>Who knew that it was possible to say more about how to fit a line to data?
+Recently, Megan Bedell asked about how to generalize the method described in section 7 of <a href="https://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the bible</a>
+ for fitting a line to data with 2-dimensional error elipses to higher dimensional problems, and how to include intrinsic scatter in that relation.
+While the correct generalization might be obvious to some of you, I wanted to go through the full derivation to make sure that I knew what was going on.
+As a result, we discovered a mistake in the aforementioned paper (discussed in <a href="https://github.com/davidwhogg/DataAnalysisRecipes/issues/18#issuecomment-304933813" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>this GitHub issue</a>
+ — they are going to fix the mistake in an updated version of the paper) and I learned a few things about Gaussian integrals, so I wanted to post this here for posterity.
+I&rsquo;ll start with a discussion of how to correct the method from Hogg, Bovy, &amp; Lang (2010), then talk about including intrinsic scatter, and, finally, generalize to N dimensions.
+I&rsquo;m sure that this is written somewhere else in the literature with different notation, but I never came across it so I thought that it might be worth writing it down.</p>
+<p>To start, we&rsquo;ll need a dataset to work with:</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+
+# Reproducible!
+np.random.seed(42)
+
+# A helper function to make the plots with error ellipses
+def plot_error_ellipses(ax, X, S, color=&quot;k&quot;):
+    for n in range(len(X)):
+        vals, vecs = np.linalg.eig(S[n])
+        theta = np.degrees(np.arctan2(*vecs[::-1, 0]))
+        w, h = 2 * np.sqrt(vals)
+        ell = Ellipse(xy=X[n], width=w, height=h,
+                      angle=theta, color=color, lw=0.5)
+        ell.set_facecolor(&quot;none&quot;)
+        ax.add_artist(ell)
+    ax.plot(X[:, 0], X[:, 1], &quot;.&quot;, color=color, ms=4)
+
+# Generate the true coordinates of the data points.
+N = 10
+m_true = 1.2
+b_true = -0.1
+X_true = np.empty((N, 2))
+X_true[:, 0] = np.random.uniform(0, 10, N)
+X_true[:, 1] = m_true * X_true[:, 0] + b_true
+X = np.empty((N, 2))
+
+# Generate error ellipses and add uncertainties to each point.
+S = np.zeros((N, 2, 2))
+for n in range(N):
+    L = np.zeros((2, 2))
+    L[0, 0] = np.exp(np.random.uniform(-1, 1))
+    L[1, 1] = np.exp(np.random.uniform(-1, 1))
+    L[1, 0] = 0.5 * np.random.randn()
+    S[n] = np.dot(L, L.T)
+    X[n] = np.random.multivariate_normal(X_true[n], S[n])
+
+# Plot the simulated dataset.
+fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+x0 = np.array([-2, 12])
+ax.plot(x0, m_true*x0 + b_true, lw=1)
+plot_error_ellipses(ax, X, S)
+ax.set_xlim(-2, 12)
+ax.set_ylim(-2, 12)
+ax.set_xlabel(&quot;x&quot;)
+ax.set_ylabel(&quot;y&quot;);
+</code></pre>
+<p><img src="output_3_0.png" alt="png"></p>
+<p>In this figure, you&rsquo;re seeing the simulated dataset with its error ellipses shown in black.
+The true linear relation that was used to simulate the data is shown in blue.</p>
+<h2 id="naïve-sampling">Naïve sampling<a class="anchor" href="#naïve-sampling">#</a></h2>
+<p>The simplest way to fit this line to the data is to invoke $N$ new parameters $\hat{x}_n$ giving the &ldquo;true&rdquo; independent coordinate of each data point.
+In this case, the likelihood function is:</p>
+<p>$$
+p({y_n,,x_n},|,m,,b,,{\hat{x}<em>n,,S_n}) = \prod</em>{n=1}^N \frac{1}{2,\pi,\sqrt{\det S_n}}
+\exp\left(-\frac{1}{2},{\vec{r}_n}^\mathrm{T},{S_n}^{-1},{\vec{r}_n}\right)
+$$</p>
+<p>where $m$ and $b$ are the usual slope and intercept of the line, $x_n$ and $y_n$ are the observations, $S_n$ is the uncertainty tensor of the $n$-th data point:</p>
+<p>$$
+S_n = \left(\begin{array}{cc}
+{\sigma_{x,n}}^2 &amp; {\sigma_{xy,n}} \<br>
+{\sigma_{xy,n}} &amp; {\sigma_{y,n}}^2 \<br>
+\end{array}\right) \quad,
+$$</p>
+<p>and $\vec{r}_n$ is the residual vector:</p>
+<p>$$
+\vec{r}_n = \left( x_n - \hat{x}_n \quad y_n - m,\hat{x}_n - b \right)^\mathrm{T} \quad.
+$$</p>
+<p>Now, let&rsquo;s choose some priors for $m$, $b$, and $\hat{x}_n$ and sample the posterior</p>
+<p>$$
+p(m,,b,,{\hat{x}_n},|,{y_n,,x_n,,S_n}) \propto
+p({y_n,,x_n},|,m,,b,,{\hat{x}_n,,S_n}) , p(m,,b,,{\hat{x}_n}) \quad.
+$$</p>
+<p>Following <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/#Prior-on-Slope-and-Intercept" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Jake VanderPlas</a>
+, let&rsquo;s use the prior:</p>
+<p>$$
+p(m,,b,,{\hat{x}_n}) \propto \left(1+m^2\right)^{-3/2} \quad.
+$$</p>
+<p>Formally, this prior is improper, but it&rsquo;ll do the trick for today.
+Here&rsquo;s the model in code:</p>
+<pre><code class="language-python">def log_prior(params):
+    m = params[0]
+    return -1.5 * np.log(1 + m*m)
+
+# Pre-compute the inverses for speed.
+Sinv = np.array([np.linalg.inv(Sn) for Sn in S])
+def log_prob_naive(params):
+    # Compute the &quot;true&quot; model predictions.
+    m, b = params[:2]
+    xhat = params[2:]
+    yhat = m * xhat + b
+    
+    # Compute the residuals.
+    r = np.array(X)
+    r[:, 0] -= xhat
+    r[:, 1] -= yhat
+    
+    # Use some numpy magic to compute the likelihood (up to a constant).
+    ll = -0.5*np.einsum(&quot;n...i,nij,n...j&quot;, r, Sinv, r)
+    
+    return ll + log_prior(params)
+</code></pre>
+<p>Let&rsquo;s use <a href="http://dan.iel.fm/emcee" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>emcee</a>
+ to sample this density:</p>
+<pre><code class="language-python">import emcee
+
+nwalkers = 64
+xhat0 = np.array(X[:, 0])
+p0 = np.append([m_true, b_true], xhat0)
+p0 = p0 + 1e-4 * np.random.randn(nwalkers, len(p0))
+
+sampler_naive = emcee.EnsembleSampler(nwalkers, p0.shape[1], log_prob_naive)
+pos, _, _ = sampler_naive.run_mcmc(p0, 5000)
+sampler_naive.reset()
+sampler_naive.run_mcmc(pos, 10000)
+samples_naive = sampler_naive.flatchain[:, :2]
+</code></pre>
+<p>We&rsquo;ll look at the integrated autocorrelation time to judge convergence:</p>
+<pre><code class="language-python">tau = sampler_naive.get_autocorr_time(c=4)
+nsamples = len(samples_naive)
+print(&quot;{0:.0f} independent samples of m&quot;.format(nsamples / tau[0]))
+print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[1]))
+</code></pre>
+<pre><code>2217 independent samples of m
+3267 independent samples of b
+</code></pre>
+<p>And plot the posterior constraints on $m$ and $b$:</p>
+<pre><code class="language-python">import corner
+rng = [(x.min(), x.max()) for x in samples_naive.T]
+corner.corner(samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths=[m_true, b_true],
+              range=rng);
+</code></pre>
+<p><img src="output_11_0.png" alt="png"></p>
+<p>Cool.
+That looks fine, but the problem here is that this won&rsquo;t really scale well to large datasets because we&rsquo;ll need a parameter $\hat{x}_n$ for each data point.
+It turns out (thanks to the magic of Gaussians) that we can analytically marginalize over these nuisance parameters and reduce the problem back down to 2-D.</p>
+<h2 id="marginalizing-over-the-true-coordinates">Marginalizing over the true coordinates<a class="anchor" href="#marginalizing-over-the-true-coordinates">#</a></h2>
+<p>To start, let&rsquo;s look at a single data point $n$ and marginalize over $\hat{x}_n$ for that point.
+The integral that we need to compute is:</p>
+<p>$$
+\begin{eqnarray}
+p(y_n,,x_n,|,m,,b,,S_n) &amp;=&amp; \int_{-x_\mathrm{min}}^{x_\mathrm{max}} p(\hat{x}_n) , p(y_n,,x_n,|,m,,b,,\hat{x}_n,,S_n),\mathrm{d}\hat{x}_n \<br>
+&amp;=&amp; \frac{1}{x_\mathrm{max} - x_\mathrm{min}} \int_{-x_\mathrm{min}}^{x_\mathrm{max}} p(y_n,,x_n,|,m,,b,,\hat{x}_n,,S_n),\mathrm{d}\hat{x}_n
+\end{eqnarray}
+$$</p>
+<p>In order to simplify the math, I&rsquo;ll be a little sloppy here and send $x_\mathrm{min} \to -\infty$ and $x_\mathrm{max} \to \infty$, but ignore the fact that this makes the constant $1/(x_\mathrm{max} - x_\mathrm{min})$ zero.
+This inconsistency is caused by the fact that we used an improper prior above and there are more rigorous ways to derive and interpret this result—by putting a broad Gaussian prior on $\hat{x}_n$, for example—but this won&rsquo;t change the results.
+If you&rsquo;re willing to roll with me here (and if you aren&rsquo;t, too bad!) then the integral that we need to compute becomes:</p>
+<p>$$
+p(y_n,,x_n,|,m,,b,,S_n) \propto \int_{-\infty}^{\infty}
+\frac{1}{2,\pi,\sqrt{\det S_n}}
+\exp\left(-\frac{1}{2},{\vec{r}_n}^\mathrm{T},{S_n}^{-1},{\vec{r}_n}\right)
+,\mathrm{d}\hat{x}_n
+$$</p>
+<p>where $r_n$ and $S_n$ are defined above.
+We&rsquo;ll go through the pain of solving this integral in the general case below, but for now, I just tossed this into Mathematica and found:</p>
+<p>$$
+p(y_n,,x_n,|,m,,b,,S_n) \propto \frac{1}{\sqrt{2,\pi,{\Sigma_n}^2}},
+\exp\left(-\frac{{\Delta_n}^2}{2,{\Sigma_n}^2}\right)
+$$</p>
+<p>where $\Delta_n = y_n - m,x_n - b$ and ${\Sigma_n}^2 = (\sigma_x,m)^2 - 2,\sigma_{xy},m + {\sigma_y}^2$ or, equivalently ${\Sigma_n}^2 = \vec{v}^\mathrm{T},S_n,\vec{v}$ where $\vec{v}^\mathrm{T} = (-m,,1)$.
+This likelihood function is similar to Equation (32) in <a href="https://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hogg, Bovy, &amp; Lang (2010)</a>
+.
+You can convince yourself that the version in that paper isn&rsquo;t quite right by checking the limiting case where $\sigma_x = 0$ and $\sigma_{xy} = 0$, and feel free to work the math to convince youself that this one is right.
+Note: Jo Bovy came to the same result with a different derivation that you can read about <a href="https://github.com/davidwhogg/DataAnalysisRecipes/issues/18#issuecomment-305301479" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>here</a>
+ and I think that they are planning to update the document on ArXiv to fix this section.
+The main thing to note about this equation is that you *must* include the pre-factor $1/\sqrt{2,\pi,{\Sigma_n}^2}$ because $\Sigma_n$ is a function of $m$.</p>
+<p>Now that we&rsquo;ve derived the marginalized likelihood function, let&rsquo;s use emcee to sample from the 2-D problem with the same prior $p(m,,b)$ and confirm that we get the same results.</p>
+<pre><code class="language-python">def log_marg_prob(params):
+    m, b = params
+    v = np.array([-m, 1.0])
+    
+    # Compute \Sigma^2 and \Delta.
+    # You can probably convince yourself that this formulation of
+    # \Sigma^2 is equivalent to the one in the text.
+    Sigma2 = np.dot(np.dot(S, v), v)
+    Delta = m * X[:, 0] + b - X[:, 1]
+    
+    # Compute the log likelihood up to a constant (zero, oops...).
+    ll = -0.5 * np.sum(Delta**2 / Sigma2 + np.log(Sigma2))
+    return ll + log_prior(params)
+
+# Run the MCMC with the same initialization as above.
+sampler_marg = emcee.EnsembleSampler(nwalkers, 2, log_marg_prob)
+pos, _, _ = sampler_marg.run_mcmc(p0[:, :2], 100)
+sampler_marg.reset()
+sampler_marg.run_mcmc(pos, 1000)
+samples_marg = sampler_marg.flatchain
+
+tau = sampler_marg.get_autocorr_time(c=4)
+nsamples = len(samples_marg)
+print(&quot;{0:.0f} independent samples of m&quot;.format(nsamples / tau[0]))
+print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[1]))
+
+# Plot the posterior constraints for the naive sampling.
+fig = corner.corner(samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths=[m_true, b_true],
+                    range=rng)
+
+# Plot the constraints from the marginalized sampling.
+# We need to re-weight the samples because we didn't need to run
+# as many steps to converge in 2 dimensions as we did in 12.
+w = len(samples_naive) / len(samples_marg) + np.zeros(len(samples_marg))
+corner.corner(samples_marg, range=rng, color=&quot;g&quot;, fig=fig, weights=w);
+</code></pre>
+<pre><code>4402 independent samples of m
+3998 independent samples of b
+</code></pre>
+<p><img src="output_13_1.png" alt="png"></p>
+<p>In this figure, you see the same results from before (in black) when we sampled in $m$, $b$, and $\hat{x}_n$.
+The green contours are what we got when we sampled the analytically marginalized probability density.
+As expected, these results are indistinguishable within the sampling error, but the latter is more scalable and easier to sample to convergence (we evaluated the model an order of magnitude fewer times to get the same number of independent samples).</p>
+<p>To finish this section, let&rsquo;s make one more plot of the results:</p>
+<pre><code class="language-python">fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+x0 = np.array([-2, 12])
+
+# Plot posterior predictions for a few samples.
+for m, b in samples_marg[np.random.randint(len(samples_marg), size=100)]:
+    ax.plot(x0, m*x0 + b, lw=1, alpha=0.1, color=&quot;g&quot;)
+    
+ax.plot(x0, m_true*x0 + b_true, &quot;k&quot;, lw=2)
+plot_error_ellipses(ax, X, S)
+ax.set_xlim(-2, 12)
+ax.set_ylim(-2, 12)
+ax.set_xlabel(&quot;x&quot;)
+ax.set_ylabel(&quot;y&quot;);
+</code></pre>
+<p><img src="output_15_0.png" alt="png"></p>
+<p>In this figure, the true model is shown as the black line and several posterior samples are shown as light green lines.</p>
+<h2 id="intrinsic-scatter">Intrinsic scatter<a class="anchor" href="#intrinsic-scatter">#</a></h2>
+<p>Now, let&rsquo;s generalize our derivation from above to include an intrinsic width to the line.
+Another way of saying this is that, instead of $\hat{y}_n = m,\hat{x}_n + b$, our model is defined by</p>
+<p>$$
+\left(\begin{array}{c}
+\hat{x}_n \ \hat{y}_n
+\end{array}\right) \sim \mathcal{N}\left(
+\left(\begin{array}{c}
+\tilde{x}_n \ m,\tilde{x}_n + b
+\end{array}\right),,\Lambda
+\right)
+$$</p>
+<p>where $\Lambda$ is a 2x2 tensor describing the width of the line, and we have redefined $\tilde{x}_n$ as the &ldquo;true&rdquo; input coordinate.
+In this case, we can multiply this Gaussian by the Gaussian defined in <a href="#Na%c3%afve-sampling" 
+  
+  
+>the first equation in the first section</a>
+ and integrate out $\hat{x}_n$ and $\hat{y}_n$ (Section 8.1.8 of <a href="http://compbio.fmph.uniba.sk/vyuka/ml/old/2008/handouts/matrix-cookbook.pdf" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>this document</a>
+ might come in handy) to find:</p>
+<p>$$
+\begin{eqnarray}
+&amp;&amp;p({y_n,,x_n},|,m,,b,,{\tilde{x}<em>n,,S_n},,\Lambda) \<br>
+&amp;=&amp; \prod</em>{n=1}^N \frac{1}{2,\pi,\sqrt{\det (S_n+\Lambda)}}
+\exp\left(-\frac{1}{2},{\tilde{r}_n}^\mathrm{T},({S_n} + \Lambda)^{-1},{\tilde{r}_n}\right)
+\end{eqnarray}
+$$</p>
+<p>where</p>
+<p>$$
+\tilde{r}_n = \left( x_n - \tilde{x}_n \quad y_n - m,\tilde{x}_n - b \right)^\mathrm{T} \quad.
+$$</p>
+<p>Then we can repeat the derivation from <a href="#Marginalizing-over-the-true-coordinates" 
+  
+  
+>Section 2</a>
+ to find the marginalized likelihood:</p>
+<p>$$
+p(y_n,,x_n,|,m,,b,,S_n,,\Lambda) \propto \frac{1}{\sqrt{2,\pi,{\tilde{\Sigma}_n}^2}},
+\exp\left(-\frac{{\Delta_n}^2}{2,{\tilde{\Sigma}_n}^2}\right)
+$$</p>
+<p>where $\Delta_n$ is defined above and ${\tilde{\Sigma}_n}^2 = \vec{v}^\mathrm{T},(S_n + \Lambda),\vec{v}$.</p>
+<p>To be more concrete, here are a few examples of the scatter that you might expect:</p>
+<ol>
+<li>If the scatter is perpendicular to the line with some variance $\lambda^2$, then
+$$
+\Lambda = \frac{\lambda^2}{1+m^2},\left(\begin{array}{cc}
+m^2 &amp; -m \<br>
+-m &amp; 1
+\end{array}\right)
+$$</li>
+<li>If the scatter is only in the $y$ direction, then
+$$
+\Lambda = \lambda^2,\left(\begin{array}{cc}
+0 &amp; 0 \<br>
+0 &amp; 1
+\end{array}\right)
+$$</li>
+</ol>
+<p>For simplicity, let&rsquo;s consider the simple case where the intrinsic scatter is in the $y$ direction.
+In this case, $\vec{v}^\mathrm{T},\Lambda,\vec{v}$ simplifies to $\lambda^2$.</p>
+<pre><code class="language-python"># Reproducible!
+np.random.seed(42)
+
+# Add some scatter perpendicular to the line.
+lambda_true = 2.0
+X_scatter = np.array(X)
+X_scatter[:, 1] += lambda_true * np.random.randn(N)
+
+# Plot the updated dataset.
+fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+x0 = np.array([-2, 12])
+ax.plot(x0, m_true*x0 + b_true, lw=1)
+plot_error_ellipses(ax, X_scatter, S)
+
+# Plot the displacement vectors.
+for n in range(N):
+    ax.plot([X[n, 0], X_scatter[n, 0]],
+            [X[n, 1], X_scatter[n, 1]],
+            &quot;k&quot;, lw=0.5)
+
+ax.set_xlim(-2, 12)
+ax.set_ylim(-2, 12)
+ax.set_xlabel(&quot;x&quot;)
+ax.set_ylabel(&quot;y&quot;);
+</code></pre>
+<p><img src="output_17_0.png" alt="png"></p>
+<p>This is the same kind of figure that we had before but now I&rsquo;m indicating the extra scatter that was added to each data point with the black lines.
+You can see that all of these offsets are in the $y$ direction.</p>
+<p>To sample this model, we&rsquo;ll need to choose a prior on $\lambda$.
+It&rsquo;s useful to choose a proper prior in this case so I&rsquo;ll choose (somewhat arbitrarily) a log-uniform prior between $e^{-5}$ and $e^5$:</p>
+<p>$$
+p(\ln\lambda) \propto \left{\begin{array}{ll}
+1 &amp; \mathrm{if,-5 &lt; \ln\lambda &lt; 5} \<br>
+0 &amp; \mathrm{otherwise}
+\end{array}\right.
+$$</p>
+<pre><code class="language-python">def log_marg_prob_scatter(params):
+    m, b, log_lambda = params
+    v = np.array([-m, 1.0])
+    
+    # Enforce the log-uniform prior on lambda. 
+    if not -5.0 &lt; log_lambda &lt; 5.0:
+        return -np.inf
+        
+    # Compute \Sigma^2 and \Delta.
+    Sigma2 = np.dot(np.dot(S, v), v) + np.exp(2*log_lambda)
+    Delta = m * X_scatter[:, 0] + b - X_scatter[:, 1]
+    
+    # Compute the log likelihood up to a constant.
+    ll = -0.5 * np.sum(Delta**2 / Sigma2 + np.log(Sigma2))
+    return ll + log_prior(params)
+
+# Run the MCMC.
+sampler_scatter = emcee.EnsembleSampler(nwalkers, 3, log_marg_prob_scatter)
+p0 = np.array([m_true, b_true, np.log(lambda_true)])
+p0 = p0 + 1e-4 * np.random.randn(nwalkers, len(p0))
+pos, _, _ = sampler_scatter.run_mcmc(p0, 1000)
+sampler_scatter.reset()
+sampler_scatter.run_mcmc(pos, 6000)
+samples_scatter = sampler_scatter.flatchain
+
+tau = sampler_scatter.get_autocorr_time(c=4)
+nsamples = len(samples_scatter)
+print(&quot;{0:.0f} independent samples of m&quot;.format(nsamples / tau[0]))
+print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[1]))
+print(&quot;{0:.0f} independent samples of lambda&quot;.format(nsamples / tau[2]))
+
+corner.corner(samples_scatter, labels=[&quot;m&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
+              truths=[m_true, b_true, np.log(lambda_true)]);
+</code></pre>
+<pre><code>7734 independent samples of m
+9528 independent samples of b
+5108 independent samples of lambda
+</code></pre>
+<p><img src="output_19_1.png" alt="png"></p>
+<p>We can compare this sampling to the previous on (without scatter) by plotting some samples of the model in the &ldquo;data&rdquo; space.
+You can see that the constaints are wider than previously, but things seemed to have worked well.</p>
+<pre><code class="language-python">fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+x0 = np.array([-2, 12])
+
+# Plot posterior predictions for a few samples.
+for m, b, _ in samples_scatter[np.random.randint(len(samples_scatter), size=100)]:
+    ax.plot(x0, m*x0 + b, lw=1, alpha=0.1, color=&quot;g&quot;)
+    
+ax.plot(x0, m_true*x0 + b_true, &quot;k&quot;, lw=2)
+plot_error_ellipses(ax, X_scatter, S)
+ax.set_xlim(-2, 12)
+ax.set_ylim(-2, 12)
+ax.set_xlabel(&quot;x&quot;)
+ax.set_ylabel(&quot;y&quot;);
+</code></pre>
+<p><img src="output_21_0.png" alt="png"></p>
+<h2 id="generalizing-to-higher-dimensions">Generalizing to higher dimensions<a class="anchor" href="#generalizing-to-higher-dimensions">#</a></h2>
+<p>Now let&rsquo;s extend our discussion to fitting a plane to data in $D$ dimensions.
+Some people might have just been able to intuit the correct result here, but I wanted to derive it to make sure that I was happy so here it goes&hellip;</p>
+<p>To simplify the derivation, I&rsquo;ll update the notation as follows (bear with me — there&rsquo;s a lot going on here).
+The observations are now ${\vec{x}_n,,y_n,,S_n}$ where $\vec{x}<em>n$ is a $D-1$ vector ${\boldsymbol{x}<em>n}^\mathrm{T} = (x</em>{1,n},,\cdots,x</em>{d-1,n})$ and $S_n$ is a $D \times D$ matrix that we can write, without loss of generality, as the block matrix</p>
+<p>$$
+S_n = \left(\begin{array}{cc}
+S_{x,n} &amp; s_{xy,n} \<br>
+s_{xy,n}^\mathrm{T} &amp; s_{y,n}
+\end{array}\right)
+$$</p>
+<p>where $S_{x,n}$ is the $D-1 \times D-1$ covariance for the $\vec{x}$s, $\vec{s}_{xy,n}$ is the $D-1$ covariance between $\vec{x}_n$ and $y_n$, and $s_{y,n} = {\sigma_{y,n}}^2$ is the (scalar) uncertainty variance for $y$.</p>
+<p>In this space, we can rewrite the likelihood in the first equation from <a href="#Na%c3%afve-sampling" 
+  
+  
+>Section 1</a>
+ as</p>
+<p>$$\begin{eqnarray}
+&amp;&amp;p({y_n,,\vec{x}_n},|,\vec{m},,b,,{\boldsymbol{\hat{x}}<em>n,,S_n}) \<br>
+&amp;=&amp; \prod</em>{n=1}^N \frac{1}{(2,\pi)^{D/2},\sqrt{\det S_n}}
+\exp\left(-\frac{1}{2},{(\vec{z}_n-M,\boldsymbol{\hat{x}}_n-\vec{b})}^\mathrm{T},{S_n}^{-1},{(\vec{z}_n-M,\boldsymbol{\hat{x}}_n-\vec{b})}\right)
+\end{eqnarray}
+$$</p>
+<p>where ${\vec{z}<em>n}^\mathrm{T} = (x</em>{1,n},,\ldots,,x_{D-1,n},,y_n)$, ${\boldsymbol{\hat{x}}_n}^\mathrm{T} = (\hat{x}_{1,n},,\ldots,,\hat{x}_{D-1,n},,0)$, ${\vec{b}}^\mathrm{T} = (0,,\ldots,,b)$, and $M$ is the $D \times D$ matrix</p>
+<p>$$
+M = \left(\begin{array}{cc}
+I_{D-1} &amp; -\vec{m} \<br>
+\vec{m}^\mathrm{T} &amp; 1
+\end{array}\right)
+$$</p>
+<p>where $I_{D-1}$ is the $D-1$ dimensional identity and $\vec{m}^\mathrm{T} = (m_1,,\ldots,,m_{D-1})$.</p>
+<p>Now that we have that notation out of the way, we now want to complete the square and marginalize over $\boldsymbol{\hat{x}}_n$.
+Thanks to the magic of Gaussians (see <a href="http://www.gaussianprocess.org/gpml/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Appendix A of R&amp;W</a>
+, for example), this integral can be done easily if we can rewrite the likelihood as a $D$ dimensional Gaussian for $\boldsymbol{\hat{x}}_n$.
+Then the marginalized likelihood will be a one dimensional Gaussian with mean given by the last element of the mean vector and variance given by the bottom left entry in the covariance matrix.
+To manipulate this equation, let&rsquo;s write the argument of the exponential as follows</p>
+<p>$$
+\begin{eqnarray}
+&amp;&amp; {(z_n-M,\hat{x}_n-\vec{b})}^\mathrm{T},{S_n}^{-1},(\vec{z}_n-M,\boldsymbol{\hat{x}}_n-\vec{b})\<br>
+&amp;=&amp; {\left[M,M^{-1},(\vec{z}_n-M,\boldsymbol{\hat{x}}_n-\vec{b})\right]}^\mathrm{T},{S_n}^{-1},\left[M,M^{-1},(z_n-M,\hat{x}_n-\vec{b})\right]\<br>
+&amp;=&amp; {\left[M^{-1},(\vec{z}_n - \vec{b}) - \boldsymbol{\hat{x}}_n\right]}^\mathrm{T},M^\mathrm{T},{S_n}^{-1},M,\left[M^{-1},(\vec{z}_n - \vec{b}) - \boldsymbol{\hat{x}}_n\right]
+\end{eqnarray}
+$$</p>
+<p>to find that each term in the likelihood is a $D$ dimensional Gaussian for $\boldsymbol{\hat{x}}_n$ with mean</p>
+<p>$$
+\mu_n = M^{-1},(\vec{z}_n - \vec{b})
+$$</p>
+<p>and covariance</p>
+<p>$$
+C_n = M^{-1},S_n,(M^{-1})^\mathrm{T} \quad.
+$$</p>
+<p>Using <a href="https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_inversion" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the block matrix inverse equations</a>
+, we can  find the inverse of $M$ to be</p>
+<p>$$
+M^{-1} = \frac{1}{1+\vec{m}^\mathrm{T},\vec{m}}\left(\begin{array}{cc}
+I_{D-1} - \vec{m},\vec{m}^\mathrm{T} &amp; \vec{m} \<br>
+-\vec{m}^\mathrm{T} &amp; 1
+\end{array}\right) \quad.
+$$</p>
+<p>Armed with these equations and some patience, we can derive the general expressions for the mean $\mu$ and covariance $C$, but I&rsquo;ll spare you the details and just give the results for the relevant values.
+After marginalizing over $\hat{x}_n$, the marginalized likelihood resembles the previous one</p>
+<p>$$
+p(y_n,,\vec{x}<em>n,|,\vec{m},,b,,S_n) \propto \frac{1}{\sqrt{2,\pi,{\Sigma</em>{D,n}}^2}},
+\exp\left(-\frac{{\Delta_{D,n}}^2}{2,{\Sigma_{D,n}}^2}\right)
+$$</p>
+<p>where</p>
+<p>$$
+\Delta_{D,n} = y_n - \vec{m}^\mathrm{T},\vec{x}_n - b
+$$</p>
+<p>and</p>
+<p>$$
+\begin{eqnarray}
+{\Sigma_{D,n}}^2 &amp;=&amp; \vec{m}^\mathrm{T},S_{x,n},\vec{m} - 2,\vec{m}^\mathrm{T},\vec{s}_{xy,n} + s_y \<br>
+&amp;=&amp; \vec{v}^\mathrm{T},S_n,\vec{v}
+\end{eqnarray}
+$$</p>
+<p>where I have redefined $\vec{v}^\mathrm{T} = (-\vec{m},,1)$.
+As you might hope, this looks pretty much identical to the result that we got for the two-dimensional case (this is why you might have just been able to intuit this result) .</p>
+<p>Finally, we can include intrinsic scatter as above by replacing $S_n$ by $S_n + \Lambda$:</p>
+<p>$$
+{\Sigma_{D,n}}^2 = \vec{v}^\mathrm{T},(S_n + \Lambda),\vec{v}
+$$</p>
+<p>and also fit for the parameters of $\Lambda$.
+For scatter with amplitude $\lambda$ in the $D$-th dimension, this simplifies to</p>
+<p>$$
+{\Sigma_{D,n}}^2 = \vec{v}^\mathrm{T},S_n,\vec{v} + \lambda^2 \quad.
+$$</p>
+<p>Let&rsquo;s demonstrate this model by generating some fake data in 3 dimensions and fitting for the plane using this marginalized likelihood.
+It&rsquo;s a bit trickier to plot the simulated data in higher dimensions so we&rsquo;ll plot all of the projections of the error ellipses.</p>
+<pre><code class="language-python">from itertools import product
+
+np.random.seed(42)
+
+# Generate the true coordinates of the data points.
+N = 50
+m_true = np.array([1.2, -0.3])
+b_true = -0.1
+X_true = np.empty((N, 3))
+X_true[:, 0] = np.random.uniform(0, 10, N)
+X_true[:, 1] = np.random.uniform(0, 10, N)
+X_true[:, 2] = np.dot(X_true[:, :-1], m_true) + b_true
+X = np.empty((N, 3))
+
+# Generate error ellipses and add uncertainties to each point.
+S = np.zeros((N, 3, 3))
+for n in range(N):
+    L = np.zeros((3, 3))
+    L[np.diag_indices_from(L)] = np.exp(np.random.uniform(-1, 1))
+    L[np.tril_indices_from(L, -1)] = 0.5 * np.random.randn()
+    S[n] = np.dot(L, L.T)
+    X[n] = np.random.multivariate_normal(X_true[n], S[n])
+    
+# Finally add some scatter.
+lambda_true = 2.0
+X[:, -1] += lambda_true * np.random.randn(N)
+
+# Plot the simulated dataset.
+fig, axes = plt.subplots(2, 2, figsize=(5, 5))
+for xi, yi in product(range(3), range(3)):
+    if yi &lt;= xi:
+        continue
+    ax = axes[yi-1, xi]
+    plot_error_ellipses(ax, X[:, [xi, yi]],
+                        S[:,
+                          [[xi, xi], [yi, yi]],
+                          [[xi, yi], [xi, yi]]])
+    
+    ax.set_xlim(-7, 17)
+    ax.set_ylim(-7, 17)
+
+# Make the plots look nicer...
+ax = axes[0, 1]
+ax.set_frame_on(False)
+ax.set_xticks([])
+ax.set_yticks([])
+
+ax = axes[0, 0]
+ax.set_ylabel(&quot;$x_2$&quot;)
+ax.set_xticklabels([])
+ax = axes[1, 0]
+ax.set_xlabel(&quot;$x_1$&quot;)
+ax.set_ylabel(&quot;$y$&quot;)
+ax = axes[1, 1]
+ax.set_xlabel(&quot;$x_2$&quot;)
+ax.set_yticklabels([])
+fig.subplots_adjust(wspace=0, hspace=0)
+</code></pre>
+<p><img src="output_23_0.png" alt="png"></p>
+<pre><code class="language-python">def log_prob_D(params):
+    m = params[:2]
+    b, log_lambda = params[2:]
+    v = np.append(-m, 1.0)
+    
+    # Enforce the log-uniform prior on lambda. 
+    if not -5.0 &lt; log_lambda &lt; 5.0:
+        return -np.inf
+        
+    # Compute \Sigma^2 and \Delta.
+    Sigma2 = np.dot(np.dot(S, v), v) + np.exp(2*log_lambda)
+    Delta = np.dot(X, v) - b
+    
+    # Compute the log likelihood up to a constant.
+    ll = -0.5 * np.sum(Delta**2 / Sigma2 + np.log(Sigma2))
+    return ll
+
+# Run the MCMC.
+sampler_D = emcee.EnsembleSampler(nwalkers, 4, log_prob_D)
+p0 = np.append(m_true, [b_true, np.log(lambda_true)])
+p0 = p0 + 1e-4 * np.random.randn(nwalkers, len(p0))
+pos, _, _ = sampler_D.run_mcmc(p0, 500)
+sampler_D.reset()
+sampler_D.run_mcmc(pos, 5000)
+samples_D = sampler_D.flatchain
+
+tau = sampler_D.get_autocorr_time(c=4)
+nsamples = len(samples_D)
+print(&quot;{0:.0f} independent samples of m1&quot;.format(nsamples / tau[0]))
+print(&quot;{0:.0f} independent samples of m2&quot;.format(nsamples / tau[1]))
+print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[2]))
+print(&quot;{0:.0f} independent samples of ln(lambda)&quot;.format(nsamples / tau[3]))
+
+corner.corner(samples_D, labels=[&quot;$m_1$&quot;, &quot;$m_2$&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
+              truths=np.append(m_true, [b_true, np.log(lambda_true)]));
+</code></pre>
+<pre><code>11514 independent samples of m1
+5614 independent samples of m2
+9536 independent samples of b
+4105 independent samples of ln(lambda)
+</code></pre>
+<p><img src="output_24_1.png" alt="png"></p>
+<p>If you made it this far, you might notice that I don&rsquo;t really have a reasonable prior for the slopes.
+The current prior (uniform in $\vec{m}$) will have the same problems that <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/#Prior-on-Slope-and-Intercept" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Jake VanderPlas talks about on his blog</a>
+, but I decided that there&rsquo;s already too much in this post so I&rsquo;ll leave the generalization of that prior as an exercise for the reader :-)</p>
+<h2 id="summary">Summary<a class="anchor" href="#summary">#</a></h2>
+<p>In this post, I worked through the problem of fitting a $D$-dimensional plane to data with arbitrary measurement covariance matrices.
+The result is similar to the previous result from <a href="https://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hogg, Bovy, &amp; Lang (2010)</a>
+, but I have fixed a small mistake in their solution and generalized the method to higher dimensions, including intrinsic scatter.
+Hope this is helpful and please let me know of any mistakes in my work via the comments or <a href="https://github.com/dfm/dfm.io/issues" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>GitHub issues</a>
+.</p>
+
+
+              
+                  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script>
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/stan-c&#43;&#43;/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets</span>
+    </a>
+  
+
+  
+    <a class="pagination__item" href="https://dfm.io/posts/travis-latex/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >Continuous integration of academic papers</span>
+    </a>
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="GitHub"
+         href="https://github.com/dfm"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Email"
+         href="mailto:foreman.mackey@gmail.com"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2021</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>

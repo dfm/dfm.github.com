@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets" />
+  <meta name="twitter:description" content=""/>
+  <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
+  <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/stan-c\u002b\u002b\/",
+      "name": "Using external C\u002b\u002b functions with PyStan \u0026 radial velocity exoplanets",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/"> home</a>
+      </li>
+    
+      <li>
+        <a  href="/about">about</a>
+      </li>
+    
+      <li>
+        <a  href="/posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets</h1>
+            <time datetime="2017-05-04 00:00:00 &#43;0000 UTC" class="post__date">May 4 2017</time> 
+          </header>
+          <article class="post__content">
+              
+<p>In this blog post, I&rsquo;ll demonstrate how to use a custom C++ function in a <a href="http://mc-stan.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Stan</a>
+ model using the Python interface <a href="http://mc-stan.org/interfaces/pystan.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>PyStan</a>
+. This was previously only possible using the R interface <a href="http://mc-stan.org/interfaces/rstan.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>RStan</a>
+ (see <a href="https://cran.r-project.org/web/packages/rstan/vignettes/external.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>an example here</a>
+) so I hacked PyStan to make this possible in Python as well. You&rsquo;ll need to install <a href="https://github.com/dfm/pystan/tree/feature-external-c&#43;&#43;" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the &lsquo;feature-external-c++&rsquo; branch of my fork of PyStan</a>
+ to make this work. This is unlikely to get merged into PyStan because there is a hope that this will one day be a feature of the core Stan language, but if you&rsquo;re impatient and need this now, read on!</p>
+<p>Since I&rsquo;m an astronomer, I&rsquo;ll motivate this demo using a specific example from astronomy but I expect that this is more broadly applicable. The basic motivation is that I have some existing C++ code that implements my model and its derivatives so I don&rsquo;t want to have to re-write the model in the Stan language. Furthermore, part of the model requires solving a transcendental equation numerically; it&rsquo;s not obvious that applying autodiff to an iterative solver is a great idea, but the analytic gradients are trivial to evaluate.</p>
+<p>The example that we&rsquo;ll use is fitting <a href="https://en.wikipedia.org/wiki/Doppler_spectroscopy" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>radial velocity observations of an exoplanet</a>
+. In particular, we&rsquo;ll fit recent observations of <a href="https://en.wikipedia.org/wiki/51_Pegasi_b" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>51 Peg b</a>
+, the first exoplanet discovered around a main sequence star. To start, let&rsquo;s run all of the imports and download the time series from the <a href="http://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=51&#43;Peg&#43;b&amp;type=CONFIRMED_PLANET" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Exoplanet Archive</a>
+. The most recent observations are from <a href="https://arxiv.org/abs/1606.03134" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Howard &amp; Fulton (2016)</a>
+, but let&rsquo;s download some older data to make the comparisons easier. We&rsquo;ll download the data from <a href="http://adsabs.harvard.edu/abs/2006ApJ...646..505B" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Butler et al. (2006)</a>
+ instead.</p>
+<pre><code class="language-python"># First, import all the packages that we'll need:
+from __future__ import division, print_function
+
+import time
+import corner  # http://corner.readthedocs.io
+import requests
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# This must be the 'feature-external-c++' branch of my fork:
+# https://github.com/dfm/pystan/tree/feature-external-c++
+import pystan
+
+# Download the dataset from the Exoplanet Archive:
+url = &quot;https://exoplanetarchive.ipac.caltech.edu/data/ExoData/0113/0113357/data/UID_0113357_RVC_001.tbl&quot;
+r = requests.get(url)
+if r.status_code != requests.codes.ok:
+    r.raise_for_status()
+data = np.array([l.split() for l in r.text.splitlines()
+                 if not l.startswith(&quot;\\&quot;) and not l.startswith(&quot;|&quot;)],
+                dtype=float)
+t, rv, rv_err = data.T
+t -= np.mean(t)
+
+# Plot the observations &quot;folded&quot; on the published period:
+# Butler et al. (2006) https://arxiv.org/abs/astro-ph/0607493
+lit_period = 4.230785
+plt.errorbar((t % lit_period)/lit_period, rv, yerr=rv_err, fmt=&quot;.k&quot;, capsize=0)
+plt.xlim(0, 1)
+plt.ylim(-110, 110)
+plt.annotate(&quot;period = {0:.6f} days&quot;.format(lit_period),
+             xy=(1, 0), xycoords=&quot;axes fraction&quot;,
+             xytext=(-5, 5), textcoords=&quot;offset points&quot;,
+             ha=&quot;right&quot;, va=&quot;bottom&quot;, fontsize=12)
+plt.ylabel(&quot;radial velocity [m/s]&quot;)
+plt.xlabel(&quot;phase&quot;);
+</code></pre>
+<p><img src="output_3_0.png" alt="png"></p>
+<h2 id="the-problem-statement-a-kepler-solver-in-c">The problem statement: a Kepler solver in C++<a class="anchor" href="#the-problem-statement-a-kepler-solver-in-c">#</a></h2>
+<p>We want to fit this dataset using a Keplerian model where the radial velocity is given by</p>
+<p>$$
+RV(t) = RV_0 + RV_\mathrm{trend},t + K,\left[\cos(\omega+f(t))+e,\cos(\omega)\right]
+$$</p>
+<p>where $RV_0$ is the mean radial velocity, $RV_\mathrm{trend}$ is the slope of the RV trend, $K$ is the semi-amplitude, $\omega$ is the argument of periastron, and $f(t)$ is the true anomaly. I won&rsquo;t go into details about all of these parameters, but interested readers can check out <a href="http://exoplanets.astro.yale.edu/workshop/EPRV/Bibliography_files/Radial_Velocity.pdf" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the discussion here</a>
+ or in the <a href="https://www.amazon.com/Exoplanets-Space-Science-Sara-Seager/dp/0816529450" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Exoplanets</a>
+ textbook.</p>
+<p>The crux for our discussion is that computation of $f(t)$ requires solving <a href="https://en.wikipedia.org/wiki/Kepler%27s_equation" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Kepler&rsquo;s equation</a>
+</p>
+<p>$$
+M(t) = E(t) - e,\sin E(t)
+$$</p>
+<p>for the eccentric anomaly $E(t)$ at given mean anomaly $M(t)$ and eccentricity $e$. This equation is typically solved numerically using the <a href="https://en.wikipedia.org/wiki/Newton%27s_method" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Newton–Raphson method</a>
+. The following is a simple implementation in C++:</p>
+<pre><code class="language-cpp">double kepler (double M, double e) {
+  double E0 = M, E = M;
+  for (int i = 0; i &lt; 200; ++i) {
+    double g = E0 - e * sin(E0) - M,
+           gp = 1.0 - e * cos(E0);
+    E = E0 - g / gp;
+
+    // Check for convergence.
+    if (abs((E - E0) / E) &lt;= 1.234e-10) return E;
+    E0 = E;
+  }
+  
+  // If we get here, we didn't converge, but return the best estimate.
+  return E;
+}
+</code></pre>
+<p>This function could, of course, also be implemented directly in the Stan language. It is, however, standard lore that one shouldn&rsquo;t apply automatic differentiation to an iterative method. Furthermore, it is easy to compute the partial derivatives of this expression analytically:</p>
+<p>$$
+\frac{dE(t)}{dM(t)} = \frac{1}{1-e,\cos E(t)}
+$$</p>
+<p>and</p>
+<p>$$
+\frac{dE(t)}{de} = \frac{\sin E(t)}{1-e,\cos E(t)}
+$$</p>
+<p>In the following few cells, we&rsquo;ll implement this method with a syntax that is compatible with Stan. First, the code from above with a few extra bells and whistles:</p>
+<pre><code class="language-python">cpp_code = &quot;&quot;&quot;
+inline double kepler (double M, double e, std::ostream* pstream) {
+  // Check for un-physical parameters.
+  if (e &lt; 0.0 || e &gt;= 1.0)
+    domain_error(&quot;kepler&quot;, &quot;eccentricity is&quot;, e, &quot;&quot;);
+
+  double E0 = M, E = M;
+  for (int i = 0; i &lt; 200; ++i) {
+    double g = E0 - e * sin(E0) - M,
+           gp = 1.0 - e * cos(E0);
+    E = E0 - g / gp;
+
+    // Check for convergence.
+    if (abs((E - E0) / E) &lt;= 1.234e-10) return E;
+
+    E0 = E;
+  }
+  
+  // If we get here, we didn't converge, but return the best estimate.
+  return E;
+}
+&quot;&quot;&quot;
+</code></pre>
+<p>The main difference between this implementation and the one above is that the function takes an extra <code>std::ostream*</code> argument. This stream can be used for logging if your method needs to print anything to the terminal and any function that you expose to Stan <em>must</em> have this as the last argument. This function also checks for the allowed domain (0 to 1) for the eccentricity and it will throw an error (and set the probability of the model to zero) if the eccentricity is outside of this allowed range.</p>
+<p>Next, we must implement the derivatives of this function using overloading with the <code>stan::math::var</code> type. This is the type that is used by Stan to compute derivatives in their automatic differentiation library (see <a href="https://arxiv.org/abs/1509.07164" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Carpenter et al. (2015)</a>
+ for details) and I&rsquo;ve found that the easiest way to use them is with the <code>precomp_v_vari</code> and <code>precomp_vv_vari</code> wrapper classes. For example, to provide the derivatives with respect to both $M(t)$ and $e$, we will use the following code:</p>
+<pre><code class="language-python">cpp_code += &quot;&quot;&quot;
+inline var kepler (const var&amp; M_var, const var&amp; e_var, std::ostream* pstream) {
+  // First, compute the value of E at the current values of M and e
+  double M = M_var.val(),
+         e = e_var.val(),
+         E = kepler(M, e, pstream);
+
+  // Then compute the partial derivatives:
+  double dE_dM = 1.0 / (1.0 - e * cos(E)),
+         dE_de = sin(E) * dE_dM;
+         
+  // Construct the autodiff wrapper:
+  return var(new precomp_vv_vari(
+    E,             // The _value_ of the output
+    M_var.vi_,     // The input gradient wrt M
+    e_var.vi_,     // The input gradient wrt e
+    dE_dM,         // The partial introduced by this function wrt M
+    dE_de          // The partial introduced by this function wrt e
+  ));
+}
+
+&quot;&quot;&quot;
+</code></pre>
+<p>We now go on to implement versions of this function for fixed $M(t)$ and $e$. I don&rsquo;t <em>think</em> that these extra functions are strictly needed in our case because $M(t)$ and $e$ will always be functions of parameters, but it doesn&rsquo;t hurt to implement all of the permutations in case we decide to fix any parameters. In these cases, we use the <code>precomp_v_vari</code> class because the derivatives are only taken with repect to a single parameter:</p>
+<pre><code class="language-python">cpp_code += &quot;&quot;&quot;
+inline var kepler (double M, const var&amp; e_var, std::ostream* pstream) {
+  double e = e_var.val(),
+         E = kepler(M, e, pstream),
+         dE_de = sin(E) / (1.0 - e * cos(E));
+  return var(new precomp_v_vari(E, e_var.vi_, dE_de));
+}
+
+inline var kepler (const var&amp; M_var, double e, std::ostream* pstream) {
+  double M = M_var.val(),
+         E = kepler(M, e, pstream),
+         dE_dM = 1.0 / (1.0 - e * cos(E));
+  return var(new precomp_v_vari(E, M_var.vi_, dE_dM));
+}
+
+&quot;&quot;&quot;
+</code></pre>
+<p>Finally, we&rsquo;ll save this to a C++ header file in the current directory:</p>
+<pre><code class="language-python">with open(&quot;kepler.hpp&quot;, &quot;w&quot;) as f:
+    f.write(cpp_code)
+</code></pre>
+<h2 id="the-stan-model">The Stan model<a class="anchor" href="#the-stan-model">#</a></h2>
+<p>Now, let&rsquo;s build our model in Stan. Describing the Stan language is beyond the scope of this post so you should check out <a href="http://mc-stan.org/documentation/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the official docs</a>
+ if you&rsquo;re new to Stan. The only non-standard addition in our model is a <code>functions</code> block at the beginning with the interface for our Kepler solver:</p>
+<pre><code>functions {
+    real kepler(real M, real e);
+}
+</code></pre>
+<p>After the <code>functions</code> block, the rest of the model is pretty standard. I found that the sampling performance was substantially improved after reparameterizing the model a bit. The first crucial reaparameterization is to sample in $\sqrt{e},\sin\omega$ and $\sqrt{e},\cos\omega$ instead of $e$ and $\omega$. For $e \le 1$, this still has a uniform prior distribution for $e$ and $\omega$, but the shape posterior in these coordinates is much better behaved. The second reparameterization is to sample in $\phi = \frac{2,\pi,t_0}{P} - \omega$ instead of $t_0$.</p>
+<p>The following cell defines the full probabilistic model in the Stan language and compiles the generated C++ code including the <code>kepler.hpp</code> header that we defined above. Note the <code>allow_undefined</code>, <code>includes</code>, and <code>include_dirs</code> arguments in the <code>pystan.StanModel</code> constructor. These are required to allow interfacing to external C++ code, but they&rsquo;re not provided by the official PyStan implementation so, as mentioned above, you&rsquo;ll need to have my fork of PyStan installed to compile this model.</p>
+<pre><code class="language-python">model_code = &quot;&quot;&quot;
+functions {
+    real kepler(real M, real e);
+}
+data {
+    int&lt;lower=0&gt; N;          // number of times
+    vector[N]    t;          // the times
+    vector[N]    rv;         // the rvs
+    vector[N]    rv_err;     // the rv uncertainties
+    int&lt;lower=0&gt; N_pred;     // number of predictions
+}
+parameters {
+    real&lt;lower=0, upper=log(200)&gt; log_K;       // ln(semi-amplitude)
+    real&lt;lower=0, upper=log(100)&gt; log_P;       // ln(period)
+    real&lt;lower=0, upper=2*pi()&gt;   phi;         // phase
+    real&lt;lower=0, upper=1&gt;        e;           // eccentricity
+    unit_vector[2]                w_vec;       // [cos(w), sin(w)]
+    real&lt;lower=-10, upper=5&gt;      log_jitter;  // ln(jitter)
+    real&lt;lower=-10, upper=10&gt;     rv0;         // mean RV
+    real&lt;lower=-10, upper=10&gt;     rv_trend;    // RV trend
+}
+transformed parameters {
+    real n       = 2*pi()*exp(-log_P);
+    real K       = exp(log_K);
+    real w       = atan2(w_vec[2], w_vec[1]);
+    real jitter2 = exp(2*log_jitter);
+    real t0      = (phi + w) / n;
+    
+    // This will store the predicted RV signal at the observed times
+    vector[N] mod;
+    
+    // And this stores the RV trend at the observed times
+    vector[N] trend;
+    
+    for (j in 1:N) {
+        // Compute the predicted RV signal at time t[j]
+        real M = n * t[j] - (phi + w);
+        real E = kepler(M, e);
+        real f = 2*atan2(sqrt(1+e) * tan(0.5*E), sqrt(1-e));
+        trend[j] = rv0 + rv_trend * t[j] / 365.25;
+        mod[j] = trend[j] + K * (w_vec[1]*(cos(f)+e)-w_vec[2]*sin(f));
+    }
+}
+model {
+    // We already have a uniform prior on &quot;e&quot; but it must be in the
+    // range [0, 1].
+    e ~ uniform(0, 1);
+    
+    // Loop over observations
+    for (j in 1:N) {
+        // Compute the predicted RV signal at time t[j]
+        // Assume Gaussian uncertainties with jitter
+        rv[j] ~ normal(mod[j], sqrt(rv_err[j]^2 + jitter2));
+    }
+}
+generated quantities {
+    // At each accepted step in the MCMC, compute the predicted RV
+    // curve for `N_pred` equally-spaced phases
+    vector[N_pred] rv_pred;
+    for (j in 1:N_pred) {
+        real M = (2.0*pi()*(j-1))/(N_pred-1) - (phi + w);
+        real E = kepler(M, e);
+        real f = 2*atan2(sqrt(1+e) * tan(0.5*E), sqrt(1-e));
+        rv_pred[j] = K * (w_vec[1]*(cos(f)+e)-w_vec[2]*sin(f));
+    }
+}
+&quot;&quot;&quot;
+
+strt = time.time()
+model = pystan.StanModel(model_code=model_code, allow_undefined=True,
+                         includes=[&quot;kepler.hpp&quot;], include_dirs=[&quot;.&quot;])
+print(&quot;Compilation took {0:.1f} seconds&quot;.format(time.time() - strt))
+</code></pre>
+<pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_8a556093ae546532f90fa3f7e850eea0 NOW.
+
+
+Compilation took 43.6 seconds
+</code></pre>
+<h2 id="inference--parameter-estimation">Inference &amp; parameter estimation<a class="anchor" href="#inference--parameter-estimation">#</a></h2>
+<p>To start, we need to initialize the parameters of our model. In this case, it would be pretty inefficient to optimize with random restarts within the prior because some of the parameters are very well constrained (e.g. period) and we probably already have a good initial guess for the values of these parameters. Instead, we will use a custom initialization function and the <code>L-BFGS</code> implementation built into Stan to find the maximum <em>a postieriori</em> (MAP) parameters.</p>
+<pre><code class="language-python">np.random.seed(42)
+
+# Custom initialization function. Some parameters are randomized
+def init_func():
+    omega = np.random.uniform(0, 2*np.pi)
+    return dict(
+        log_K=np.log(0.5 * (np.max(rv) - np.min(rv))),
+        log_P=np.log(4.230785),
+        phi=np.random.uniform(0, 2*np.pi),
+        e=np.random.uniform(0, 0.01),
+        w_vec=[np.cos(omega), np.sin(omega)],
+        log_jitter=np.log(np.mean(rv_err)),
+        rv0=np.mean(rv),
+        rv_trend=0.0,
+    )
+
+# Run 5 randomized restarts to find the MAP parameters
+data = dict(N=len(t), t=t, rv=rv, rv_err=rv_err, N_pred=100)
+best = dict(value=-np.inf)
+for k in range(5):
+    try:
+        opt = model.optimizing(data=data, as_vector=False, init=init_func)
+    except RuntimeError:
+        continue
+    if opt[&quot;value&quot;] &gt; best[&quot;value&quot;]:
+        best = opt
+        
+print(&quot;Maximum log-probability: {0:.3f}&quot;.format(best[&quot;value&quot;]))
+</code></pre>
+<pre><code>Maximum log-probability: -629.137
+</code></pre>
+<p>To make sure that we&rsquo;re not totally off to start, let&rsquo;s plot the prediction of the model at the MAP.</p>
+<pre><code class="language-python"># Extract the best fit parameters
+period = np.exp(best[&quot;par&quot;][&quot;log_P&quot;])
+t0 = best[&quot;par&quot;][&quot;t0&quot;]
+pred = best[&quot;par&quot;][&quot;rv_pred&quot;]
+mod = best[&quot;par&quot;][&quot;mod&quot;]
+trend = best[&quot;par&quot;][&quot;trend&quot;]
+
+# Compute the effective uncertainties including the contribution
+# of jitter
+yerr = np.sqrt(rv_err**2 + np.exp(2*best[&quot;par&quot;][&quot;log_jitter&quot;]))
+
+# Plot the data, model, and residuals
+plt.errorbar((t/period) % 1.0, rv - trend, yerr=yerr, fmt=&quot;.k&quot;, label=&quot;data&quot;, lw=1, ms=4)
+plt.plot(np.arange(len(pred)) / (len(pred)-1), pred, label=&quot;MAP model&quot;)
+plt.plot((t/period) % 1.0, rv - mod, &quot;.k&quot;, alpha=0.3, mec=&quot;none&quot;,
+         label=&quot;resiudals&quot;, ms=5)
+
+plt.legend(loc=3, fontsize=11)
+plt.xlim(0, 1)
+plt.ylim(-110, 110)
+plt.annotate(&quot;period = {0:.6f} days&quot;.format(period),
+             xy=(1, 0), xycoords=&quot;axes fraction&quot;,
+             xytext=(-5, 5), textcoords=&quot;offset points&quot;,
+             ha=&quot;right&quot;, va=&quot;bottom&quot;, fontsize=12)
+plt.ylabel(&quot;radial velocity [m/s]&quot;)
+plt.xlabel(&quot;phase&quot;);
+</code></pre>
+<p><img src="output_17_0.png" alt="png"></p>
+<p>Now, starting from the MAP coordinates, we&rsquo;ll run 4 parallel MCMC chains of 2000 steps using the default settings in Stan. By default, Stan discards 50% of the chain as &ldquo;warmup&rdquo; so we&rsquo;ll end up with 4000 samples (1000 from each chain).</p>
+<pre><code class="language-python">strt = time.time()
+fit = model.sampling(iter=2000, data=data, init=lambda *args: best[&quot;par&quot;])
+print(&quot;Sampling took {0:.1f} seconds&quot;.format(time.time() - strt))
+</code></pre>
+<pre><code>Sampling took 568.4 seconds
+</code></pre>
+<p>PyStan doesn&rsquo;t really provide a very flexible interface for looking at convergence diagnostics of the MCMC chains and if we use the default method, the output would be longer than this whole blog post! So the following cell hacks the standard diagnostics output to only show the first couple of lines. This is enough for us to get a sense for how things went.</p>
+<pre><code class="language-python">lines = fit.__str__().splitlines()
+print(&quot;\n&quot;.join(lines[:19] + lines[-5:]))
+</code></pre>
+<pre><code>Inference for Stan model: anon_model_8a556093ae546532f90fa3f7e850eea0.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+              mean se_mean     sd   2.5%    25%    50%    75%  97.5%  n_eff   Rhat
+log_K         4.02  1.6e-4 9.3e-3    4.0   4.01   4.02   4.03   4.04   3477    1.0
+log_P         1.44  1.6e-7 9.0e-6   1.44   1.44   1.44   1.44   1.44   3284    nan
+phi            0.4  1.7e-4 9.8e-3   0.38   0.39    0.4    0.4   0.42   3460    1.0
+e             0.01  2.8e-4 7.8e-3 4.2e-4 4.2e-3 9.1e-3   0.02   0.03    799    1.0
+w_vec[0]      0.25    0.02   0.64  -0.99  -0.24   0.42   0.81    1.0   1242    1.0
+w_vec[1]      0.38    0.02   0.62  -0.98  -0.02   0.62    0.9    1.0   1277    1.0
+log_jitter   -4.65     0.1   3.07  -9.69  -7.31  -4.69  -2.02   0.44   1029    1.0
+rv0          -1.81  7.0e-3   0.38  -2.56  -2.06  -1.82  -1.56  -1.06   2944    1.0
+rv_trend     -1.59  3.9e-3   0.19  -1.96  -1.71  -1.58  -1.46  -1.21   2440    1.0
+n             1.49  2.3e-7 1.3e-5   1.49   1.49   1.49   1.49   1.49   3284    nan
+K            55.66  8.7e-3   0.52  54.65  55.32  55.66   56.0  56.69   3475    1.0
+w             0.58    0.03   1.39  -2.84  -0.03   0.83   1.48   2.84   2150    1.0
+jitter2       0.21    0.01   0.78 3.8e-9 4.5e-7 8.5e-5   0.02   2.41   4000    1.0
+t0            0.66    0.02   0.93  -1.65   0.25   0.82   1.26   2.17   2147    1.0
+
+Samples were drawn using NUTS at Fri May  5 11:06:24 2017.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
+<p>From this, we can see that the sampling for most of the parameters has converged. I think that the <code>Rhat = nan</code> for the log period is OK and it has something to do with the precision with which <code>Rhat</code> is computed compared to the fractional posterior uncertainty on the period.</p>
+<p>Now, let&rsquo;s make some plots of our results. First, let&rsquo;s make a <a href="http://corner.readthedocs.io/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>corner plot</a>
+ of the posterior samples.</p>
+<pre><code class="language-python">params = [&quot;log_P&quot;, &quot;K&quot;, &quot;e&quot;]
+samples = pd.DataFrame(fit.extract(permuted=True, pars=params))
+samples[&quot;period&quot;] = np.exp(samples[&quot;log_P&quot;])
+samples = np.array(samples[[&quot;period&quot;, &quot;K&quot;, &quot;e&quot;]])
+labels = [&quot;period [days]&quot;, &quot;semi-amplitude [m/s]&quot;, &quot;eccentricity&quot;]
+corner.corner(samples, labels=labels);
+</code></pre>
+<p><img src="output_23_0.png" alt="png"></p>
+<p>Another good plot is the posterior model predictions overplotted on the data. In the following figure, the green &ldquo;line&rdquo; is actually a <em>contour</em> showing the 68% credible region for the model RV as a function of phase.</p>
+<pre><code class="language-python">samples = fit.extract(permuted=True)
+pred = samples[&quot;rv_pred&quot;]
+phase = np.arange(pred.shape[1]) / (pred.shape[1]-1)
+
+q = np.percentile(pred, [16, 50, 84], axis=0)
+plt.plot(phase, q[1], color=&quot;g&quot;)
+plt.fill_between(phase, q[0], q[2], color=&quot;g&quot;, alpha=0.3)
+period = np.exp(best[&quot;par&quot;][&quot;log_P&quot;])
+plt.errorbar((t/period) % 1.0, rv - trend, yerr=yerr, fmt=&quot;.k&quot;, label=&quot;data&quot;, lw=1, ms=4)
+plt.xlim(0, 1)
+plt.ylim(-110, 110)
+plt.annotate(&quot;period = {0:.6f} days&quot;.format(period),
+             xy=(1, 0), xycoords=&quot;axes fraction&quot;,
+             xytext=(-5, 5), textcoords=&quot;offset points&quot;,
+             ha=&quot;right&quot;, va=&quot;bottom&quot;, fontsize=12)
+plt.ylabel(&quot;radial velocity [m/s]&quot;)
+plt.xlabel(&quot;phase&quot;);
+</code></pre>
+<p><img src="output_25_0.png" alt="png"></p>
+<h2 id="results--summary">Results &amp; summary<a class="anchor" href="#results--summary">#</a></h2>
+<p>Now that we have a sufficiently converged MCMC chain, we can compare our results to the literature values. In particular, let&rsquo;s look at the measured period and semi-amplitude. The literature values of these properties are (<a href="http://adsabs.harvard.edu/abs/2006ApJ...646..505B" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Butler et al. 2006</a>
+):</p>
+<p>$$
+P = 4.230785 \pm 0.000036,\mathrm{days} \quad \mathrm{and} \quad K = 55.94 \pm 0.69,\mathrm{m/s}
+$$</p>
+<p>The constraints that we get based on our MCMC chains are:</p>
+<pre><code class="language-python">periods = np.exp(samples[&quot;log_P&quot;])
+print(&quot;P = {0:.6f} ± {1:.6f}&quot;.format(np.mean(periods),  np.std(periods)))
+amps = np.exp(samples[&quot;log_K&quot;])
+print(&quot;K = {0:.2f} ± {1:.2f}&quot;.format(np.mean(amps),  np.std(amps)))
+</code></pre>
+<pre><code>P = 4.230783 ± 0.000038
+K = 55.66 ± 0.52
+</code></pre>
+<p>These results are in good agreement with the published values based on the same dataset. The error bars on the semi-amplitude are somewhat smaller based on our analysis, but I haven&rsquo;t had a chance to track down exactly why that might be and it&rsquo;s probably beyond the scope of this post.</p>
+<p>The fact that we get consistent results does indicate that this method is working, but the real point of this blog post was to demonstrate how to use external C++ functions for MCMC sampling with PyStan. I imagine this feature being useful in a few situations and the lack of this feature was the main reason why I&rsquo;ve been hesitant to use Stan in the past. The two main use cases that I see are:</p>
+<ol>
+<li>I have a full model implemented in C or C++ already and I don&rsquo;t want to reimplement the code in the Stan language, and</li>
+<li>I have a component of the model that requires special functions or some sort of numerical solution that isn&rsquo;t implemented in the core Stan language, but I can compute the gradients analytically.</li>
+</ol>
+<p>I certainly have problems in my own research that have this structre and I hope that this discussion will be useful for others in the same situation.</p>
+<h2 id="postscript-using-stan-autodiff-in-the-external-function">Postscript: Using Stan autodiff in the external function<a class="anchor" href="#postscript-using-stan-autodiff-in-the-external-function">#</a></h2>
+<p>In the previous discussion, we assumed that you could easily compute the gradient of your external C++ function. I expect that this will probably be the most common situation because you could probably write your function in Stan directly instead of C++ if that&rsquo;s not what you want. But, for completeness, I wanted to include a demonstration of how you can use Stan&rsquo;s autodiff library to compute the gradients of your function automatically. Here&rsquo;s how we would update our example from above to use autodiff instead of analytic gradients:</p>
+<pre><code class="language-python">with open(&quot;kepler_autodiff.hpp&quot;, &quot;w&quot;) as f:
+    f.write(&quot;&quot;&quot;
+template &lt;typename T1, typename T2&gt;
+typename boost::math::tools::promote_args&lt;T1, T2&gt;::type
+kepler (const T1&amp; M, const T2&amp; e, std::ostream* pstream) {
+  typedef typename boost::math::tools::promote_args&lt;T1, T2&gt;::type T;
+
+  // Check for un-physical parameters.
+  if (e &lt; T2(0.0) || e &gt;= T2(1.0))
+    domain_error(&quot;kepler&quot;, &quot;eccentricity is&quot;, e, &quot;&quot;);
+
+  T E0 = M, E = M;
+  for (int i = 0; i &lt; 200; ++i) {
+    T g = E0 - e * sin(E0) - M,
+      gp = T(1.0) - e * cos(E0);
+    E = E0 - g / gp;
+
+    // Check for convergence.
+    if (abs((E - E0) / E) &lt;= 1.234e-10) return E;
+
+    E0 = E;
+  }
+  
+  // If we get here, we didn't converge, but return the best estimate.
+  return E;
+}
+
+&quot;&quot;&quot;)
+    
+model_autodiff = pystan.StanModel(model_code=model_code, allow_undefined=True,
+                                  includes=[&quot;kepler_autodiff.hpp&quot;],
+                                  include_dirs=[&quot;.&quot;])
+</code></pre>
+<pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_8a556093ae546532f90fa3f7e850eea0 NOW.
+</code></pre>
+
+
+              
+                  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script>
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/exopop/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">An experiment in open science: exoplanet population inference</span>
+    </a>
+  
+
+  
+    <a class="pagination__item" href="https://dfm.io/posts/fitting-a-plane/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >Fitting a plane to data</span>
+    </a>
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="GitHub"
+         href="https://github.com/dfm"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Email"
+         href="mailto:foreman.mackey@gmail.com"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2021</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>

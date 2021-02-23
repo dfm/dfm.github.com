@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dan Foreman-Mackey</title>
+    <link>https://dfm.io/</link>
+    <description>Recent content on Dan Foreman-Mackey</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© {year}</copyright>
+    <lastBuildDate>Tue, 15 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PyMC3 &#43; PyTorch</title>
+      <link>https://dfm.io/posts/pymc-pytorch/</link>
+      <pubDate>Tue, 15 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/pymc-pytorch/</guid>
+      <description>the second most ambitious crossover event in history</description>
+    </item>
+    
+    <item>
+      <title>Dense mass matrices for PyMC3</title>
+      <link>https://dfm.io/posts/pymc3-mass-matrix/</link>
+      <pubDate>Thu, 11 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/pymc3-mass-matrix/</guid>
+      <description>improving the performance of PyMC3 on problems with correlated parameters</description>
+    </item>
+    
+    <item>
+      <title>emcee &#43; PyMC3</title>
+      <link>https://dfm.io/posts/emcee-pymc3/</link>
+      <pubDate>Tue, 21 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/emcee-pymc3/</guid>
+      <description>sampling models defined in PyMC3 using emcee</description>
+    </item>
+    
+    <item>
+      <title>PyMC3 &#43; TensorFlow</title>
+      <link>https://dfm.io/posts/pymc-tensorflow/</link>
+      <pubDate>Thu, 02 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/pymc-tensorflow/</guid>
+      <description>the most ambitious crossover event in history</description>
+    </item>
+    
+    <item>
+      <title>Autocorrelation time estimation</title>
+      <link>https://dfm.io/posts/autocorr/</link>
+      <pubDate>Mon, 16 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/autocorr/</guid>
+      <description>this is one of the trickiest parts of any MCMC analysis</description>
+    </item>
+    
+    <item>
+      <title>Continuous integration of academic papers</title>
+      <link>https://dfm.io/posts/travis-latex/</link>
+      <pubDate>Wed, 12 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/travis-latex/</guid>
+      <description>keeping an up-to-date build of your TeX source using GitHub and Travis</description>
+    </item>
+    
+    <item>
+      <title>Fitting a plane to data</title>
+      <link>https://dfm.io/posts/fitting-a-plane/</link>
+      <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/fitting-a-plane/</guid>
+      <description>with general Gaussian measurement covariances</description>
+    </item>
+    
+    <item>
+      <title>Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets</title>
+      <link>https://dfm.io/posts/stan-c&#43;&#43;/</link>
+      <pubDate>Thu, 04 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/stan-c&#43;&#43;/</guid>
+      <description>The key feature that was missing from PyStan</description>
+    </item>
+    
+    <item>
+      <title>An experiment in open science: exoplanet population inference</title>
+      <link>https://dfm.io/posts/exopop/</link>
+      <pubDate>Mon, 06 Jul 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/exopop/</guid>
+      <description>Let&amp;rsquo;s see if we can reproduce a paper using only public data!</description>
+    </item>
+    
+    <item>
+      <title>The Hack Day at AAS 225</title>
+      <link>https://dfm.io/posts/aas-hack-day/</link>
+      <pubDate>Sun, 18 Jan 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/aas-hack-day/</guid>
+      <description>The wrap-up post from the hack day at the 225th AAS meeting</description>
+    </item>
+    
+    <item>
+      <title>Mixture Models</title>
+      <link>https://dfm.io/posts/mixture-models/</link>
+      <pubDate>Fri, 12 Dec 2014 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/mixture-models/</guid>
+      <description>A practical discussion of mixture models</description>
+    </item>
+    
+    <item>
+      <title>The Histogram (Part 1)</title>
+      <link>https://dfm.io/posts/histogram1/</link>
+      <pubDate>Tue, 29 Jul 2014 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/histogram1/</guid>
+      <description>Thousands of words about histograms (part 1)</description>
+    </item>
+    
+    <item>
+      <title>Python modules in C</title>
+      <link>https://dfm.io/posts/python-c-extensions/</link>
+      <pubDate>Fri, 03 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/python-c-extensions/</guid>
+      <description>How to roll your own Python modules in C</description>
+    </item>
+    
+    <item>
+      <title>Dan Foreman-Mackey</title>
+      <link>https://dfm.io/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/about/</guid>
+      <description>I&amp;rsquo;m an Associate Research Scientist at the Flatiron Institute &amp;rsquo;s Center for Computational Astrophysics . My main research interest is the application of probabilistic data analysis techniques to solve fundamental problems in astronomy. These days, I&amp;rsquo;m mostly using time domain surveys to discover new exoplanets, interpret the underlying population of these planets, and learn more about the variability of stars. I am also interested in the development of scientific software and open-source practices.</description>
+    </item>
+    
+  </channel>
+</rss>

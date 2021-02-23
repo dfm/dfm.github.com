@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>PyMC3 &#43; PyTorch | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="PyMC3 &#43; PyTorch" />
+  <meta name="twitter:description" content=""/>
+  <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
+  <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/pymc-pytorch\/",
+      "name": "PyMC3 \u002b PyTorch",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/"> home</a>
+      </li>
+    
+      <li>
+        <a  href="/about">about</a>
+      </li>
+    
+      <li>
+        <a  href="/posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">PyMC3 &#43; PyTorch</h1>
+            <time datetime="2019-10-15 00:00:00 &#43;0000 UTC" class="post__date">Oct 15 2019</time> 
+          </header>
+          <article class="post__content">
+              
+<p>This post is a small extension to <a href="../pymc-tensorflow" 
+  
+  
+>my previous post</a>
+ where I demonstrated that it was possible to combine TensorFlow with PyMC3 to take advantage of the modeling capabilities of TensorFlow while still using the powerful inference engine provided by PyMC3.
+The basic procedure involved writing a custom Theano operation that understood how to evaluate a TensorFlow tensor.
+In this post, I provide a similar snippet that can be used to combine PyTorch and PyMC3 to a similar end.</p>
+<p>One reason why I&rsquo;m interested in these experiments is because I want to use these tools in a fundamentally different way than some other users.
+In particular, I spend a lot of my time writing custom ops to extend the modeling languages provided by the standard model building languages since the physically motivated models that I&rsquo;m interested in fitting often aren&rsquo;t easily or efficiently implemented using the existing stack.
+For example, I recently release the <a href="http://exoplanet.dfm.io/en/stable/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>&ldquo;exoplanet&rdquo; library</a>
+ which is an extension to PyMC3 that provides much of the custom functionality needed for fitting astronomical time series data sets.
+I chose PyMC3 even though I knew that Theano was deprecated because I found that it had the best combination of powerful inference capabilities and an extensible interface.
+With the development of PyMC4, it&rsquo;s not clear that my use case will be well supported since the sampling will be so tightly embedded in TensorFlow.
+Furthermore, I don&rsquo;t want to be locked into using TensorFlow just so that I can take advantage of PyMC4&rsquo;s inference algorithms.
+Instead, I&rsquo;m interested in understanding how feasible it would be to fork the inference engine part of PyMC3 to build a Python-based inference library that could be used for inference with models defined in TensorFlow-probability, Pyro, Jax, or whatever comes next without a full re-write.
+My key thought here is that I don&rsquo;t think that the modeling and inference components of a probabilistic modeling stack need to be as tightly integrated as most existing packages are.</p>
+<p>This post doesn&rsquo;t answer the question, but I thought that it was worth sharing anyways.
+As in the TensorFlow post, I&rsquo;ll demonstrate this idea using linear regression.
+Take a look <a href="../pymc-tensorflow" 
+  
+  
+>at the previous post</a>
+ for more details.
+First, let&rsquo;s generate the same simulated data:</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+true_params = np.array([0.5, -2.3, -0.23])
+
+N = 50
+t = np.linspace(0, 10, 2)
+x = np.random.uniform(0, 10, 50)
+y = x * true_params[0] + true_params[1]
+y_obs = y + np.exp(true_params[-1]) * np.random.randn(N)
+
+plt.plot(x, y_obs, &quot;.k&quot;, label=&quot;observations&quot;)
+plt.plot(t, true_params[0]*t + true_params[1], label=&quot;truth&quot;)
+plt.xlabel(&quot;x&quot;)
+plt.ylabel(&quot;y&quot;)
+plt.legend(fontsize=14);
+</code></pre>
+<p><img src="output_3_0.png" alt="png"></p>
+<p>Next, let&rsquo;s implement the likelihood function for this simple linear model using PyTorch.</p>
+<p><strong>Disclaimer:</strong> I&rsquo;m definitely not a PyTorch expert so there might be a better way to do this, but this should at least demonstrate the idea.</p>
+<pre><code class="language-python">import torch
+
+class LinearModel(torch.nn.Module):
+    
+    def __init__(self):
+        super(LinearModel, self).__init__()
+        
+        self.m = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
+        self.b = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
+        self.logs = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
+        
+    def forward(self, x, y):
+        mean = self.m * x + self.b
+        loglike = -0.5 * torch.sum((y - mean) ** 2 * torch.exp(-2 * self.logs) + 2 * self.logs)
+        return loglike
+</code></pre>
+<p>Now, here&rsquo;s a custom Theano Op that knows how to evaluate a PyTorch <em>scalar</em> and its gradient.
+It would be possible to extend this work for arbitrary PyTorch tensors, but it would take a bit more book keeping.</p>
+<pre><code class="language-python">import theano
+import theano.tensor as tt
+
+class TorchOp(tt.Op):
+    
+    def __init__(self, module, params, args=None):
+        self.module = module
+        self.params = list(params)
+        if args is None:
+            self.args = tuple()
+        else:
+            self.args = tuple(args)
+    
+    def make_node(self, *args):
+        if len(args) != len(self.params):
+            raise ValueError(&quot;dimension mismatch&quot;)
+        args = [tt.as_tensor_variable(a) for a in args]
+        return theano.gof.Apply(self, args, [tt.dscalar().type()] + [a.type() for a in args])
+    
+    def infer_shape(self, node, shapes):
+        return tuple([()] + list(shapes))
+    
+    def perform(self, node, inputs, outputs):
+        for p, value in zip(self.params, inputs):
+            p.data = torch.tensor(value)
+            if p.grad is not None:
+                p.grad.detach_()
+                p.grad.zero_()
+
+        result = self.module(*self.args)
+        result.backward()
+        
+        outputs[0][0] = result.detach().numpy()
+        for i, p in enumerate(self.params):
+            outputs[i+1][0] = p.grad.numpy()
+
+    def grad(self, inputs, gradients):
+        for i, g in enumerate(gradients[1:]):
+            if not isinstance(g.type, theano.gradient.DisconnectedType):
+                raise ValueError(
+                    &quot;can't propagate gradients wrt parameter {0}&quot;.format(i + 1)
+                )
+        return [gradients[0] * d for d in self(*inputs)[1:]]
+</code></pre>
+<p>Here&rsquo;s how we can combine these into a Theano op that knows how to evaluate the linear model using PyTorch:</p>
+<pre><code class="language-python"># Instantiate the PyTorch model
+model = torch.jit.script(LinearModel())
+
+# It's useful to select the parameters directly instead of using model.parameters()
+# so that we make sure that the order is as expected
+params = [model.m, model.b, model.logs]
+
+# The &quot;forward&quot; method of the torch op takes the data as well
+args = [torch.tensor(x, dtype=torch.double), torch.tensor(y_obs, dtype=torch.double)]
+
+# Finally put it all together
+op = TorchOp(model, params, args=args)
+</code></pre>
+<p>Now we&rsquo;re all set to use this in a PyMC3 model:</p>
+<pre><code class="language-python">import pymc3 as pm
+
+with pm.Model() as torch_model:
+    
+    m = pm.Uniform(&quot;m&quot;, -5, 5)
+    b = pm.Uniform(&quot;b&quot;, -5, 5)
+    logs = pm.Uniform(&quot;logs&quot;, -5, 5)
+
+    pm.Potential(&quot;obs&quot;, op(m, b, logs)[0])
+        
+    np.random.seed(6940)
+    torch_trace = pm.sample(1000, tune=5000, target_accept=0.9)
+</code></pre>
+<pre><code>Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [logs, b, m]
+Sampling 2 chains, 0 divergences: 100%|██████████| 12000/12000 [00:32&lt;00:00, 367.06draws/s]
+</code></pre>
+<p>Note that unlike the TensorFlow implementation, there&rsquo;s no problem using multiple cores with this model and we actually get more than a factor of two increase in efficiency (probably because PyTorch has less Python overhead per call).</p>
+<p>For comparison, we can reimplement the same model directly in PyMC3:</p>
+<pre><code class="language-python">with pm.Model() as pymc3_model:
+    
+    m = pm.Uniform(&quot;m&quot;, -5, 5)
+    b = pm.Uniform(&quot;b&quot;, -5, 5)
+    logs = pm.Uniform(&quot;logs&quot;, -5, 5)
+
+    pm.Normal(&quot;obs&quot;, mu=m*x + b, sd=pm.math.exp(logs), observed=y_obs)
+        
+    np.random.seed(6940)
+    pymc3_trace = pm.sample(1000, tune=5000, target_accept=0.9)
+</code></pre>
+<pre><code>Auto-assigning NUTS sampler...
+Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (2 chains in 2 jobs)
+NUTS: [logs, b, m]
+Sampling 2 chains, 0 divergences: 100%|██████████| 12000/12000 [00:15&lt;00:00, 779.79draws/s]
+</code></pre>
+<p>In this case, the PyMC3 model is about a factor of 2 faster than the PyTorch model, but this is a simple enough model that it&rsquo;s not really a fair comparison.
+I expect that this gap would close for more expensive models where the overhead is less important.
+Personally, I&rsquo;m willing to pay some performance penalty for the benefit of being able to use whichever modeling framework I want without serious compromises when it comes to inference capabilities.</p>
+<p>Finally, we can confirm that we got the same results (they should actually be <em>identical</em> because I used the same random number seed above):</p>
+<pre><code class="language-python">pm.summary(torch_trace)
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>mc_error</th>
+      <th>hpd_2.5</th>
+      <th>hpd_97.5</th>
+      <th>n_eff</th>
+      <th>Rhat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>m</th>
+      <td>0.481958</td>
+      <td>0.036578</td>
+      <td>0.001365</td>
+      <td>0.405873</td>
+      <td>0.549908</td>
+      <td>803.898354</td>
+      <td>1.000925</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>-2.225355</td>
+      <td>0.198432</td>
+      <td>0.007420</td>
+      <td>-2.588863</td>
+      <td>-1.801773</td>
+      <td>787.809183</td>
+      <td>1.000351</td>
+    </tr>
+    <tr>
+      <th>logs</th>
+      <td>-0.295540</td>
+      <td>0.102417</td>
+      <td>0.002933</td>
+      <td>-0.494024</td>
+      <td>-0.104418</td>
+      <td>1345.545739</td>
+      <td>1.000058</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<pre><code class="language-python">pm.summary(pymc3_trace)
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>mc_error</th>
+      <th>hpd_2.5</th>
+      <th>hpd_97.5</th>
+      <th>n_eff</th>
+      <th>Rhat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>m</th>
+      <td>0.481958</td>
+      <td>0.036578</td>
+      <td>0.001365</td>
+      <td>0.405873</td>
+      <td>0.549908</td>
+      <td>803.898354</td>
+      <td>1.000925</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>-2.225355</td>
+      <td>0.198432</td>
+      <td>0.007420</td>
+      <td>-2.588863</td>
+      <td>-1.801773</td>
+      <td>787.809183</td>
+      <td>1.000351</td>
+    </tr>
+    <tr>
+      <th>logs</th>
+      <td>-0.295540</td>
+      <td>0.102417</td>
+      <td>0.002933</td>
+      <td>-0.494024</td>
+      <td>-0.104418</td>
+      <td>1345.545739</td>
+      <td>1.000058</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Looks right to me!</p>
+<p>I think that this experiment seems pretty promising.
+It demonstrates that it is feasible to sample a model implemented in PyTorch using PyMC3 with some overhead.
+I expect that more expensive models like the ones I normally work on will be even more closely matched in terms of performance.
+There are still some open questions, but I think that there&rsquo;s enough here to sketch out a plan for a common Python inference library that could be used with models defined in any modeling framework that can be called from within Python.
+To zeroth order, I would like something that can do NUTS sampling where the interface is just a Python function that computes the log-probability and its derivative for a vector of parameters (and maybe some other functions for evaluating deterministics, etc.).
+In the long term, it would be awesome to reproduce other functionality of PyMC3 like ADVI, but I have less experience with that so I&rsquo;m not sure exactly what that would take.
+Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pictures of good dogs, etc.</p>
+
+
+              
+                  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script>
+              
+          </article>
+          
+
+<ul class="tags__list">
+    
+    <li class="tag__item">
+        <a class="tag__link" href="https://dfm.io/tags/pymc/">pymc</a>
+    </li></ul>
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/pymc3-mass-matrix/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">Dense mass matrices for PyMC3</span>
+    </a>
+  
+
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="GitHub"
+         href="https://github.com/dfm"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Email"
+         href="mailto:foreman.mackey@gmail.com"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2021</p>
+          </footer>
+          </div>
+      </div>
+      
+      <div class="toc-container">
+          
+        <nav id="TableOfContents"></nav>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+    <script src="/js/table-of-contents.js"></script>
+  
+
+
+</body>
+
+</html>
