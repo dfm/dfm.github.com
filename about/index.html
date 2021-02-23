@@ -2,7 +2,7 @@
 <html lang="en-us">
 
 <head>
-  <title>Dan Foreman-Mackey | Dan Foreman-Mackey</title>
+  <title>About | Dan Foreman-Mackey</title>
 
   <meta charset="UTF-8">
   <meta name="language" content="en">
@@ -15,7 +15,7 @@
   
   
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Dan Foreman-Mackey" />
+  <meta name="twitter:title" content="About" />
   <meta name="twitter:description" content=""/>
   <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
@@ -51,7 +51,7 @@
       "@context": "http://schema.org", 
       "@type": "WebSite", 
       "url": "https:\/\/dfm.io\/about\/",
-      "name": "Dan Foreman-Mackey",
+      "name": "About",
       "author": {
         "@type": "Person",
         "name": ""
@@ -104,11 +104,12 @@
       <div class="post__container">
         <div class="post">
           <header class="post__header">
-            <h1 id="post__title">Dan Foreman-Mackey</h1>
+            <h1 id="post__title">About</h1>
             
           </header>
           <article class="post__content">
               
+<h2 id="hi-im-dan-foreman-mackey">Hi, I&rsquo;m Dan Foreman-Mackey<a class="anchor" href="#hi-im-dan-foreman-mackey">#</a></h2>
 <p>I&rsquo;m an Associate Research Scientist at the <a href="https://www.simonsfoundation.org/flatiron/" 
   
    target="_blank" rel="noreferrer noopener" 
@@ -125,6 +126,108 @@ using time domain surveys to discover new exoplanets, interpret the underlying
 population of these planets, and learn more about the variability of stars. I am
 also interested in the development of scientific software and open-source
 practices.</p>
+<h2 id="code">Code<a class="anchor" href="#code">#</a></h2>
+<p>I write a lot of code for work and in my spare time. All my projects live in
+<a href="https://github.com/dfm" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>public repositories on GitHub</a>. Here are some of my most popular research codes:</p>
+<script id="code-template" type="x-tmpl-mustache">
+{{#codes}}
+<li>
+    <i><a href="{{homepageUrl}}">{{name}}</a></i> &mdash; {{description}}
+</li>
+{{/codes}}
+{{^codes}}
+Unable to load of software.
+{{/codes}}
+</script>
+<ul id="codelist"></ul>
+<h2 id="publications">Publications<a class="anchor" href="#publications">#</a></h2>
+<p>My full list of publications is available
+<a href="http://adsabs.harvard.edu/cgi-bin/nph-abs_connect?return_req=no_params&amp;author=Foreman-Mackey&amp;db_key=PRE" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>on ADS</a>
+but here are a few highlights:</p>
+<script id="pub-template" type="x-tmpl-mustache">
+{{#pubs}}
+<li>
+    {{authorsFormat}}, {{year}}, <a href="{{url}}"><i>{{title}}</i></a>.
+    {{#codeLink}}<br><small>[<a href="{{codeLink}}">code</a>]</small>{{/codeLink}}
+</li>
+{{/pubs}}
+{{^pubs}}
+Unable to load publication list.
+{{/pubs}}
+</script>
+<ul id="publist"></ul>
+<script src="https://unpkg.com/mustache@latest"></script>
+<script>
+  var codeMap = {
+    "10.1086/670067": "https://github.com/dfm/emcee",
+    "10.1088/0004-637X/795/1/64": "https://github.com/dfm/exopop",
+    "10.1088/0004-637X/806/2/215": "https://github.com/dfm/ketu",
+    "10.21105/joss.00024": "https://github.com/dfm/corner.py",
+    "10.3847/0004-6256/152/6/206": "https://github.com/dfm/peerless",
+    "10.3847/1538-3881/aa9332": "https://github.com/dfm/celerite",
+    "10.3847/2515-5172/aaaf6c": "https://github.com/dfm/celerite-grad",
+    "10.21105/joss.01864": "https://github.com/dfm/emcee"
+  };
+
+  function formatAuthors(authors) {
+    authors = authors.map(author => {
+      var tokens = author.split(", ");
+      if (tokens.length != 2) return author;
+      return tokens[1][0] + ". " + tokens[0];
+    });
+    if (authors.length == 1) {
+      return authors[0];
+    } else if (authors.length >= 5) {
+      return authors.slice(0, 4).join(", ") + ", et al.";
+    }
+    return authors.slice(0, authors.length - 1).join(", ") + ", and " + authors[authors.length - 1];
+  }
+
+  (() => {
+    var codeTemplate = document.getElementById("code-template").innerHTML;
+    fetch("https://raw.githubusercontent.com/dfm/cv/main/data/repos.json")
+      .then(response => response.json())
+      .then(data => {
+        data = data.data.user.pinnedItems.edges.map(value => value.node);
+        var rendered = Mustache.render(codeTemplate, { codes: data });
+        document.getElementById("codelist").innerHTML = rendered;
+      })
+      .catch(() => {
+        var rendered = Mustache.render(codeTemplate, { codes: [] });
+        document.getElementById("codelist").innerHTML = rendered;
+      });
+
+    var pubTemplate = document.getElementById("pub-template").innerHTML;
+    fetch("https://raw.githubusercontent.com/dfm/cv/main/data/pubs.json")
+      .then(response => response.json())
+      .then(data => {
+        // Only first author
+        data = data.filter(value => {
+          return value.authors[0].startsWith("Foreman-Mackey") && value.doctype == "article";
+        });
+
+        // Format authors
+        data = data.map(value => {
+          value.authorsFormat = formatAuthors(value.authors);
+          value.codeLink = codeMap[value.doi];
+          return value;
+        });
+
+        var rendered = Mustache.render(pubTemplate, { pubs: data });
+        document.getElementById("publist").innerHTML = rendered;
+      })
+      .catch(() => {
+        var rendered = Mustache.render(pubTemplate, { pubs: [] });
+        document.getElementById("publist").innerHTML = rendered;
+      });
+  })();
+</script>
 
 
               
