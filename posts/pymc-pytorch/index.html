@@ -38,7 +38,7 @@
     <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.35b42e22c6a654efa5c6265d0d8de2a6116ad7c29d8f155fbbcd218418218d6e.css" integrity="sha256-NbQuIsamVO&#43;lxiZdDY3iphFq18KdjxVfu80hhBghjW4="/>
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -109,24 +109,30 @@
           </header>
           <article class="post__content">
               
-<p>This post is a small extension to <a href="../pymc-tensorflow">my previous post</a> where I demonstrated that it was possible to combine TensorFlow with PyMC3 to take advantage of the modeling capabilities of TensorFlow while still using the powerful inference engine provided by PyMC3.
+<p>This post is a small extension to <a href="../pymc-tensorflow" 
+  
+  
+>my previous post</a> where I demonstrated that it was possible to combine TensorFlow with PyMC3 to take advantage of the modeling capabilities of TensorFlow while still using the powerful inference engine provided by PyMC3.
 The basic procedure involved writing a custom Theano operation that understood how to evaluate a TensorFlow tensor.
 In this post, I provide a similar snippet that can be used to combine PyTorch and PyMC3 to a similar end.</p>
-
 <p>One reason why I&rsquo;m interested in these experiments is because I want to use these tools in a fundamentally different way than some other users.
 In particular, I spend a lot of my time writing custom ops to extend the modeling languages provided by the standard model building languages since the physically motivated models that I&rsquo;m interested in fitting often aren&rsquo;t easily or efficiently implemented using the existing stack.
-For example, I recently release the <a href="http://exoplanet.dfm.io/en/stable/">&ldquo;exoplanet&rdquo; library</a> which is an extension to PyMC3 that provides much of the custom functionality needed for fitting astronomical time series data sets.
+For example, I recently release the <a href="http://exoplanet.dfm.io/en/stable/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>&ldquo;exoplanet&rdquo; library</a> which is an extension to PyMC3 that provides much of the custom functionality needed for fitting astronomical time series data sets.
 I chose PyMC3 even though I knew that Theano was deprecated because I found that it had the best combination of powerful inference capabilities and an extensible interface.
 With the development of PyMC4, it&rsquo;s not clear that my use case will be well supported since the sampling will be so tightly embedded in TensorFlow.
 Furthermore, I don&rsquo;t want to be locked into using TensorFlow just so that I can take advantage of PyMC4&rsquo;s inference algorithms.
 Instead, I&rsquo;m interested in understanding how feasible it would be to fork the inference engine part of PyMC3 to build a Python-based inference library that could be used for inference with models defined in TensorFlow-probability, Pyro, Jax, or whatever comes next without a full re-write.
 My key thought here is that I don&rsquo;t think that the modeling and inference components of a probabilistic modeling stack need to be as tightly integrated as most existing packages are.</p>
-
 <p>This post doesn&rsquo;t answer the question, but I thought that it was worth sharing anyways.
 As in the TensorFlow post, I&rsquo;ll demonstrate this idea using linear regression.
-Take a look <a href="../pymc-tensorflow">at the previous post</a> for more details.
+Take a look <a href="../pymc-tensorflow" 
+  
+  
+>at the previous post</a> for more details.
 First, let&rsquo;s generate the same simulated data:</p>
-
 <pre><code class="language-python">import numpy as np
 import matplotlib.pyplot as plt
 
@@ -146,13 +152,9 @@ plt.xlabel(&quot;x&quot;)
 plt.ylabel(&quot;y&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-
-<p><img src="output_3_0.png" alt="png" /></p>
-
+<p><img src="output_3_0.png" alt="png"></p>
 <p>Next, let&rsquo;s implement the likelihood function for this simple linear model using PyTorch.</p>
-
 <p><strong>Disclaimer:</strong> I&rsquo;m definitely not a PyTorch expert so there might be a better way to do this, but this should at least demonstrate the idea.</p>
-
 <pre><code class="language-python">import torch
 
 class LinearModel(torch.nn.Module):
@@ -169,10 +171,8 @@ class LinearModel(torch.nn.Module):
         loglike = -0.5 * torch.sum((y - mean) ** 2 * torch.exp(-2 * self.logs) + 2 * self.logs)
         return loglike
 </code></pre>
-
 <p>Now, here&rsquo;s a custom Theano Op that knows how to evaluate a PyTorch <em>scalar</em> and its gradient.
 It would be possible to extend this work for arbitrary PyTorch tensors, but it would take a bit more book keeping.</p>
-
 <pre><code class="language-python">import theano
 import theano.tensor as tt
 
@@ -217,9 +217,7 @@ class TorchOp(tt.Op):
                 )
         return [gradients[0] * d for d in self(*inputs)[1:]]
 </code></pre>
-
 <p>Here&rsquo;s how we can combine these into a Theano op that knows how to evaluate the linear model using PyTorch:</p>
-
 <pre><code class="language-python"># Instantiate the PyTorch model
 model = torch.jit.script(LinearModel())
 
@@ -233,9 +231,7 @@ args = [torch.tensor(x, dtype=torch.double), torch.tensor(y_obs, dtype=torch.dou
 # Finally put it all together
 op = TorchOp(model, params, args=args)
 </code></pre>
-
 <p>Now we&rsquo;re all set to use this in a PyMC3 model:</p>
-
 <pre><code class="language-python">import pymc3 as pm
 
 with pm.Model() as torch_model:
@@ -249,18 +245,14 @@ with pm.Model() as torch_model:
     np.random.seed(6940)
     torch_trace = pm.sample(1000, tune=5000, target_accept=0.9)
 </code></pre>
-
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
 Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [logs, b, m]
 Sampling 2 chains, 0 divergences: 100%|██████████| 12000/12000 [00:32&lt;00:00, 367.06draws/s]
 </code></pre>
-
 <p>Note that unlike the TensorFlow implementation, there&rsquo;s no problem using multiple cores with this model and we actually get more than a factor of two increase in efficiency (probably because PyTorch has less Python overhead per call).</p>
-
 <p>For comparison, we can reimplement the same model directly in PyMC3:</p>
-
 <pre><code class="language-python">with pm.Model() as pymc3_model:
     
     m = pm.Uniform(&quot;m&quot;, -5, 5)
@@ -272,37 +264,32 @@ Sampling 2 chains, 0 divergences: 100%|██████████| 12000/120
     np.random.seed(6940)
     pymc3_trace = pm.sample(1000, tune=5000, target_accept=0.9)
 </code></pre>
-
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
 Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [logs, b, m]
 Sampling 2 chains, 0 divergences: 100%|██████████| 12000/12000 [00:15&lt;00:00, 779.79draws/s]
 </code></pre>
-
 <p>In this case, the PyMC3 model is about a factor of 2 faster than the PyTorch model, but this is a simple enough model that it&rsquo;s not really a fair comparison.
 I expect that this gap would close for more expensive models where the overhead is less important.
 Personally, I&rsquo;m willing to pay some performance penalty for the benefit of being able to use whichever modeling framework I want without serious compromises when it comes to inference capabilities.</p>
-
 <p>Finally, we can confirm that we got the same results (they should actually be <em>identical</em> because I used the same random number seed above):</p>
-
 <pre><code class="language-python">pm.summary(torch_trace)
 </code></pre>
-
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -350,24 +337,22 @@ Personally, I&rsquo;m willing to pay some performance penalty for the benefit of
   </tbody>
 </table>
 </div>
-
 <pre><code class="language-python">pm.summary(pymc3_trace)
 </code></pre>
-
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -415,9 +400,7 @@ Personally, I&rsquo;m willing to pay some performance penalty for the benefit of
   </tbody>
 </table>
 </div>
-
 <p>Looks right to me!</p>
-
 <p>I think that this experiment seems pretty promising.
 It demonstrates that it is feasible to sample a model implemented in PyTorch using PyMC3 with some overhead.
 I expect that more expensive models like the ones I normally work on will be even more closely matched in terms of performance.
@@ -430,15 +413,39 @@ Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pi
               
                   
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-            showMathMenu: false, //disables context menu
-            tex2jax: {
-            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
-           }
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ["script", "noscript", "style", "textarea", "pre"],
+    },
+  };
+
+  window.addEventListener("load", (event) => {
+    document.querySelectorAll("mjx-container").forEach(function (x) {
+      x.parentElement.classList += "has-jax";
     });
+  });
 </script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script
+  type="text/javascript"
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+></script>
+
               
           </article>
           
@@ -468,15 +475,6 @@ Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pi
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
-        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
-      </a>
-    
-  
-     
-    
       <a class="social-icons__link" rel="me" title="GitHub"
          href="https://github.com/dfm"
          target="_blank" rel="noopener">
@@ -490,6 +488,15 @@ Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pi
          href="mailto:foreman.mackey@gmail.com"
          target="_blank" rel="noopener">
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
      

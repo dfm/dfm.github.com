@@ -38,7 +38,7 @@
     <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.35b42e22c6a654efa5c6265d0d8de2a6116ad7c29d8f155fbbcd218418218d6e.css" integrity="sha256-NbQuIsamVO&#43;lxiZdDY3iphFq18KdjxVfu80hhBghjW4="/>
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -109,27 +109,36 @@
           </header>
           <article class="post__content">
               
-
-
 <blockquote>
-<p>This post can be cited with the DOI: <a href="http://dx.doi.org/10.5281/zenodo.15856">10.5281/zenodo.15856</a></p>
+<p>This post can be cited with the DOI: <a href="http://dx.doi.org/10.5281/zenodo.15856" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>10.5281/zenodo.15856</a></p>
 </blockquote>
-
-<p>There are a lot of reasons why you might use a mixture model and there is a <a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20">huge</a> <a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20">related</a> <a href="http://arxiv.org/abs/1008.4686">literature</a>. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.</p>
-
+<p>There are a lot of reasons why you might use a mixture model and there is a <a href="http://www.amazon.com/gp/product/1439840954?tag=danielfm-20" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>huge</a> <a href="http://www.amazon.com/gp/product/0387310738?tag=danielfm-20" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>related</a> <a href="http://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>literature</a>. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.</p>
 <p>In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&rsquo;s the language I&rsquo;ll use but the results are applicable to any other mixture model. The questions that I&rsquo;ll try to answer are:</p>
-
 <ol>
-<li>How do you derive the <em>marginalized</em> likelihood—as popularized by <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>, I think—and why would you want to?</li>
+<li>How do you derive the <em>marginalized</em> likelihood—as popularized by <a href="http://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hogg <em>et al.</em> (2010)</a>, I think—and why would you want to?</li>
 <li>How do you work out the mixture membership probabilities (or what is the probability that the point is an outlier) after using this model?</li>
 </ol>
-
 <h2 id="the-basic-model">The basic model<a class="anchor" href="#the-basic-model">#</a></h2>
-
-<p>The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don&rsquo;t care about! For simplicity, let&rsquo;s consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a> give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.</p>
-
+<p>The idea here is that you have some data drawn from the model that you care about and some data points that are outliers—drawn from a different model that you don&rsquo;t care about! For simplicity, let&rsquo;s consider a linear model. Everything that I derive here will be applicable to other more complicated models but it is easier to visualize the linear case. <a href="http://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hogg <em>et al.</em> (2010)</a> give a nice treatment of this linear model with slightly different notation but they miss a few useful points in the discussion.</p>
 <p>To start, let&rsquo;s generate some fake data:</p>
-
 <pre><code class="language-python">import numpy as np
 import matplotlib.pyplot as pl
 
@@ -155,9 +164,7 @@ m_bkg = np.random.rand(len(x)) &gt; true_frac
 y[m_bkg] = true_outliers[0]
 y[m_bkg] += np.sqrt(true_outliers[1]+yerr[m_bkg]**2) * np.random.randn(sum(m_bkg))
 </code></pre>
-
 <p>Here&rsquo;s what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don&rsquo;t account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).</p>
-
 <pre><code class="language-python"># First, fit the data and find the maximum likelihood model ignoring outliers.
 A = np.vander(x, 2)
 p = np.linalg.solve(np.dot(A.T, A / yerr[:, None]**2), np.dot(A.T, y / yerr**2))
@@ -180,56 +187,44 @@ pl.ylabel(&quot;$y$&quot;)
 pl.ylim(-2.5, 2.5)
 pl.xlim(-2.1, 2.1);
 </code></pre>
-
-<p><img src="output_6_0.png" alt="png" /></p>
-
-<p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let&rsquo;s generalize this model and add a binary flag $q_k$ for each data point $k$. If $q_k$ is zero, then the point is &ldquo;good&rdquo; and the likelihood is given by the usual Gaussian:</p>
-
-<p>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y<em>k - f</em>\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$</p>
-
-<p>where $f_\theta (x_k) = \theta_1 \, x_k + \theta_2$ is the linear model.</p>
-
-<p>Now, if $q_k = 1$ then the point is an outlier and the likelihood becomes:</p>
-
-<p>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) = \frac{1}{\sqrt{2\,\pi\,[\sigma_k^2 + \theta_4]}} \exp \left(-\frac{[y_k - \theta_3]^2}{2\,[\sigma_k^2 + \theta_4]}\right) \quad.$$</p>
-
-<p>I have made the simplifying assumption that the outliers are drawn from a single Gaussian with mean $\theta_3$ and variance $\theta_4$. From experience, the results aren&rsquo;t normally very sensitive to the choice of outlier model and the Gaussian model is often good enough but the following derivations will be valid for any model that you choose.</p>
-
+<p><img src="output_6_0.png" alt="png"></p>
+<p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let&rsquo;s generalize this model and add a binary flag <code>$q_k$</code> for each data point <code>$k$</code>. If <code>$q_k$</code> is zero, then the point is &ldquo;good&rdquo; and the likelihood is given by the usual Gaussian:</p>
+<div>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$</div>
+<p>where <code>$f_\theta (x_k) = \theta_1 \, x_k + \theta_2$</code> is the linear model.</p>
+<p>Now, if <code>$q_k = 1$</code> then the point is an outlier and the likelihood becomes:</p>
+<div>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) = \frac{1}{\sqrt{2\,\pi\,[\sigma_k^2 + \theta_4]}} \exp \left(-\frac{[y_k - \theta_3]^2}{2\,[\sigma_k^2 + \theta_4]}\right) \quad.$$</div>
+<p>I have made the simplifying assumption that the outliers are drawn from a single Gaussian with mean <code>$\theta_3$</code> and variance <code>$\theta_4$</code>. From experience, the results aren&rsquo;t normally very sensitive to the choice of outlier model and the Gaussian model is often good enough but the following derivations will be valid for any model that you choose.</p>
 <p>Under this new model, the full likelihood for the entire dataset becomes:</p>
-
-<p>$$p({y_k}\,|\,{x_k},\,{\sigma_k},\,\theta,\,{q<em>k}) = \prod</em>{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$</p>
-
-<p>where, for each term, the correct Gaussian is chosen depending on the value of $q_k$. To write this equation, I&rsquo;ve assumed that the data points are independent and if that&rsquo;s not true for your dataset then things get <em>a lot</em> harder.</p>
-
-<p>Now we could just take this likelihood function, apply priors, and use MCMC to find posterior constraints on $\theta$ and the ${q_k}$ flags but this would be hard for a few reasons. First, if you&rsquo;re used to using <a href="http://dfm.io/emcee">emcee</a> for your MCMC needs, you&rsquo;ll find that it&rsquo;s pretty hard to implement a model with discrete variables so you&rsquo;d probably need to learn some <a href="http://pymc-devs.github.io/pymc/">other</a> <a href="http://mc-stan.org/">sampler</a> and, honestly, it probably wouldn&rsquo;t work well for this problem either! Which brings us to our second problem. This problem is <em>very</em> high dimensional and the dimension scales with the number of data points. Without the outlier model, the problem is only two-dimensional but when we include the outliers, the model suddenly becomes $(4 + K)$-dimensional, where $K$ is the number of data points. This will always be hard! Therefore, in practice, it is useful to marginalize out the badly behaved parameters ($q_k$) and just sample in $\theta$.</p>
-
+<div>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta,\,\{q_k\}) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\sigma_k,\,\theta,\,q_k)$$</div>
+<p>where, for each term, the correct Gaussian is chosen depending on the value of <code>$q_k$</code>. To write this equation, I&rsquo;ve assumed that the data points are independent and if that&rsquo;s not true for your dataset then things get <em>a lot</em> harder.</p>
+<p>Now we could just take this likelihood function, apply priors, and use MCMC to find posterior constraints on <code>$\theta$</code> and the <code>$\{q_k\}$</code> flags but this would be hard for a few reasons. First, if you&rsquo;re used to using <a href="http://dfm.io/emcee" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>emcee</a> for your MCMC needs, you&rsquo;ll find that it&rsquo;s pretty hard to implement a model with discrete variables so you&rsquo;d probably need to learn some <a href="http://pymc-devs.github.io/pymc/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>other</a> <a href="http://mc-stan.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>sampler</a> and, honestly, it probably wouldn&rsquo;t work well for this problem either! Which brings us to our second problem. This problem is <em>very</em> high dimensional and the dimension scales with the number of data points. Without the outlier model, the problem is only two-dimensional but when we include the outliers, the model suddenly becomes <code>$(4 + K)$</code>-dimensional, where <code>$K$</code> is the number of data points. This will always be hard! Therefore, in practice, it is useful to marginalize out the badly behaved parameters (<code>$q_k$</code>) and just sample in <code>$\theta$</code>.</p>
 <h2 id="the-marginalized-likelihood">The marginalized likelihood<a class="anchor" href="#the-marginalized-likelihood">#</a></h2>
-
-<p>In order to marginalize out the ${q_k}$ flags, we need to choose a prior $p(q_k)$. After making this choice (I won&rsquo;t specialize yet), the marginalization can be written:</p>
-
-<p>$$p({y_k}\,|\,{x_k},\,{\sigma<em>k},\,\theta) = \sum</em>{{q<em>k}} \prod</em>{k=1}^{K} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k)$$</p>
-
-<p>where the sum is over all the possible permutations of the $q_k$ flags. If you squint for a second, you&rsquo;ll see that you can actually switch the order of the sum and product without changing anything. This follows from our assumption that the data points are independent. Therefore, we&rsquo;re left with the much simpler likelihood function</p>
-
-<p>$$p({y_k}\,|\,{x_k},\,{\sigma<em>k},\,\theta) = \prod</em>{k=1}^{K} p(y_k\,|\,x_k,\,\sigma_k,\,\theta)$$</p>
-
+<p>In order to marginalize out the <code>$\{q_k\}$</code> flags, we need to choose a prior <code>$p(q_k)$</code>. After making this choice (I won&rsquo;t specialize yet), the marginalization can be written:</p>
+<div>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \sum_{\{q_k\}} \prod_{k=1}^{K} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k)$$</div>
+<p>where the sum is over all the possible permutations of the <code>$q_k$</code> flags. If you squint for a second, you&rsquo;ll see that you can actually switch the order of the sum and product without changing anything. This follows from our assumption that the data points are independent. Therefore, we&rsquo;re left with the much simpler likelihood function</p>
+<div>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} p(y_k\,|\,x_k,\,\sigma_k,\,\theta)$$</div>
 <p>where</p>
-
-<p>$$p(y_k\,|\,x_k,\,\sigma<em>k,\,\theta) = \sum</em>{q_k} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k) \quad.$$</p>
-
-<p>The prior $p(q_k)$ could be different for every data point but it is often sufficient to choose a simple model like</p>
-
-<p>$$p(q_k) = \left {\begin{array}{ll}
-Q &amp; \mathrm{if}\,q_k=0 <br />
-1-Q &amp; \mathrm{if}\,q_k=1
-\end{array}\right.$$</p>
-
-<p>where $Q \in [0, 1]$ is a constant that sets the prior probability that a point is drawn from the foreground model. Chosing this model, we recover the (possibly) familiar likelihood function from <a href="http://arxiv.org/abs/1008.4686">Hogg <em>et al.</em> (2010)</a>:</p>
-
-<p>$$p({y_k}\,|\,{x_k},\,{\sigma<em>k},\,\theta) = \prod</em>{k=1}^{K} \left [ Q\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) + (1-Q)\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) \right ] \quad.$$</p>
-
+<div>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta) = \sum_{q_k} p(q_k) \, p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k) \quad.$$</div>
+<p>The prior <code>$p(q_k)$</code> could be different for every data point but it is often sufficient to choose a simple model like</p>
+<div>$$p(q_k) = \left \{\begin{array}{ll}
+Q & \mathrm{if}\,q_k=0 \\
+1-Q & \mathrm{if}\,q_k=1
+\end{array}\right.$$</div>
+<p>where <code>$Q \in [0, 1]$</code> is a constant that sets the prior probability that a point is drawn from the foreground model. Chosing this model, we recover the (possibly) familiar likelihood function from <a href="http://arxiv.org/abs/1008.4686" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hogg <em>et al.</em> (2010)</a>:</p>
+<div>$$p(\{y_k\}\,|\,\{x_k\},\,\{\sigma_k\},\,\theta) = \prod_{k=1}^{K} \left [ Q\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) + (1-Q)\,p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=1) \right ] \quad.$$</div>
 <p>This is a much easier model to sample so let&rsquo;s do that now:</p>
-
 <pre><code class="language-python">import emcee
 
 # Define the probabilistic model...
@@ -293,21 +288,15 @@ pos, _, _, _ = sampler.run_mcmc(p0, 500)
 sampler.reset()
 sampler.run_mcmc(pos, 1500);
 </code></pre>
-
 <p>This code should only take about a minute to run. Compare that to any attempt you&rsquo;ve ever made at sampling the same problem with another 15 or more parameters and you should be pretty stoked!</p>
-
 <p>Let&rsquo;s show the resulting parameter constraints and compare them to the <em>true</em> values (indicated in blue) used to generate the synthetic dataset. This should encourage us that we&rsquo;ve done something reasonable.</p>
-
 <pre><code class="language-python">import triangle
 labels = [&quot;$m$&quot;, &quot;$b$&quot;, &quot;$Q$&quot;, &quot;$M$&quot;, &quot;$\ln V$&quot;]
 truths = true_params + [true_frac, true_outliers[0], np.log(true_outliers[1])]
 triangle.corner(sampler.flatchain, bins=35, extents=bounds, labels=labels, truths=truths);
 </code></pre>
-
-<p><img src="output_13_0.png" alt="png" /></p>
-
+<p><img src="output_13_0.png" alt="png"></p>
 <p>Similarly, the predicted constraint on the linear model is:</p>
-
 <pre><code class="language-python"># Compute the quantiles of the predicted line and plot them.
 A = np.vander(x0, 2)
 lines = np.dot(sampler.flatchain[:, :2], A.T)
@@ -326,31 +315,21 @@ pl.ylabel(&quot;$y$&quot;)
 pl.ylim(-2.5, 2.5)
 pl.xlim(-2.1, 2.1);
 </code></pre>
-
-<p><img src="output_15_0.png" alt="png" /></p>
-
+<p><img src="output_15_0.png" alt="png"></p>
 <p>Great! Comparing the purple swath to the true line (shown in black), I think that we can all agree that this is a much better fit! But now, how do we label the points to decide which ones are outliers?</p>
-
 <h2 id="mixture-membership-probabilities">Mixture membership probabilities<a class="anchor" href="#mixture-membership-probabilities">#</a></h2>
-
-<p>Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn&rsquo;t we throw away a lot of information when we used the marginalized likelihood instead of sampling in the $q_k$ parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the <em>outlierness</em> of each point. This is a very common question when I suggest that people use this model so I wanted to show that you&rsquo;re actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!</p>
-
+<p>Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn&rsquo;t we throw away a lot of information when we used the marginalized likelihood instead of sampling in the <code>$q_k$</code> parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the <em>outlierness</em> of each point. This is a very common question when I suggest that people use this model so I wanted to show that you&rsquo;re actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!</p>
 <p>To be specific, the thing that we want to compute is:</p>
-
-<p>$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$</p>
-
-<p>the posterior probability of a specific point $k$ being good ($q_k=0$) given all the data. In this equation, I&rsquo;ve simplified the notation a bit and $y = {y_k}$ now indicates <em>all the data</em> and I&rsquo;m leaving out the implied ${x_k},\,{\sigma_k}$ on the right-hand side of every probability. To compute this, we&rsquo;ll need to evaluate the conditional probability</p>
-
-<p>$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q<em>k)}{\sum</em>{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$</p>
-
-<p>where the sum is over every allowed value of $q_k$. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee&rsquo;s <a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs">blobs feature</a> so it&rsquo;ll be ease to evaluate $p(q_k\,|\,y,\,\theta^{(n)})$ for each sample $\theta^{(n)}$ from the chain.</p>
-
-<p>Then, we need to realize that the Markov chain gave us samples $\theta^{(n)}$ from the probability distribution $p(\theta\,|\,y)$, so we can approximate the previous integral as</p>
-
-<p>$$p(q_k\,|\,y) = \int p(q<em>k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \approx \frac{1}{N}\sum</em>{n=1}^N p(q_k\,|\,y,\,\theta^{(n)}) \quad.$$</p>
-
+<div>$$p(q_k\,|\,y) = \int p(q_k,\,\theta\,|\,y)\,\mathrm{d}\theta = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \quad,$$</div>
+<p>the posterior probability of a specific point <code>$k$</code> being good (<code>$q_k=0$</code>) given all the data. In this equation, I&rsquo;ve simplified the notation a bit and <code>$y = \{y_k\}$</code> now indicates <em>all the data</em> and I&rsquo;m leaving out the implied <code>$\{x_k\},\,\{\sigma_k\}$</code> on the right-hand side of every probability. To compute this, we&rsquo;ll need to evaluate the conditional probability</p>
+<div>$$p(q_k\,|\,y,\,\theta) = \frac{p(q_k)\,p(y\,|\,\theta,\,q_k)}{\sum_{j} p(q_k=j)\,p(y\,|\,\theta,\,q_k=j)}$$</div>
+<p>where the sum is over every allowed value of <code>$q_k$</code>. Both the numerator and denominator are used when computing the marginalized likelihood so if we hang onto those, we can re-use them to compute the membership probabilities. In the example above, I stored these results using emcee&rsquo;s <a href="http://dan.iel.fm/emcee/current/user/advanced/#arbitrary-metadata-blobs" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>blobs feature</a> so it&rsquo;ll be ease to evaluate <code>$p(q_k\,|\,y,\,\theta^{(n)})$</code> for each sample <code>$\theta^{(n)}$</code> from the chain.</p>
+<p>Then, we need to realize that the Markov chain gave us samples <code>$\theta^{(n)}$</code> from the probability distribution <code>$p(\theta\,|\,y)$</code>, so we can approximate the previous integral as</p>
+<div>$$p(q_k\,|\,y) = \int p(q_k\,|\,y,\,\theta)\,p(\theta\,|\,y)\,\mathrm{d}\theta \approx \frac{1}{N}\sum_{n=1}^N p(q_k\,|\,y,\,\theta^{(n)}) \quad.$$</div>
 <p>Therefore, the posterior probaility of being an outlier or not can be computed by just taking the average of a bunch of values that we&rsquo;ve already computed! In practice, this would look like the following:</p>
-
 <pre><code class="language-python">norm = 0.0
 post_prob = np.zeros(len(x))
 for i in range(sampler.chain.shape[1]):
@@ -360,19 +339,13 @@ for i in range(sampler.chain.shape[1]):
         norm += 1
 post_prob /= norm
 </code></pre>
-
 <p>Therefore, from left to right, the marginalized posterior probability that each point is part of the foreground model is:</p>
-
 <pre><code class="language-python">print(&quot;, &quot;.join(map(&quot;{0:.3f}&quot;.format, post_prob)))
 </code></pre>
-
 <pre><code>0.357, 0.936, 0.000, 0.954, 0.000, 0.890, 0.885, 0.830, 0.858, 0.966, 0.000, 0.994, 0.995, 0.995, 0.979
 </code></pre>
-
 <p>This model works pretty well&hellip; so well, in fact, that the strong outliers are given nearly zero probability of being in the foreground model!</p>
-
 <p>Finally, it can be useful to label outliers on the final plot so let&rsquo;s use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!</p>
-
 <pre><code class="language-python"># Plot the predition.
 pl.fill_between(x0, quantiles[0], quantiles[1], color=&quot;#8d44ad&quot;, alpha=0.5)
 
@@ -391,25 +364,50 @@ pl.ylabel(&quot;$y$&quot;)
 pl.ylim(-2.5, 2.5)
 pl.xlim(-2.1, 2.1);
 </code></pre>
-
-<p><img src="output_22_0.png" alt="png" /></p>
-
-<p><strong>Acknowledgments</strong> &nbsp;
-<em>I&rsquo;d like to thank <a href="http://ruthang.us">Ruth Angus</a> for useful comments.</em></p>
+<p><img src="output_22_0.png" alt="png"></p>
+<p><strong>Acknowledgments</strong>  
+<em>I&rsquo;d like to thank <a href="http://ruthang.us" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Ruth Angus</a> for useful comments.</em></p>
 
 
               
                   
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-            showMathMenu: false, //disables context menu
-            tex2jax: {
-            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
-           }
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ["script", "noscript", "style", "textarea", "pre"],
+    },
+  };
+
+  window.addEventListener("load", (event) => {
+    document.querySelectorAll("mjx-container").forEach(function (x) {
+      x.parentElement.classList += "has-jax";
     });
+  });
 </script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script
+  type="text/javascript"
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+></script>
+
               
           </article>
           
@@ -439,15 +437,6 @@ pl.xlim(-2.1, 2.1);
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
-        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
-      </a>
-    
-  
-     
-    
       <a class="social-icons__link" rel="me" title="GitHub"
          href="https://github.com/dfm"
          target="_blank" rel="noopener">
@@ -461,6 +450,15 @@ pl.xlim(-2.1, 2.1);
          href="mailto:foreman.mackey@gmail.com"
          target="_blank" rel="noopener">
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
      
