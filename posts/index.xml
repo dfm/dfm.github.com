@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© 2014-{year} Dan Foreman-Mackey</copyright>
-    <lastBuildDate>Tue, 15 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 11 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Extending JAX with custom C&#43;&#43; and CUDA code</title>
+      <link>https://dfm.io/posts/extending-jax/</link>
+      <pubDate>Mon, 11 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/extending-jax/</guid>
+      <description>The primary version of this post can be found on GitHub: dfm/extending-jax  This repository is meant as a tutorial demonstrating the infrastructure required to provide custom ops in JAX when you have an existing implementation in C++ and, optionally, CUDA. I originally wanted to write this as a blog post, but there&amp;rsquo;s enough boilerplate code that I ended up deciding that it made more sense to just share it as a repo with the tutorial in the README, so here we are!</description>
+    </item>
+    
     <item>
       <title>PyMC3 &#43; PyTorch</title>
       <link>https://dfm.io/posts/pymc-pytorch/</link>
