@@ -1,94 +1,148 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Python modules in C by Dan Foreman-Mackey</title>
-    <meta id="viewport" name="viewport" content="width=500" />
-    <meta
-      name="description"
-      content="Dan Foreman-Mackey is an Associate Research Scientist at the Center for Computational Astrophysics in the Flatiron Institute at the Simons Foundation."
-    />
+<html lang="en-us">
+
+<head>
+  <title>Python modules in C | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Python modules in C" />
+  <meta name="twitter:description" content=""/>
+  <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
+  <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
 
 
-    <link rel="stylesheet" href="../../theme/css/normalize.css" type="text/css" />
-    <link rel="stylesheet" href="../../theme/css/base.css?v=2" type="text/css" />
-    <link rel="stylesheet" href="../../theme/css/code.css" type="text/css" />
-
-    <link rel="icon" type="image/png" href="../../theme/images/avatar.png" sizes="200x200" />
-    <link rel="icon" type="image/png" href="../../theme/images/favicon.png" sizes="32x32" />
-
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" integrity="sha256-47DEQpj8HBSa&#43;/TImW&#43;5JCeuQeRkm5NMpJWZG3hSuFU="/>
+  
+  
+   
+   
     
 
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/python-c-extensions\/",
+      "name": "Python modules in C",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/"> home</a>
+      </li>
+    
+      <li>
+        <a  href="/about">about</a>
+      </li>
+    
+      <li>
+        <a  href="/posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
 
 
+  <main>
+    
+    
 
-    <link rel="stylesheet" href="../../theme/css/article.css" type="text/css" />
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
-            TeX: { equationNumbers: { autoNumber: "all" } }
-        });
-    </script>
-    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  </head>
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">Python modules in C</h1>
+            <time datetime="2012-08-03 00:00:00 &#43;0000 UTC" class="post__date">Aug 3 2012</time> 
+          </header>
+          <article class="post__content">
+              
+<p>Writing your own C extensions to Python can seem like a pretty daunting task
+when you first get started. If you take a look at the <a href="http://docs.python.org/c-api/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Python/C API
+docs</a>
+ the details of reference counting and compilation are enough to
+make you go crazy. This is the main reason why <a href="http://www.cython.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>so</a>
+ <a href="http://www.swig.org/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>many</a>
 
-  <body>
-    <div class="icon-set">
-      <ul>
-        <li>
-          <a href="https://github.com/dfm"><img class="hdr-icon" src="../../theme/images/github.svg"/></a>
-        </li>
-        <li>
-          <a href="https://twitter.com/exoplaneteer"
-            ><img class="hdr-icon" src="../../theme/images/twitter.svg"
-          /></a>
-        </li>
-        <li>
-          <a href="mailto:foreman.mackey@gmail.com"
-            ><img class="hdr-icon" src="../../theme/images/gmail.svg"
-          /></a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="content">
-      <header>
-        <img src="../../theme/images/avatar.png" alt="me" />
-        <h1><a href="../../">Dan Foreman-Mackey</a></h1>
-        <ul>
-          <li><a href="../../#code">Code</a></li>
-          <li><a href="../../#pubs">Publications</a></li>
-          <li><a href="https://github.com/dfm/cv">CV</a></li>
-          <li><a href="../../posts/">Blog</a></li>
-        </ul>
-      </header>
-
-
-
-<section>
-    <div class="page-title">
-        <h1>Python modules in C</h1>
-        <p>August 03, 2012</p>
-    </div>
-    <p>Writing your own C extensions to Python can seem like a pretty daunting task
-when you first get started. If you take a look at the <a href="http://docs.python.org/c-api/">Python/C API
-docs</a> the details of reference counting and compilation are enough to
-make you go crazy. This is the main reason why <a href="http://www.cython.org/">so</a> <a href="http://www.swig.org/">many</a>
-<a href="http://docs.python.org/library/ctypes.html">options</a> exist for wrapping or compiling C code into Python without
+<a href="http://docs.python.org/library/ctypes.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>options</a>
+ exist for wrapping or compiling C code into Python without
 ever directly interacting with the API. That being said, I often find that
 all that I need to do is wrap a <em>single</em> C function that accepts a few
 doubles and returns another double. In this case, it seems crazy to generate
 the thousands of lines of C code required by automatic methods like Cython
-and SWIG. You might argue that these aesthetic issues don't provide
+and SWIG. You might argue that these aesthetic issues don&rsquo;t provide
 sufficient reason for diving into the rabbit hole that the C API seems to
-be—and maybe you'd be right—but I'm a stubborn coder and I don't mind
+be—and maybe you&rsquo;d be right—but I&rsquo;m a stubborn coder and I don&rsquo;t mind
 getting my hands a little dirty so I went for it. This was a few years ago
-and since then, I've developed a template module that suits my needs
+and since then, I&rsquo;ve developed a template module that suits my needs
 perfectly and it seems to make the extension writing process relatively
-painless so I thought that I'd share what I've learned here.</p>
-<p>I'm not going to claim that what I say here is a general introduction to
-writing C extensions because I don't feel qualified to do that but it
+painless so I thought that I&rsquo;d share what I&rsquo;ve learned here.</p>
+<p>I&rsquo;m not going to claim that what I say here is a general introduction to
+writing C extensions because I don&rsquo;t feel qualified to do that but it
 should be a sufficient tutorial for a scientific programmer (read: grad
 student) to get started and write a fully functional module for their
 research. In particular, this tutorial will be most useful for someone
@@ -96,103 +150,108 @@ who already has a chunk of code written in C and just wants to be able to
 call a few of those functions directly from within Python. Several people
 have specifically asked me about how to do this when they have legacy
 data analysis code that they would like to use with my Markov chain
-Monte Carlo package <a href="http://danfm.ca/emcee">emcee</a>. In that context,
+Monte Carlo package <a href="http://danfm.ca/emcee" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>emcee</a>
+. In that context,
 the C code is expected to return the likelihood of some data given some
 model parameters passed as doubles to the C function. This is the same
 format that would be needed if you just wanted to find the minimum
 chi-squared (or maximum likelihood) solution to a problem using something
 like
-<a href="http://docs.scipy.org/doc/scipy/reference/optimize.html">scipy.optimize</a>.</p>
-<h2>The Objective</h2>
-<p>To be concrete, let's consider a specific example: fitting a line
+<a href="http://docs.scipy.org/doc/scipy/reference/optimize.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>scipy.optimize</a>
+.</p>
+<h2 id="the-objective">The Objective<a class="anchor" href="#the-objective">#</a></h2>
+<p>To be concrete, let&rsquo;s consider a specific example: fitting a line
 (parameterized by a slope <em>m</em> and y intercept <em>b</em>) to some <em>N</em> noisy data
 points \( \{ x_n, y_n, \sigma_n \} \). In this case, the
 chi-squared function is given by:</p>
 <p>$$
 \chi^2 (m, b) = \sum_{n = 1} ^N \frac{[y_n -
-        (m \, x_n + b)]^2}{\sigma_n^2} \quad .
+(m , x_n + b)]^2}{\sigma_n^2} \quad .
 $$</p>
-<p>It's probably overkill to write this function in C but it'll do for our
+<p>It&rsquo;s probably overkill to write this function in C but it&rsquo;ll do for our
 purposes today. In C, the file <code>chi2.c</code> containing our function should look
 something like:</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
+<pre><code class="language-c">#include &quot;chi2.h&quot;
 
-<span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
-    <span class="kt">double</span> <span class="n">result</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">diff</span><span class="p">;</span>
+double chi2(double m, double b, double *x, double *y, double *yerr, int N) {
+    int n;
+    double result = 0.0, diff;
 
-    <span class="k">for</span> <span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">;</span> <span class="n">n</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">))</span> <span class="o">/</span> <span class="n">yerr</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
-        <span class="n">result</span> <span class="o">+=</span> <span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span><span class="p">;</span>
-    <span class="p">}</span>
+    for (n = 0; n &lt; N; n++) {
+        diff = (y[n] - (m * x[n] + b)) / yerr[n];
+        result += diff * diff;
+    }
 
-    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+    return result;
+}
+</code></pre>
 <p>And the corresponding header file <code>chi2.h</code> is simply:</p>
-<div class="highlight"><pre><span></span><code><span class="kt">double</span> <span class="nf">chi2</span><span class="p">(</span><span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">);</span>
-</code></pre></div>
-
+<pre><code class="language-c">double chi2(double m, double b, double *x, double *y, double *yerr, int N);
+</code></pre>
 <p>Now, our goal is to wrap this function so that we can call it from directly
 within Python.</p>
-<h2>The Wrapper</h2>
+<h2 id="the-wrapper">The Wrapper<a class="anchor" href="#the-wrapper">#</a></h2>
 <p>The code needed to write the wrapper module is another C file containing
 a few special Python functions. Conventionally, the names of C extensions
-begin with an underscore so let's call our module <code>_chi2</code> and write it in
+begin with an underscore so let&rsquo;s call our module <code>_chi2</code> and write it in
 a file <code>_chi2.c</code> (not to be confused with the <code>chi2.c</code> file that we wrote
 just a minute ago).</p>
 <p>In order to be able to access the C functions and types in the Python API,
 the first thing that we need to do is import the Python header. I also
-expect that we'll want to interact with <code>numpy</code> arrays and our <code>chi2</code>
-function as well so let's import those headers too:</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span> <span class="cpf">&lt;Python.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;numpy/arrayobject.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&quot;chi2.h&quot;</span><span class="cp"></span>
-</code></pre></div>
-
+expect that we&rsquo;ll want to interact with <code>numpy</code> arrays and our <code>chi2</code>
+function as well so let&rsquo;s import those headers too:</p>
+<pre><code class="language-c">#include &lt;Python.h&gt;
+#include &lt;numpy/arrayobject.h&gt;
+#include &quot;chi2.h&quot;
+</code></pre>
 <p>Next, we should write the
-<a href="http://www.python.org/dev/peps/pep-0257/">docstrings</a> for our module and
-the function that we're wrapping:</p>
-<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="kt">char</span> <span class="n">module_docstring</span><span class="p">[]</span> <span class="o">=</span>
-    <span class="s">&quot;This module provides an interface for calculating chi-squared using C.&quot;</span><span class="p">;</span>
-<span class="k">static</span> <span class="kt">char</span> <span class="n">chi2_docstring</span><span class="p">[]</span> <span class="o">=</span>
-    <span class="s">&quot;Calculate the chi-squared of some data given a model.&quot;</span><span class="p">;</span>
-</code></pre></div>
-
+<a href="http://www.python.org/dev/peps/pep-0257/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>docstrings</a>
+ for our module and
+the function that we&rsquo;re wrapping:</p>
+<pre><code class="language-c">static char module_docstring[] =
+    &quot;This module provides an interface for calculating chi-squared using C.&quot;;
+static char chi2_docstring[] =
+    &quot;Calculate the chi-squared of some data given a model.&quot;;
+</code></pre>
 <p>and declare the function:</p>
-<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">);</span>
-</code></pre></div>
-
-<p>This is the first time that we're seeing anything Python-specific. The
+<pre><code class="language-c">static PyObject *chi2_chi2(PyObject *self, PyObject *args);
+</code></pre>
+<p>This is the first time that we&rsquo;re seeing anything Python-specific. The
 type <code>PyObject</code> refers to all Python types. Any communication between the
 Python interpreter and your C code will be done by passing <code>PyObject</code>s so
 any function that you want to be able to call from Python must return one.
 Under the hood, <code>PyObject</code> is just a <code>struct</code> with a reference count and a
 pointer to the data contained within the object. This can be as simple as
-a <code>double</code> or <code>int</code> or as complicated as a fully functional Python class.
-Remember: <a href="http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html">everything is an object</a>.</p>
-<p>The name that I've given to the function (<code>chi2_chi2</code>) is also a matter of
-convention. From Python, we're going to call the function with the command
+a <code>double</code> or <code>int</code> or as complicated as a fully functional Python class.</p>
+<p>The name that I&rsquo;ve given to the function (<code>chi2_chi2</code>) is also a matter of
+convention. From Python, we&rsquo;re going to call the function with the command
 <code>_chi2.chi2</code> where <code>_chi2</code> is the name of the module and <code>chi2</code> is the name
-of the function. Since C doesn't have any concept of namespaces, the
+of the function. Since C doesn&rsquo;t have any concept of namespaces, the
 convention is to name your C functions with the form
 <code>{module_name}_{function_name}</code> and my preference is to leave out the
-leading underscore but it doesn't really matter either way.</p>
+leading underscore but it doesn&rsquo;t really matter either way.</p>
 <p>The arguments for the function are pretty standard fare. In our case the
 <code>self</code> object points to the module and the <code>args</code> object is a Python tuple
-of input arguments—we'll see how to parse them soon. It is also possible
+of input arguments—we&rsquo;ll see how to parse them soon. It is also possible
 to accept keyword arguments by including a third <code>PyObject</code> in the calling
-specification but let's not get into that here.</p>
-<p>Now, we'll specify what the members of this module will be. In this case
-there is only going to be one function (called <code>chi2</code>) so the "method
-definition" looks like:</p>
-<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">module_methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="p">{</span><span class="s">&quot;chi2&quot;</span><span class="p">,</span> <span class="n">chi2_chi2</span><span class="p">,</span> <span class="n">METH_VARARGS</span><span class="p">,</span> <span class="n">chi2_docstring</span><span class="p">},</span>
-    <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-
+specification but let&rsquo;s not get into that here.</p>
+<p>Now, we&rsquo;ll specify what the members of this module will be. In this case
+there is only going to be one function (called <code>chi2</code>) so the &ldquo;method
+definition&rdquo; looks like:</p>
+<pre><code class="language-c">static PyMethodDef module_methods[] = {
+    {&quot;chi2&quot;, chi2_chi2, METH_VARARGS, chi2_docstring},
+    {NULL, NULL, 0, NULL}
+};
+</code></pre>
 <p>More functions can be added by adding more lines like the second one. This
 second line contains all the info that the interpreter needs to link a Python
 call to the correct C function and call it in the right way. The
@@ -200,154 +259,179 @@ first string is the name of the function as it will be called from Python,
 the second object is the C function to link to and the last argument is the
 docstring for the function. The third argument <code>METH_VARARGS</code> means that the
 function only accepts positional arguments. If you wanted to support
-keyword arguments, you would need to change this to <a href="http://docs.python.org/extending/extending.html#the-module-s-method-table-and-initialization-function"><code>METH_VARARGS |
-METH_KEYWORDS</code></a>.</p>
+keyword arguments, you would need to change this to <a href="http://docs.python.org/extending/extending.html#the-module-s-method-table-and-initialization-function" 
+  
+   target="_blank" rel="noreferrer noopener" 
+><code>METH_VARARGS | METH_KEYWORDS</code></a>
+.</p>
 <p>The final step in initializing your new C module is to write an <code>init{name}</code>
 function. This function <strong>must</strong> be called <code>init_chi2</code> where <code>_chi2</code> is
 (of course) the name of the module.</p>
-<div class="highlight"><pre><span></span><code><span class="n">PyMODINIT_FUNC</span> <span class="nf">init_chi2</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span> <span class="o">=</span> <span class="n">Py_InitModule3</span><span class="p">(</span><span class="s">&quot;_chi2&quot;</span><span class="p">,</span> <span class="n">module_methods</span><span class="p">,</span> <span class="n">module_docstring</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
-        <span class="k">return</span><span class="p">;</span>
+<pre><code class="language-c">PyMODINIT_FUNC init_chi2(void)
+{
+    PyObject *m = Py_InitModule3(&quot;_chi2&quot;, module_methods, module_docstring);
+    if (m == NULL)
+        return;
 
-    <span class="cm">/* Load `numpy` functionality. */</span>
-    <span class="n">import_array</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>Everything that's going on here should be fairly self explanatory by this
-point but it's important to note that if you want to use any of the
+    /* Load `numpy` functionality. */
+    import_array();
+}
+</code></pre>
+<p>Everything that&rsquo;s going on here should be fairly self explanatory by this
+point but it&rsquo;s important to note that if you want to use any of the
 functionality defined by <code>numpy</code>, you need to include the call to
 <code>import_array()</code> (a function defined in the <code>numpy/arrayobject.h</code> header).</p>
-<h2>The Interface</h2>
-<p>Up to this point, we've written only about 25 lines of C code to set up
+<h2 id="the-interface">The Interface<a class="anchor" href="#the-interface">#</a></h2>
+<p>Up to this point, we&rsquo;ve written only about 25 lines of C code to set up
 a C extension module. All of these steps will be common between any modules
 that you write but as we continue, the details become somewhat less general
 because I will focus on building a wrapper for scientific code.</p>
-<p>Now, it's time to write the <code>chi2_chi2</code> function that we declared above.
+<p>Now, it&rsquo;s time to write the <code>chi2_chi2</code> function that we declared above.
 In this example, the <code>args</code> tuple will contain two <code>double</code>s (the slope
 and y-intercept of our model) and three <code>numpy</code> arrays for the <em>x</em>, <em>y</em>
-and uncertainties that constitute the "data" that we're trying to model.
-Let's just throw down the whole function here and then dissect it line-by-line
+and uncertainties that constitute the &ldquo;data&rdquo; that we&rsquo;re trying to model.
+Let&rsquo;s just throw down the whole function here and then dissect it line-by-line
 below:</p>
-<div class="highlight"><pre><span></span><code><span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span><span class="nf">chi2_chi2</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">double</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">x_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">y_obj</span><span class="p">,</span> <span class="o">*</span><span class="n">yerr_obj</span><span class="p">;</span>
+<pre><code class="language-c">static PyObject *chi2_chi2(PyObject *self, PyObject *args)
+{
+    double m, b;
+    PyObject *x_obj, *y_obj, *yerr_obj;
 
-    <span class="cm">/* Parse the input tuple */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;ddOOO&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x_obj</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y_obj</span><span class="p">,</span>
-                                        <span class="o">&amp;</span><span class="n">yerr_obj</span><span class="p">))</span>
-        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    /* Parse the input tuple */
+    if (!PyArg_ParseTuple(args, &quot;ddOOO&quot;, &amp;m, &amp;b, &amp;x_obj, &amp;y_obj,
+                                        &amp;yerr_obj))
+        return NULL;
 
-    <span class="cm">/* Interpret the input objects as numpy arrays. */</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">x_array</span> <span class="o">=</span> <span class="n">PyArray_FROM_OTF</span><span class="p">(</span><span class="n">x_obj</span><span class="p">,</span> <span class="n">NPY_DOUBLE</span><span class="p">,</span> <span class="n">NPY_IN_ARRAY</span><span class="p">);</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">y_array</span> <span class="o">=</span> <span class="n">PyArray_FROM_OTF</span><span class="p">(</span><span class="n">y_obj</span><span class="p">,</span> <span class="n">NPY_DOUBLE</span><span class="p">,</span> <span class="n">NPY_IN_ARRAY</span><span class="p">);</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">yerr_array</span> <span class="o">=</span> <span class="n">PyArray_FROM_OTF</span><span class="p">(</span><span class="n">yerr_obj</span><span class="p">,</span> <span class="n">NPY_DOUBLE</span><span class="p">,</span>
-                                            <span class="n">NPY_IN_ARRAY</span><span class="p">);</span>
+    /* Interpret the input objects as numpy arrays. */
+    PyObject *x_array = PyArray_FROM_OTF(x_obj, NPY_DOUBLE, NPY_IN_ARRAY);
+    PyObject *y_array = PyArray_FROM_OTF(y_obj, NPY_DOUBLE, NPY_IN_ARRAY);
+    PyObject *yerr_array = PyArray_FROM_OTF(yerr_obj, NPY_DOUBLE,
+                                            NPY_IN_ARRAY);
 
-    <span class="cm">/* If that didn&#39;t work, throw an exception. */</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">x_array</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">y_array</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">||</span> <span class="n">yerr_array</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">x_array</span><span class="p">);</span>
-        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">y_array</span><span class="p">);</span>
-        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">yerr_array</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="p">}</span>
+    /* If that didn't work, throw an exception. */
+    if (x_array == NULL || y_array == NULL || yerr_array == NULL) {
+        Py_XDECREF(x_array);
+        Py_XDECREF(y_array);
+        Py_XDECREF(yerr_array);
+        return NULL;
+    }
 
-    <span class="cm">/* How many data points are there? */</span>
-    <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">PyArray_DIM</span><span class="p">(</span><span class="n">x_array</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    /* How many data points are there? */
+    int N = (int)PyArray_DIM(x_array, 0);
 
-    <span class="cm">/* Get pointers to the data as C-types. */</span>
-    <span class="kt">double</span> <span class="o">*</span><span class="n">x</span>    <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">PyArray_DATA</span><span class="p">(</span><span class="n">x_array</span><span class="p">);</span>
-    <span class="kt">double</span> <span class="o">*</span><span class="n">y</span>    <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">PyArray_DATA</span><span class="p">(</span><span class="n">y_array</span><span class="p">);</span>
-    <span class="kt">double</span> <span class="o">*</span><span class="n">yerr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">PyArray_DATA</span><span class="p">(</span><span class="n">yerr_array</span><span class="p">);</span>
+    /* Get pointers to the data as C-types. */
+    double *x    = (double*)PyArray_DATA(x_array);
+    double *y    = (double*)PyArray_DATA(y_array);
+    double *yerr = (double*)PyArray_DATA(yerr_array);
 
-    <span class="cm">/* Call the external C function to compute the chi-squared. */</span>
-    <span class="kt">double</span> <span class="n">value</span> <span class="o">=</span> <span class="n">chi2</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
+    /* Call the external C function to compute the chi-squared. */
+    double value = chi2(m, b, x, y, yerr, N);
 
-    <span class="cm">/* Clean up. */</span>
-    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">x_array</span><span class="p">);</span>
-    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">y_array</span><span class="p">);</span>
-    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">yerr_array</span><span class="p">);</span>
+    /* Clean up. */
+    Py_DECREF(x_array);
+    Py_DECREF(y_array);
+    Py_DECREF(yerr_array);
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_RuntimeError</span><span class="p">,</span>
-                    <span class="s">&quot;Chi-squared returned an impossible value.&quot;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="p">}</span>
+    if (value &lt; 0.0) {
+        PyErr_SetString(PyExc_RuntimeError,
+                    &quot;Chi-squared returned an impossible value.&quot;);
+        return NULL;
+    }
 
-    <span class="cm">/* Build the output tuple */</span>
-    <span class="n">PyObject</span> <span class="o">*</span><span class="n">ret</span> <span class="o">=</span> <span class="n">Py_BuildValue</span><span class="p">(</span><span class="s">&quot;d&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>I know that that was a lot in one go so let's break things down a little bit.
+    /* Build the output tuple */
+    PyObject *ret = Py_BuildValue(&quot;d&quot;, value);
+    return ret;
+}
+</code></pre>
+<p>I know that that was a lot in one go so let&rsquo;s break things down a little bit.
 The first thing that we did was parse the input tuple using the
 <code>PyArg_ParseTuple</code> function. This function takes the tuple, a format and
 the list of pointers to the objects that you want to take the input values.
-This format should be familiar if you've ever used something like the
-<code>sscanf</code> function in C but the format characters are <a href="http://docs.python.org/c-api/arg.html">a little
-different</a>. In our example, <code>d</code>
+This format should be familiar if you&rsquo;ve ever used something like the
+<code>sscanf</code> function in C but the format characters are <a href="http://docs.python.org/c-api/arg.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>a little
+different</a>
+. In our example, <code>d</code>
 indicates that the argument should be cast as a C <code>double</code> and <code>O</code> is
-just a catchall for <code>PyObject</code>s. There isn't a specific format character
+just a catchall for <code>PyObject</code>s. There isn&rsquo;t a specific format character
 for <code>numpy</code> arrays so we have to parse them as raw <code>PyObject</code>s and then
 interpret them afterwards. If <code>PyArg_ParseTuple</code> fails, it will return
 <code>NULL</code> which is the C-API technique for propagating exceptions. That means
 that we should also return <code>NULL</code> immediately if parsing the tuple fails.</p>
 <p>The next few lines (12-25) show how to load <code>numpy</code> arrays from the raw
 objects. The
-<a href="http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html#PyArray_FROM_OTF"><code>PyArray_FROM_OTF</code></a>
+<a href="http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html#PyArray_FROM_OTF" 
+  
+   target="_blank" rel="noreferrer noopener" 
+><code>PyArray_FROM_OTF</code></a>
+
 function is a fairly general method for converting an arbitrary Python
 object into a well-behaved <code>numpy</code> array that can be used in a standard
 C function. It is important to note that this creation mechanism only
 returns a copy of the object if necessary. Instead, the function normally
 only returns a pointer to the input object if it was already a <code>numpy</code>
-array satisfying various requirements that we won't discuss in detail here.
+array satisfying various requirements that we won&rsquo;t discuss in detail here.
 The flags <code>NPY_DOUBLE</code> and <code>NPY_IN_ARRAY</code> ensure that the returned array
 object will be represented as contiguous arrays of C <code>double</code>s. There are
 some other options available for different types, orderings and permissions
-but most of the time, this is probably what you'll need and the other
-options are described in <a href="http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html#PyArray_FROM_OTF">the
-documentation</a>.</p>
+but most of the time, this is probably what you&rsquo;ll need and the other
+options are described in <a href="http://docs.scipy.org/doc/numpy/user/c-info.how-to-extend.html#PyArray_FROM_OTF" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the
+documentation</a>
+.</p>
 <blockquote>
 <p><strong>Reference Counting</strong>: Memory management in Python works by keeping
-track of the number of "references" to a particular object and then
+track of the number of &ldquo;references&rdquo; to a particular object and then
 deallocating the memory of that object when that count reaches zero.
 You can read more about the details of this system
-<a href="http://docs.python.org/extending/extending.html#reference-counts">elsewhere</a>
+<a href="http://docs.python.org/extending/extending.html#reference-counts" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>elsewhere</a>
+
 but for now, you need to keep in mind that when you return a <code>PyObject</code>
 from a function you might want to run <code>Py_INCREF</code> on it to
 increment the reference count and when you create a new object within
-you function that you don't want to return, you should run <code>Py_DECREF</code> on
+you function that you don&rsquo;t want to return, you should run <code>Py_DECREF</code> on
 it before the function returns (even if the execution failed) so that you
-don't end up with a memory leak. The <a href="http://docs.python.org/extending/extending.html#ownership-rules">documentation explaining this
+don&rsquo;t end up with a memory leak. The <a href="http://docs.python.org/extending/extending.html#ownership-rules" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>documentation explaining this
 system</a>
-makes the important comment that it is part of each function's "interface
-specification" whether or not it increases the reference count of an
+
+makes the important comment that it is part of each function&rsquo;s &ldquo;interface
+specification&rdquo; whether or not it increases the reference count of an
 object before it returns or not. With this in mind, you need to keep
 careful track of which functions do what or the memory usage can become
 a little ugly.</p>
 </blockquote>
 <p>In our example, the objects returned by <code>PyArg_ParseTuple</code> do not have
-their reference count incremented (the calling function still "owns" them)
-so you don't need to decrement the reference count of the <code>*_obj</code> objects
+their reference count incremented (the calling function still &ldquo;owns&rdquo; them)
+so you don&rsquo;t need to decrement the reference count of the <code>*_obj</code> objects
 before returning. Conversely, <code>PyArray_FROM_OTF</code> does return an object with
 a +1 reference count. This means that you <strong>must</strong> call <code>Py_DECREF</code> with
 the <code>*_array</code> objects as the first argument before returning from this
-function. If <code>PyArray_FROM_OTF</code> can't coerce the input object into a
-form digestible as a <code>numpy</code> array, it will return <code>NULL</code> so that's why
+function. If <code>PyArray_FROM_OTF</code> can&rsquo;t coerce the input object into a
+form digestible as a <code>numpy</code> array, it will return <code>NULL</code> so that&rsquo;s why
 on lines 19-21, I actually use <code>Py_XDECREF</code>. <code>Py_XDECREF</code> checks
-to make sure that the object isn't a <code>NULL</code> pointer before trying to
+to make sure that the object isn&rsquo;t a <code>NULL</code> pointer before trying to
 decrease the reference count whereas <code>Py_DECREF</code>
 will explode if you try to call it on <code>NULL</code>.</p>
 <p>If we successfully reach line 25 then all of the input arguments were
 as expected and we have the input <code>numpy</code> arrays arranged the way we want
 them to be. Now we can get on to the fun stuff. For simplicity,
-on line 26, I'm assuming that we received a 1D array (but I could check this
-using the <a href="http://docs.scipy.org/doc/numpy/reference/c-api.array.html#PyArray_NDIM"><code>PyArray_NDIM</code></a>
-function) and getting the length of the array. Then, I'm getting pointers
+on line 26, I&rsquo;m assuming that we received a 1D array (but I could check this
+using the <a href="http://docs.scipy.org/doc/numpy/reference/c-api.array.html#PyArray_NDIM" 
+  
+   target="_blank" rel="noreferrer noopener" 
+><code>PyArray_NDIM</code></a>
+
+function) and getting the length of the array. Then, I&rsquo;m getting pointers
 to the actual C array (which will be formatted properly as an array of
 <code>double</code>s because of the flags that we used in <code>PyArray_FROM_OTF</code> above).
 Then, on line 34, we can finally call the C function that we wanted to wrap
@@ -364,111 +448,176 @@ receives a <code>NULL</code> return value, it stops execution of the current cod
 shows a representation of the value of the global <code>Exception</code> variable and
 the traceback. On line 42, if <code>chi2</code> returned a number less than zero,
 the global <code>Exception</code> is being set to have the type <code>RuntimeError</code> and
-the description: "Chi-squared returned an impossible value." Then, by
-returning <code>NULL</code> we're indicating that something went wrong.</p>
-<p>Finally, if <code>value</code> was non-negative (it'd better be), we can use
-<a href="http://docs.python.org/c-api/arg.html#Py_BuildValue"><code>Py_BuildValue</code></a> to
+the description: &ldquo;Chi-squared returned an impossible value.&rdquo; Then, by
+returning <code>NULL</code> we&rsquo;re indicating that something went wrong.</p>
+<p>Finally, if <code>value</code> was non-negative (it&rsquo;d better be), we can use
+<a href="http://docs.python.org/c-api/arg.html#Py_BuildValue" 
+  
+   target="_blank" rel="noreferrer noopener" 
+><code>Py_BuildValue</code></a>
+ to
 create the output tuple. If <code>Py_ParseTuple</code> has a syntax similar to
 <code>sscanf</code> then <code>Py_BuildValue</code> is the analog of <code>sprintf</code> with the same
-format characters as <code>Py_ParseTuple</code>. Here, we don't need to <code>Py_INCREF</code>
+format characters as <code>Py_ParseTuple</code>. Here, we don&rsquo;t need to <code>Py_INCREF</code>
 the return object because <code>Py_BuildValue</code> does that for us but if you
 generated the output in a different way, you might have to.</p>
-<p>That's it for the code required for our module. It might seem like a lot of
-work but you'll notice that we've only written about 120 lines of code and
+<p>That&rsquo;s it for the code required for our module. It might seem like a lot of
+work but you&rsquo;ll notice that we&rsquo;ve only written about 120 lines of code and
 the vast majority of these lines will be exactly the same in every module
 that you need to write.</p>
-<h2>Building</h2>
+<h2 id="building">Building<a class="anchor" href="#building">#</a></h2>
 <p>The last thing that we need to talk about is how you might compile and
 link this module so that it can actually be called from Python. The best
-way to do this is to use the built-in Python <a href="http://docs.python.org/distutils/index.html">distribution
-utilities</a>. Traditionally,
+way to do this is to use the built-in Python <a href="http://docs.python.org/distutils/index.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>distribution
+utilities</a>
+. Traditionally,
 the build script is called <code>setup.py</code> and for our example, the file
 is actually extremely simple:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">distutils.core</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
-<span class="kn">import</span> <span class="nn">numpy.distutils.misc_util</span>
+<pre><code class="language-python">from distutils.core import setup, Extension
+import numpy.distutils.misc_util
 
-<span class="n">setup</span><span class="p">(</span>
-    <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">Extension</span><span class="p">(</span><span class="s2">&quot;_chi2&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;_chi2.c&quot;</span><span class="p">,</span> <span class="s2">&quot;chi2.c&quot;</span><span class="p">])],</span>
-    <span class="n">include_dirs</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">distutils</span><span class="o">.</span><span class="n">misc_util</span><span class="o">.</span><span class="n">get_numpy_include_dirs</span><span class="p">(),</span>
-<span class="p">)</span>
-</code></pre></div>
-
+setup(
+    ext_modules=[Extension(&quot;_chi2&quot;, [&quot;_chi2.c&quot;, &quot;chi2.c&quot;])],
+    include_dirs=numpy.distutils.misc_util.get_numpy_include_dirs(),
+)
+</code></pre>
 <p>and you can call it using the command:</p>
-<div class="highlight"><pre><span></span><code>python setup.py build_ext --inplace
-</code></pre></div>
-
+<pre><code class="language-bash">python setup.py build_ext --inplace
+</code></pre>
 <p>which will compile and link you source code and create a shared object
 called <code>_chi2.so</code> in the same directory. Then, from Python, you can do
 the following:</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">_chi2</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span> <span class="n">_chi2</span><span class="o">.</span><span class="n">chi2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">30.6</span><span class="p">],</span>
-<span class="o">...</span>                            <span class="p">[</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">63.0</span><span class="p">],</span>
-<span class="o">...</span>                            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">])</span>
-<span class="mf">2.89888888889</span>
-</code></pre></div>
-
-<h2>Summary</h2>
+<pre><code class="language-python">&gt;&gt;&gt; import _chi2
+&gt;&gt;&gt; print _chi2.chi2(2.0, 1.0, [-1.0, 4.2, 30.6],
+...                            [-1.5, 8.0, 63.0],
+...                            [1.0, 1.5, 0.6])
+2.89888888889
+</code></pre>
+<h2 id="summary">Summary<a class="anchor" href="#summary">#</a></h2>
 <p>Hopefully, after going through this tutorial, you should be able to write
 your own C-extension module especially if it is just a single C function
 that you want to wrap. In general, I find that most of my time is spent
-copy-and-pasting when I'm writing a C extension and once you get the hang
-of it it shouldn't take too much effort to incorporate code like this into
-projects that you're working on. Since so much of this structure is the same
+copy-and-pasting when I&rsquo;m writing a C extension and once you get the hang
+of it it shouldn&rsquo;t take too much effort to incorporate code like this into
+projects that you&rsquo;re working on. Since so much of this structure is the same
 across projects, it would be awesome if someone wanted to make an interactive
-tool for auto-generating skeleton code but I haven't seen anything like this
+tool for auto-generating skeleton code but I haven&rsquo;t seen anything like this
 yet.</p>
 <p>To see all the source code for this tutorial in one place, you can
-check out <a href="https://gist.github.com/3247796">the gist</a> or clone the
+check out <a href="https://gist.github.com/3247796" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the gist</a>
+ or clone the
 repository using <code>git</code>:</p>
-<div class="highlight"><pre><span></span><code>git clone git://gist.github.com/3247796.git c_ext
-<span class="nb">cd</span> c_ext
+<pre><code class="language-bash">git clone git://gist.github.com/3247796.git c_ext
+cd c_ext
 python setup.py build_ext --inplace
-</code></pre></div>
+</code></pre>
+<p>If you have any comments, suggestions or questions, <a href="https://github.com/dfm/dfm.io" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>fork this
+page</a>
+ or <a href="https://twitter.com/exoplaneteer" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>tweet at
+me</a>
+.</p>
 
-<p>If you have any comments, suggestions or questions, <a href="https://github.com/dfm/dfm.io">fork this
-page</a> or <a href="https://twitter.com/exoplaneteer">tweet at
-me</a>.</p>
-</section>
 
-<section>
+              
+                  
 
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'dfmio',
-        disqus_identifier = 'python-c-extensions',
-        disqus_title = 'Python modules in C';
-
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
 </script>
-<noscript>
-    Please enable JavaScript to view the
-    <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
-</noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+              
+          </article>
+          
 
-</section>
+ <div class="pagination">
+  
+
+  
+    <a class="pagination__item" href="https://dfm.io/posts/histogram1/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >The Histogram (Part 1)</span>
+    </a>
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
 
 
-      <footer>
-        Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Dan Foreman-Mackey unless otherwise noted.<br />
-        Licensed under
-        <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><b>Creative Commons</b></a
-        >.<br />
-        Icons from <a href="https://simpleicons.org">simpleicons.org</a>.
-      </footer>
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="GitHub"
+         href="https://github.com/dfm"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Email"
+         href="mailto:foreman.mackey@gmail.com"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2021</p>
+          </footer>
+          </div>
+      </div>
+      
     </div>
+    
 
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-22909046-1', 'auto');
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview');
-</script>  </body>
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
 </html>

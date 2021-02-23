@@ -1,7 +1,0 @@
-_site
-.DS_Store
-build
-Gemfile.lock
-output
-cache
-dfm_theme
