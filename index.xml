@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© 2014-{year} Dan Foreman-Mackey</copyright>
-    <lastBuildDate>Mon, 11 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 18 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>What if I want to reuse my Python functions?</title>
+      <link>https://dfm.io/posts/simple-python-module/</link>
+      <pubDate>Thu, 18 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/simple-python-module/</guid>
+      <description>This post is an introduction to packaging Python code aimed at scientists (although the advice is probably more general) who want to be able to reuse Python functions that they have written as part of a common Jupyter notebook-based development workflow. It is not meant as a complete discussion of Python packaging for scientific software. Some day I&amp;rsquo;d love to write more about that (because I have so many thoughts and opinions), but in the meantime I&amp;rsquo;ll direct you to other resources like the excellent OpenAstronomy Python packaging guide, if you want more details.</description>
+    </item>
+    
     <item>
       <title>Extending JAX with custom C&#43;&#43; and CUDA code</title>
       <link>https://dfm.io/posts/extending-jax/</link>

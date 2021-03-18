@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>What if I want to reuse my Python functions? | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="What if I want to reuse my Python functions?" />
+  <meta name="twitter:description" content=""/>
+  <meta name="twitter:site" content="https://twitter.com/exoplaneteer" />
+  <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/simple-python-module\/",
+      "name": "What if I want to reuse my Python functions?",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/"> home</a>
+      </li>
+    
+      <li>
+        <a  href="/about">about</a>
+      </li>
+    
+      <li>
+        <a  href="/posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">What if I want to reuse my Python functions?</h1>
+            <time datetime="2021-03-18 00:00:00 &#43;0000 UTC" class="post__date">Mar 18 2021</time> 
+          </header>
+          <article class="post__content">
+              
+<p>This post is an introduction to packaging Python code aimed at scientists
+(although the advice is probably more general) who want to be able to reuse
+Python functions that they have written as part of a common Jupyter
+notebook-based development workflow. It is not meant as a complete discussion of
+Python packaging for scientific software. Some day I&rsquo;d love to write more about
+that (because I have so many thoughts and opinions), but in the meantime I&rsquo;ll
+direct you to other resources like the excellent <a href="https://packaging-guide.openastronomy.org/en/latest/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>OpenAstronomy Python packaging
+guide</a>, if you want more
+details. Instead, in this post I&rsquo;ll focus on how you can support the most
+important user of your code: you! With this in mind, the procedure described
+here is meant as a quick-and-dirty first step and <strong>it&rsquo;s definitely not a
+description of the best practices</strong>, but it might be enough for many
+researchers.</p>
+<p>I decided to write this post because I didn&rsquo;t know of a good link to share with
+collaborators who were at the (all too common) point in their development cycle
+where they are happy with some of the functions that they&rsquo;ve written in a
+Jupyter notebook and find themselves copying and pasting that definition between
+notebooks. There&rsquo;s a lot to say about a Jupyter-based research workflow like
+this, but I think you&rsquo;ll know that point where it&rsquo;s hard to tell what is
+scratch/exploratory work and what is &ldquo;production&rdquo; code. I can&rsquo;t answer that
+question, but I can provide some tips for moving code to an importable module.</p>
+<h2 id="required-files">Required files<a class="anchor" href="#required-files">#</a></h2>
+<p>As an example, let&rsquo;s imagine that we want to move a function for loading data to
+a module. This might be a good place to start because a function like this
+probably doesn&rsquo;t change very often. Our goal here is to get something like</p>
+<pre><code class="language-python">import cool_science
+
+data = cool_science.data.load_with_numpy(&quot;/path/to/data&quot;)
+</code></pre>
+<p>instead of that 150 line cell that you&rsquo;ve copied into 12 different notebooks
+called <code>Untitled.ipynb</code> (harsh, but you know it&rsquo;s true!).</p>
+<p>To do this, we&rsquo;ll create 3 files with the following directory layout:</p>
+<pre><code>├── setup.py
+└── src
+    └── cool_science
+        └── __init__.py
+        └── data.py
+</code></pre>
+<h2 id="where-to-put-the-actual-code">Where to put the actual code<a class="anchor" href="#where-to-put-the-actual-code">#</a></h2>
+<p>When discussing these files, let&rsquo;s start at the bottom with <code>data.py</code> in the
+<code>src/cool_science</code> subdirectory. This is where we&rsquo;re going to put the code for
+our function, moved from our Jupyter notebook:</p>
+<pre><code class="language-python"># File: src/cool_science/data.py
+__all__ = [&quot;load_with_numpy&quot;]
+
+import numpy as np
+
+def load_with_numpy(filename):
+    # ...
+</code></pre>
+<p>This file is called <code>data.py</code> and this becomes a &ldquo;submodule&rdquo; called <code>data</code> of
+our <code>cool_science</code> package. By comparison, you could also create a file called
+<code>plotting.py</code>, for example, with functions to making plots that you would access
+using the <code>cool_science.plotting</code> module. You don&rsquo;t have to structure your code
+this way (all your functions could live in the top level module, for example),
+but I often find it useful to structure things this way.</p>
+<h2 id="boilerplate">Boilerplate<a class="anchor" href="#boilerplate">#</a></h2>
+<p>Now that we&rsquo;ve moved our function to a file, we need some boilerplate code for
+making this code installable and importable. First, in the <code>__init__.py</code> file,
+we&rsquo;re going to list our submodules:</p>
+<pre><code class="language-python"># File: src/cool_science/__init__.py
+__all__ = [&quot;data&quot;]
+
+from . import data
+</code></pre>
+<p>This is not absolutely necessary, it would be fine for this file to be empty
+but, in that case, you would need to import the submodule directly:</p>
+<pre><code class="language-python">import cool_science.data  # instead of `import cool_science`
+</code></pre>
+<p>Finally, the <code>setup.py</code> file tells Python how to install this code. There are a
+lot of options that you can set in this file (and in bigger projects, you might
+actually use a different file such as <code>pyproject.toml</code> or <code>setup.cfg</code>), but
+we&rsquo;re going to keep things very simple here and just do the bare minimum:</p>
+<pre><code class="language-python"># File: setup.py
+from setuptools import find_packages, setup
+
+setup(
+    name=&quot;cool_science&quot;,
+    packages=find_packages(where=&quot;src&quot;),
+    package_dir={&quot;&quot;: &quot;src&quot;},
+)
+</code></pre>
+<h2 id="usage">Usage<a class="anchor" href="#usage">#</a></h2>
+<p>Now that we have our module set up, we can install it as follows:</p>
+<pre><code class="language-bash">python -m pip install -e .
+</code></pre>
+<p>where the <code>-e</code> flag stands for &ldquo;editable&rdquo;, which means that you can change the
+<code>data.py</code> file and use those changes without re-installing.</p>
+<p>After installation, you should be able to execute:</p>
+<pre><code class="language-python">import cool_science
+</code></pre>
+<p>in a Jupyter notebook or Python script, and use your fancy science functions. If
+this doesn&rsquo;t work, you might need to restart your Jupyter kernel or make sure
+that you&rsquo;re using the same Python to run your code as you used to install above.</p>
+<p>I mentioned above that the <code>-e</code> flag lets you make changes to your code and use
+them without reinstalling. This is true, but if you&rsquo;re working in a Jupyter
+notebook, you will need to restart your kernel after making changes to your
+module (there are <code>%reload</code> magic functions, but I&rsquo;ve never had much success
+getting these to work).</p>
+
+
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/extending-jax/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">Extending JAX with custom C&#43;&#43; and CUDA code</span>
+    </a>
+  
+
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="GitHub"
+         href="https://github.com/dfm"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Email"
+         href="mailto:foreman.mackey@gmail.com"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" rel="me" title="Twitter"
+         href="https://twitter.com/exoplaneteer"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2014-2021 Dan Foreman-Mackey</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>
