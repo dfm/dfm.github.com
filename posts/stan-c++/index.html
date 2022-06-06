@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,9 +106,25 @@
           <header class="post__header">
             <h1 id="post__title">Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets</h1>
             <time datetime="2017-05-04 00:00:00 &#43;0000 UTC" class="post__date">May 4 2017</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io//blob/main/content/posts/stan-c&#43;&#43;.md">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
+<pre><code class="language-python">%matplotlib inline
+%config InlineBackend.figure_format = &quot;retina&quot;
+
+from matplotlib import rcParams
+rcParams[&quot;savefig.dpi&quot;] = 100
+rcParams[&quot;figure.dpi&quot;] = 100
+rcParams[&quot;font.size&quot;] = 20
+</code></pre>
 <p>In this blog post, I&rsquo;ll demonstrate how to use a custom C++ function in a <a href="http://mc-stan.org/" 
   
    target="_blank" rel="noreferrer noopener" 
@@ -180,27 +196,27 @@ plt.annotate(&quot;period = {0:.6f} days&quot;.format(lit_period),
 plt.ylabel(&quot;radial velocity [m/s]&quot;)
 plt.xlabel(&quot;phase&quot;);
 </code></pre>
-<p><img src="output_3_0.png" alt="png"></p>
+<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_3_0.png" alt="png"></p>
 <h2 id="the-problem-statement-a-kepler-solver-in-c">The problem statement: a Kepler solver in C++<a class="anchor" href="#the-problem-statement-a-kepler-solver-in-c">#</a></h2>
 <p>We want to fit this dataset using a Keplerian model where the radial velocity is given by</p>
-<div>$$
-RV(t) = RV_0 + RV_\mathrm{trend}\,t + K\,\left[\cos(\omega+f(t))+e\,\cos(\omega)\right]
-$$</div>
-<p>where <code>$RV_0$</code> is the mean radial velocity, <code>$RV_\mathrm{trend}$</code> is the slope of the RV trend, <code>$K$</code> is the semi-amplitude, <code>$\omega$</code> is the argument of periastron, and <code>$f(t)$</code> is the true anomaly. I won&rsquo;t go into details about all of these parameters, but interested readers can check out <a href="http://exoplanets.astro.yale.edu/workshop/EPRV/Bibliography_files/Radial_Velocity.pdf" 
+<p>$$
+RV(t) = RV_0 + RV_\mathrm{trend},t + K,\left[\cos(\omega+f(t))+e,\cos(\omega)\right]
+$$</p>
+<p>where $RV_0$ is the mean radial velocity, $RV_\mathrm{trend}$ is the slope of the RV trend, $K$ is the semi-amplitude, $\omega$ is the argument of periastron, and $f(t)$ is the true anomaly. I won&rsquo;t go into details about all of these parameters, but interested readers can check out <a href="http://exoplanets.astro.yale.edu/workshop/EPRV/Bibliography_files/Radial_Velocity.pdf" 
   
    target="_blank" rel="noreferrer noopener" 
 >the discussion here</a> or in the <a href="https://www.amazon.com/Exoplanets-Space-Science-Sara-Seager/dp/0816529450" 
   
    target="_blank" rel="noreferrer noopener" 
 >Exoplanets</a> textbook.</p>
-<p>The crux for our discussion is that computation of <code>$f(t)$</code> requires solving <a href="https://en.wikipedia.org/wiki/Kepler%27s_equation" 
+<p>The crux for our discussion is that computation of $f(t)$ requires solving <a href="https://en.wikipedia.org/wiki/Kepler%27s_equation" 
   
    target="_blank" rel="noreferrer noopener" 
 >Kepler&rsquo;s equation</a></p>
-<div>$$
-M(t) = E(t) - e\,\sin E(t)
-$$</div>
-<p>for the eccentric anomaly <code>$E(t)$</code> at given mean anomaly <code>$M(t)$</code> and eccentricity <code>$e$</code>. This equation is typically solved numerically using the <a href="https://en.wikipedia.org/wiki/Newton%27s_method" 
+<p>$$
+M(t) = E(t) - e,\sin E(t)
+$$</p>
+<p>for the eccentric anomaly $E(t)$ at given mean anomaly $M(t)$ and eccentricity $e$. This equation is typically solved numerically using the <a href="https://en.wikipedia.org/wiki/Newton%27s_method" 
   
    target="_blank" rel="noreferrer noopener" 
 >Newton–Raphson method</a>. The following is a simple implementation in C++:</p>
@@ -221,13 +237,13 @@ $$</div>
 }
 </code></pre>
 <p>This function could, of course, also be implemented directly in the Stan language. It is, however, standard lore that one shouldn&rsquo;t apply automatic differentiation to an iterative method. Furthermore, it is easy to compute the partial derivatives of this expression analytically:</p>
-<div>$$
-\frac{dE(t)}{dM(t)} = \frac{1}{1-e\,\cos E(t)}
-$$</div>
+<p>$$
+\frac{dE(t)}{dM(t)} = \frac{1}{1-e,\cos E(t)}
+$$</p>
 <p>and</p>
-<div>$$
-\frac{dE(t)}{de} = \frac{\sin E(t)}{1-e\,\cos E(t)}
-$$</div>
+<p>$$
+\frac{dE(t)}{de} = \frac{\sin E(t)}{1-e,\cos E(t)}
+$$</p>
 <p>In the following few cells, we&rsquo;ll implement this method with a syntax that is compatible with Stan. First, the code from above with a few extra bells and whistles:</p>
 <pre><code class="language-python">cpp_code = &quot;&quot;&quot;
 inline double kepler (double M, double e, std::ostream* pstream) {
@@ -256,7 +272,7 @@ inline double kepler (double M, double e, std::ostream* pstream) {
 <p>Next, we must implement the derivatives of this function using overloading with the <code>stan::math::var</code> type. This is the type that is used by Stan to compute derivatives in their automatic differentiation library (see <a href="https://arxiv.org/abs/1509.07164" 
   
    target="_blank" rel="noreferrer noopener" 
->Carpenter et al. (2015)</a> for details) and I&rsquo;ve found that the easiest way to use them is with the <code>precomp_v_vari</code> and <code>precomp_vv_vari</code> wrapper classes. For example, to provide the derivatives with respect to both <code>$M(t)$</code> and <code>$e$</code>, we will use the following code:</p>
+>Carpenter et al. (2015)</a> for details) and I&rsquo;ve found that the easiest way to use them is with the <code>precomp_v_vari</code> and <code>precomp_vv_vari</code> wrapper classes. For example, to provide the derivatives with respect to both $M(t)$ and $e$, we will use the following code:</p>
 <pre><code class="language-python">cpp_code += &quot;&quot;&quot;
 inline var kepler (const var&amp; M_var, const var&amp; e_var, std::ostream* pstream) {
   // First, compute the value of E at the current values of M and e
@@ -280,7 +296,7 @@ inline var kepler (const var&amp; M_var, const var&amp; e_var, std::ostream* pst
 
 &quot;&quot;&quot;
 </code></pre>
-<p>We now go on to implement versions of this function for fixed <code>$M(t)$</code> and <code>$e$</code>. I don&rsquo;t <em>think</em> that these extra functions are strictly needed in our case because <code>$M(t)$</code> and <code>$e$</code> will always be functions of parameters, but it doesn&rsquo;t hurt to implement all of the permutations in case we decide to fix any parameters. In these cases, we use the <code>precomp_v_vari</code> class because the derivatives are only taken with repect to a single parameter:</p>
+<p>We now go on to implement versions of this function for fixed $M(t)$ and $e$. I don&rsquo;t <em>think</em> that these extra functions are strictly needed in our case because $M(t)$ and $e$ will always be functions of parameters, but it doesn&rsquo;t hurt to implement all of the permutations in case we decide to fix any parameters. In these cases, we use the <code>precomp_v_vari</code> class because the derivatives are only taken with repect to a single parameter:</p>
 <pre><code class="language-python">cpp_code += &quot;&quot;&quot;
 inline var kepler (double M, const var&amp; e_var, std::ostream* pstream) {
   double e = e_var.val(),
@@ -311,7 +327,7 @@ inline var kepler (const var&amp; M_var, double e, std::ostream* pstream) {
     real kepler(real M, real e);
 }
 </code></pre>
-<p>After the <code>functions</code> block, the rest of the model is pretty standard. I found that the sampling performance was substantially improved after reparameterizing the model a bit. The first crucial reaparameterization is to sample in <code>$\sqrt{e}\,\sin\omega$</code> and <code>$\sqrt{e}\,\cos\omega$</code> instead of <code>$e$</code> and <code>$\omega$</code>. For <code>$e \le 1$</code>, this still has a uniform prior distribution for <code>$e$</code> and <code>$\omega$</code>, but the shape posterior in these coordinates is much better behaved. The second reparameterization is to sample in <code>$\phi = \frac{2\,\pi\,t_0}{P} - \omega$</code> instead of <code>$t_0$</code>.</p>
+<p>After the <code>functions</code> block, the rest of the model is pretty standard. I found that the sampling performance was substantially improved after reparameterizing the model a bit. The first crucial reaparameterization is to sample in $\sqrt{e},\sin\omega$ and $\sqrt{e},\cos\omega$ instead of $e$ and $\omega$. For $e \le 1$, this still has a uniform prior distribution for $e$ and $\omega$, but the shape posterior in these coordinates is much better behaved. The second reparameterization is to sample in $\phi = \frac{2,\pi,t_0}{P} - \omega$ instead of $t_0$.</p>
 <p>The following cell defines the full probabilistic model in the Stan language and compiles the generated C++ code including the <code>kepler.hpp</code> header that we defined above. Note the <code>allow_undefined</code>, <code>includes</code>, and <code>include_dirs</code> arguments in the <code>pystan.StanModel</code> constructor. These are required to allow interfacing to external C++ code, but they&rsquo;re not provided by the official PyStan implementation so, as mentioned above, you&rsquo;ll need to have my fork of PyStan installed to compile this model.</p>
 <pre><code class="language-python">model_code = &quot;&quot;&quot;
 functions {
@@ -452,7 +468,7 @@ plt.annotate(&quot;period = {0:.6f} days&quot;.format(period),
 plt.ylabel(&quot;radial velocity [m/s]&quot;)
 plt.xlabel(&quot;phase&quot;);
 </code></pre>
-<p><img src="output_17_0.png" alt="png"></p>
+<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_17_0.png" alt="png"></p>
 <p>Now, starting from the MAP coordinates, we&rsquo;ll run 4 parallel MCMC chains of 2000 steps using the default settings in Stan. By default, Stan discards 50% of the chain as &ldquo;warmup&rdquo; so we&rsquo;ll end up with 4000 samples (1000 from each chain).</p>
 <pre><code class="language-python">strt = time.time()
 fit = model.sampling(iter=2000, data=data, init=lambda *args: best[&quot;par&quot;])
@@ -501,7 +517,7 @@ samples = np.array(samples[[&quot;period&quot;, &quot;K&quot;, &quot;e&quot;]])
 labels = [&quot;period [days]&quot;, &quot;semi-amplitude [m/s]&quot;, &quot;eccentricity&quot;]
 corner.corner(samples, labels=labels);
 </code></pre>
-<p><img src="output_23_0.png" alt="png"></p>
+<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_23_0.png" alt="png"></p>
 <p>Another good plot is the posterior model predictions overplotted on the data. In the following figure, the green &ldquo;line&rdquo; is actually a <em>contour</em> showing the 68% credible region for the model RV as a function of phase.</p>
 <pre><code class="language-python">samples = fit.extract(permuted=True)
 pred = samples[&quot;rv_pred&quot;]
@@ -521,15 +537,15 @@ plt.annotate(&quot;period = {0:.6f} days&quot;.format(period),
 plt.ylabel(&quot;radial velocity [m/s]&quot;)
 plt.xlabel(&quot;phase&quot;);
 </code></pre>
-<p><img src="output_25_0.png" alt="png"></p>
+<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_25_0.png" alt="png"></p>
 <h2 id="results--summary">Results &amp; summary<a class="anchor" href="#results--summary">#</a></h2>
 <p>Now that we have a sufficiently converged MCMC chain, we can compare our results to the literature values. In particular, let&rsquo;s look at the measured period and semi-amplitude. The literature values of these properties are (<a href="http://adsabs.harvard.edu/abs/2006ApJ...646..505B" 
   
    target="_blank" rel="noreferrer noopener" 
 >Butler et al. 2006</a>):</p>
-<div>$$
-P = 4.230785 \pm 0.000036\,\mathrm{days} \quad \mathrm{and} \quad K = 55.94 \pm 0.69\,\mathrm{m/s}
-$$</div>
+<p>$$
+P = 4.230785 \pm 0.000036,\mathrm{days} \quad \mathrm{and} \quad K = 55.94 \pm 0.69,\mathrm{m/s}
+$$</p>
 <p>The constraints that we get based on our MCMC chains are:</p>
 <pre><code class="language-python">periods = np.exp(samples[&quot;log_P&quot;])
 print(&quot;P = {0:.6f} ± {1:.6f}&quot;.format(np.mean(periods),  np.std(periods)))
@@ -582,6 +598,8 @@ model_autodiff = pystan.StanModel(model_code=model_code, allow_undefined=True,
                                   include_dirs=[&quot;.&quot;])
 </code></pre>
 <pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_8a556093ae546532f90fa3f7e850eea0 NOW.
+</code></pre>
+<pre><code class="language-python">
 </code></pre>
 
 
@@ -650,27 +668,39 @@ model_autodiff = pystan.StanModel(model_code=model_code, allow_undefined=True,
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -690,7 +720,7 @@ model_autodiff = pystan.StanModel(model_code=model_code, allow_undefined=True,
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

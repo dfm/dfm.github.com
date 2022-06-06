@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">PyMC3 &#43; PyTorch</h1>
             <time datetime="2019-10-15 00:00:00 &#43;0000 UTC" class="post__date">Oct 15 2019</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--pymc-pytorch">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--pymc-pytorch/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -147,28 +159,30 @@ y = x * true_params[0] + true_params[1]
 y_obs = y + np.exp(true_params[-1]) * np.random.randn(N)
 
 plt.plot(x, y_obs, &quot;.k&quot;, label=&quot;observations&quot;)
-plt.plot(t, true_params[0]*t + true_params[1], label=&quot;truth&quot;)
+plt.plot(t, true_params[0] * t + true_params[1], label=&quot;truth&quot;)
 plt.xlabel(&quot;x&quot;)
 plt.ylabel(&quot;y&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_3_0.png" alt="png"></p>
+<p><img src="output_1_0.png" alt="png"></p>
 <p>Next, let&rsquo;s implement the likelihood function for this simple linear model using PyTorch.</p>
 <p><strong>Disclaimer:</strong> I&rsquo;m definitely not a PyTorch expert so there might be a better way to do this, but this should at least demonstrate the idea.</p>
 <pre><code class="language-python">import torch
 
+
 class LinearModel(torch.nn.Module):
-    
     def __init__(self):
         super(LinearModel, self).__init__()
-        
+
         self.m = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
         self.b = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
         self.logs = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
-        
+
     def forward(self, x, y):
         mean = self.m * x + self.b
-        loglike = -0.5 * torch.sum((y - mean) ** 2 * torch.exp(-2 * self.logs) + 2 * self.logs)
+        loglike = -0.5 * torch.sum(
+            (y - mean) ** 2 * torch.exp(-2 * self.logs) + 2 * self.logs
+        )
         return loglike
 </code></pre>
 <p>Now, here&rsquo;s a custom Theano Op that knows how to evaluate a PyTorch <em>scalar</em> and its gradient.
@@ -176,8 +190,8 @@ It would be possible to extend this work for arbitrary PyTorch tensors, but it w
 <pre><code class="language-python">import theano
 import theano.tensor as tt
 
+
 class TorchOp(tt.Op):
-    
     def __init__(self, module, params, args=None):
         self.module = module
         self.params = list(params)
@@ -185,16 +199,19 @@ class TorchOp(tt.Op):
             self.args = tuple()
         else:
             self.args = tuple(args)
-    
+
     def make_node(self, *args):
         if len(args) != len(self.params):
             raise ValueError(&quot;dimension mismatch&quot;)
         args = [tt.as_tensor_variable(a) for a in args]
-        return theano.gof.Apply(self, args, [tt.dscalar().type()] + [a.type() for a in args])
-    
-    def infer_shape(self, node, shapes):
+        return theano.graph.basic.Apply(
+            self, args, [tt.dscalar().type()] + [a.type() for a in args]
+        )
+
+    def infer_shape(self, *args):
+        shapes = args[-1]
         return tuple([()] + list(shapes))
-    
+
     def perform(self, node, inputs, outputs):
         for p, value in zip(self.params, inputs):
             p.data = torch.tensor(value)
@@ -204,10 +221,10 @@ class TorchOp(tt.Op):
 
         result = self.module(*self.args)
         result.backward()
-        
+
         outputs[0][0] = result.detach().numpy()
         for i, p in enumerate(self.params):
-            outputs[i+1][0] = p.grad.numpy()
+            outputs[i + 1][0] = p.grad.numpy()
 
     def grad(self, inputs, gradients):
         for i, g in enumerate(gradients[1:]):
@@ -235,46 +252,118 @@ op = TorchOp(model, params, args=args)
 <pre><code class="language-python">import pymc3 as pm
 
 with pm.Model() as torch_model:
-    
+
     m = pm.Uniform(&quot;m&quot;, -5, 5)
     b = pm.Uniform(&quot;b&quot;, -5, 5)
     logs = pm.Uniform(&quot;logs&quot;, -5, 5)
 
     pm.Potential(&quot;obs&quot;, op(m, b, logs)[0])
-        
+
     np.random.seed(6940)
-    torch_trace = pm.sample(1000, tune=5000, target_accept=0.9)
+    torch_trace = pm.sample(
+        1000, tune=5000, target_accept=0.9, return_inferencedata=True, cores=1
+    )
 </code></pre>
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [logs, b, m]
-Sampling 2 chains, 0 divergences: 100%|██████████| 12000/12000 [00:32&lt;00:00, 367.06draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:22<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:21<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 44 seconds.
 </code></pre>
 <p>Note that unlike the TensorFlow implementation, there&rsquo;s no problem using multiple cores with this model and we actually get more than a factor of two increase in efficiency (probably because PyTorch has less Python overhead per call).</p>
 <p>For comparison, we can reimplement the same model directly in PyMC3:</p>
 <pre><code class="language-python">with pm.Model() as pymc3_model:
-    
+
     m = pm.Uniform(&quot;m&quot;, -5, 5)
     b = pm.Uniform(&quot;b&quot;, -5, 5)
     logs = pm.Uniform(&quot;logs&quot;, -5, 5)
 
-    pm.Normal(&quot;obs&quot;, mu=m*x + b, sd=pm.math.exp(logs), observed=y_obs)
-        
+    pm.Normal(&quot;obs&quot;, mu=m * x + b, sd=pm.math.exp(logs), observed=y_obs)
+
     np.random.seed(6940)
-    pymc3_trace = pm.sample(1000, tune=5000, target_accept=0.9)
+    pymc3_trace = pm.sample(
+        1000, tune=5000, target_accept=0.9, return_inferencedata=True, cores=1
+    )
 </code></pre>
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [logs, b, m]
-Sampling 2 chains, 0 divergences: 100%|██████████| 12000/12000 [00:15&lt;00:00, 779.79draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:06<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:06<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 13 seconds.
 </code></pre>
 <p>In this case, the PyMC3 model is about a factor of 2 faster than the PyTorch model, but this is a simple enough model that it&rsquo;s not really a fair comparison.
 I expect that this gap would close for more expensive models where the overhead is less important.
 Personally, I&rsquo;m willing to pay some performance penalty for the benefit of being able to use whichever modeling framework I want without serious compromises when it comes to inference capabilities.</p>
 <p>Finally, we can confirm that we got the same results (they should actually be <em>identical</em> because I used the same random number seed above):</p>
-<pre><code class="language-python">pm.summary(torch_trace)
+<pre><code class="language-python">import arviz as az
+
+az.summary(torch_trace)
 </code></pre>
 <div>
 <style scoped>
@@ -296,48 +385,56 @@ Personally, I&rsquo;m willing to pay some performance penalty for the benefit of
       <th></th>
       <th>mean</th>
       <th>sd</th>
-      <th>mc_error</th>
-      <th>hpd_2.5</th>
-      <th>hpd_97.5</th>
-      <th>n_eff</th>
-      <th>Rhat</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>m</th>
-      <td>0.481958</td>
-      <td>0.036578</td>
-      <td>0.001365</td>
-      <td>0.405873</td>
-      <td>0.549908</td>
-      <td>803.898354</td>
-      <td>1.000925</td>
+      <td>0.483</td>
+      <td>0.037</td>
+      <td>0.415</td>
+      <td>0.550</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>912.0</td>
+      <td>941.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>-2.225355</td>
-      <td>0.198432</td>
-      <td>0.007420</td>
-      <td>-2.588863</td>
-      <td>-1.801773</td>
-      <td>787.809183</td>
-      <td>1.000351</td>
+      <td>-2.226</td>
+      <td>0.197</td>
+      <td>-2.570</td>
+      <td>-1.832</td>
+      <td>0.007</td>
+      <td>0.005</td>
+      <td>891.0</td>
+      <td>964.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>logs</th>
-      <td>-0.295540</td>
-      <td>0.102417</td>
-      <td>0.002933</td>
-      <td>-0.494024</td>
-      <td>-0.104418</td>
-      <td>1345.545739</td>
-      <td>1.000058</td>
+      <td>-0.299</td>
+      <td>0.101</td>
+      <td>-0.500</td>
+      <td>-0.118</td>
+      <td>0.003</td>
+      <td>0.002</td>
+      <td>1054.0</td>
+      <td>1131.0</td>
+      <td>1.0</td>
     </tr>
   </tbody>
 </table>
 </div>
-<pre><code class="language-python">pm.summary(pymc3_trace)
+<pre><code class="language-python">az.summary(pymc3_trace)
 </code></pre>
 <div>
 <style scoped>
@@ -359,43 +456,51 @@ Personally, I&rsquo;m willing to pay some performance penalty for the benefit of
       <th></th>
       <th>mean</th>
       <th>sd</th>
-      <th>mc_error</th>
-      <th>hpd_2.5</th>
-      <th>hpd_97.5</th>
-      <th>n_eff</th>
-      <th>Rhat</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>m</th>
-      <td>0.481958</td>
-      <td>0.036578</td>
-      <td>0.001365</td>
-      <td>0.405873</td>
-      <td>0.549908</td>
-      <td>803.898354</td>
-      <td>1.000925</td>
+      <td>0.483</td>
+      <td>0.037</td>
+      <td>0.413</td>
+      <td>0.548</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>954.0</td>
+      <td>1140.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>-2.225355</td>
-      <td>0.198432</td>
-      <td>0.007420</td>
-      <td>-2.588863</td>
-      <td>-1.801773</td>
-      <td>787.809183</td>
-      <td>1.000351</td>
+      <td>-2.232</td>
+      <td>0.195</td>
+      <td>-2.590</td>
+      <td>-1.863</td>
+      <td>0.006</td>
+      <td>0.005</td>
+      <td>918.0</td>
+      <td>1071.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>logs</th>
-      <td>-0.295540</td>
-      <td>0.102417</td>
-      <td>0.002933</td>
-      <td>-0.494024</td>
-      <td>-0.104418</td>
-      <td>1345.545739</td>
-      <td>1.000058</td>
+      <td>-0.303</td>
+      <td>0.102</td>
+      <td>-0.493</td>
+      <td>-0.110</td>
+      <td>0.003</td>
+      <td>0.002</td>
+      <td>1037.0</td>
+      <td>1101.0</td>
+      <td>1.0</td>
     </tr>
   </tbody>
 </table>
@@ -475,27 +580,39 @@ Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pi
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -515,7 +632,7 @@ Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pi
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

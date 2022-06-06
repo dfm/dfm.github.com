@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">Dense mass matrices for PyMC3</h1>
             <time datetime="2018-10-11 00:00:00 &#43;0000 UTC" class="post__date">Oct 11 2018</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--pymc3-mass-matrix">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--pymc3-mass-matrix/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -141,7 +153,12 @@ I have found that this can have a <em>huge</em> effect (a few orders of magnitud
 <h2 id="sampling-an-isotropic-gaussian">Sampling an isotropic Gaussian<a class="anchor" href="#sampling-an-isotropic-gaussian">#</a></h2>
 <p>First, let&rsquo;s look at how fast PyMC3 can sample an isotropic 5-D Gaussian.</p>
 <pre><code class="language-python">import time
+import warnings
 import pymc3 as pm
+import arviz as az
+
+warnings.filterwarnings(&quot;ignore&quot;)
+
 print(&quot;PyMC3 version {0}&quot;.format(pm.__version__))
 
 ndim = 5
@@ -151,28 +168,61 @@ with pm.Model() as simple_model:
 
 strt = time.time()
 with simple_model:
-    simple_trace = pm.sample(draws=3000, tune=3000, random_seed=42)
-    
+    simple_trace = pm.sample(
+        draws=3000, tune=3000, random_seed=42, chains=2, return_inferencedata=True
+    )
+
     # About half the time is spent in tuning so correct for that
-    simple_time = 0.5*(time.time() - strt)
-    
-stats = pm.summary(simple_trace)
-simple_time_per_eff = simple_time / stats.n_eff.min()
+    simple_time = 0.5 * (time.time() - strt)
+
+stats = az.summary(simple_trace)
+simple_time_per_eff = simple_time / stats.ess_bulk.values.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(simple_time_per_eff * 1000))
 </code></pre>
-<pre><code>Auto-assigning NUTS sampler...
+<pre><code>PyMC3 version 3.11.5
+
+
+Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
-
-
-PyMC3 version 3.5
-
-
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 12000/12000 [00:04&lt;00:00, 2501.80draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:02<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 00:02<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 5 seconds.
 
 
-time per effective sample: 0.26766 ms
+time per effective sample: 1.34803 ms
 </code></pre>
 <p>On my laptop with two CPUs, I find that the computational cost per effective sample is a fraction of a millisecond.
 That&rsquo;s how things should be!</p>
@@ -189,15 +239,15 @@ import corner  # https://corner.readthedocs.io
 # Generate a random positive definite matrix
 np.random.seed(42)
 L = np.random.randn(ndim, ndim)
-L[np.diag_indices_from(L)] = 0.1*np.exp(L[np.diag_indices_from(L)])
+L[np.diag_indices_from(L)] = 0.1 * np.exp(L[np.diag_indices_from(L)])
 L[np.triu_indices_from(L, 1)] = 0.0
 cov = np.dot(L, L.T)
 
 # Draw samples from this Gaussian and plot
 samples = np.random.multivariate_normal(np.zeros(ndim), cov, size=5000)
-corner.corner(samples, labels=[&quot;$x_{{{0}}}$&quot;.format(i) for i in range(1, ndim+1)]);
+corner.corner(samples, labels=[&quot;$x_{{{0}}}$&quot;.format(i) for i in range(1, ndim + 1)]);
 </code></pre>
-<p><img src="output_5_0.png" alt="png"></p>
+<p><img src="output_3_0.png" alt="png"></p>
 <p>This plot will look familiar to any astronomers reading this (and probably some readers from other fields) because our parameters are often correlated and the dynamic range of the parameters can vary drastically.
 If you used emcee to sample this posterior and the isotropic case above, you would get identical performance (albeit somewhat worse performance than PyMC3) but, as we&rsquo;ll see, the same is not true of PyMC3.
 Let&rsquo;s try to sample this probability density using PyMC3&rsquo;s default settings.</p>
@@ -206,24 +256,60 @@ Let&rsquo;s try to sample this probability density using PyMC3&rsquo;s default s
 
 with model:
     strt = time.time()
-    default_trace = pm.sample(draws=10000, tune=5000, random_seed=42)
+    default_trace = pm.sample(
+        draws=3000, tune=3000, random_seed=42, chains=2, return_inferencedata=True
+    )
     default_time = 0.5 * (time.time() - strt)
 
-stats = pm.summary(default_trace)
-default_time_per_eff = default_time / stats.n_eff.min()
+stats = az.summary(default_trace)
+default_time_per_eff = default_time / stats.ess_bulk.values.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(default_time_per_eff * 1000))
 </code></pre>
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 30000/30000 [42:44&lt;00:00,  6.01draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 09:03<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [6000/6000 08:59<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 1083 seconds.
+The acceptance probability does not match the target. It is 0.8914101254030794, but should be close to 0.8. Try to increase the number of tuning steps.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The number of effective samples is smaller than 10% for some parameters.
 
 
-time per effective sample: 1719.01749 ms
+time per effective sample: 2003.80742 ms
 </code></pre>
 <p>Yes, the units here are the same and the computational efficiency is orders of magnitude worse than the isotropic case.
 The standard recommendation would be to re-parameterize (we can see that that&rsquo;s what PyMC3 is telling us to do here too), but I&rsquo;m not really clever or patient enough to do that in every case.
@@ -244,16 +330,17 @@ n_window = n_window.astype(int)
 <p>Next, here&rsquo;s a function that takes in a MultiTrace object from PyMC3, estimates the sample covariance, and builds a NUTS step for use in the <code>sample</code> method.</p>
 <pre><code class="language-python">from pymc3.step_methods.hmc.quadpotential import QuadPotentialFull
 
-def get_step_for_trace(trace=None, model=None,
-                       regular_window=5, regular_variance=1e-3,
-                       **kwargs):
+
+def get_step_for_trace(
+    trace=None, model=None, regular_window=5, regular_variance=1e-3, **kwargs
+):
     model = pm.modelcontext(model)
-    
+
     # If not given, use the trivial metric
     if trace is None:
         potential = QuadPotentialFull(np.eye(model.ndim))
         return pm.NUTS(potential=potential, **kwargs)
-        
+
     # Loop over samples and convert to the relevant parameter space;
     # I'm sure that there's an easier way to do this, but I don't know
     # how to make something work in general...
@@ -263,10 +350,10 @@ def get_step_for_trace(trace=None, model=None,
         for p in chain:
             samples[i] = model.bijection.map(p)
             i += 1
-    
+
     # Compute the sample covariance
     cov = np.cov(samples, rowvar=0)
-    
+
     # Stan uses a regularized estimator for the covariance matrix to
     # be less sensitive to numerical issues for large parameter spaces.
     # In the test case for this blog post, this isn't necessary and it
@@ -274,9 +361,10 @@ def get_step_for_trace(trace=None, model=None,
     # wanted to include the implementation here for completeness
     N = len(samples)
     cov = cov * N / (N + regular_window)
-    cov[np.diag_indices_from(cov)] += \
+    cov[np.diag_indices_from(cov)] += (
         regular_variance * regular_window / (N + regular_window)
-    
+    )
+
     # Use the sample covariance as the inverse metric
     potential = QuadPotentialFull(cov)
     return pm.NUTS(potential=potential, **kwargs)
@@ -291,63 +379,370 @@ with model:
     for steps in n_window:
         step = get_step_for_trace(burnin_trace, regular_window=0)
         burnin_trace = pm.sample(
-            start=start, tune=steps, draws=2, step=step,
-            compute_convergence_checks=False, discard_tuned_samples=False)
+            start=start,
+            tune=steps,
+            draws=2,
+            step=step,
+            compute_convergence_checks=False,
+            discard_tuned_samples=False,
+            return_inferencedata=False,
+        )
         start = [t[-1] for t in burnin_trace._straces.values()]
 
     step = get_step_for_trace(burnin_trace, regular_window=0)
-    dense_trace = pm.sample(draws=5000, tune=n_burn, step=step, start=start)
-    factor = 5000 / (5000 + np.sum(n_window+2) + n_burn)
+    dense_trace = pm.sample(
+        draws=5000, tune=n_burn, step=step, start=start, return_inferencedata=True
+    )
+    factor = 5000 / (5000 + np.sum(n_window + 2) + n_burn)
     dense_time = factor * (time.time() - strt)
 
-stats = pm.summary(dense_trace)
-dense_time_per_eff = dense_time / stats.n_eff.min()
+stats = az.summary(dense_trace)
+dense_time_per_eff = dense_time / stats.ess_bulk.values.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(dense_time_per_eff * 1000))
 </code></pre>
 <pre><code>Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 54/54 [00:01&lt;00:00, 41.49draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='27' class='' max='27' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [27/27 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='27' class='' max='27' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [27/27 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 25 tune and 2 draw iterations (50 + 4 draws total) took 1 seconds.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 104/104 [00:00&lt;00:00, 232.25draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='52' class='' max='52' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [52/52 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='52' class='' max='52' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [52/52 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 50 tune and 2 draw iterations (100 + 4 draws total) took 1 seconds.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 204/204 [00:00&lt;00:00, 800.87draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='102' class='' max='102' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [102/102 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='102' class='' max='102' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [102/102 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 100 tune and 2 draw iterations (200 + 4 draws total) took 0 seconds.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 404/404 [00:00&lt;00:00, 1043.13draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='202' class='' max='202' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [202/202 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='202' class='' max='202' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [202/202 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 200 tune and 2 draw iterations (400 + 4 draws total) took 0 seconds.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 804/804 [00:00&lt;00:00, 1064.61draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='402' class='' max='402' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [402/402 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='402' class='' max='402' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [402/402 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 400 tune and 2 draw iterations (800 + 4 draws total) took 1 seconds.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 1604/1604 [00:01&lt;00:00, 884.55draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='802' class='' max='802' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [802/802 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='802' class='' max='802' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [802/802 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 800 tune and 2 draw iterations (1_600 + 4 draws total) took 1 seconds.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 3204/3204 [00:03&lt;00:00, 905.63draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='1602' class='' max='1602' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1602/1602 00:01<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='1602' class='' max='1602' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1602/1602 00:01<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 1_600 tune and 2 draw iterations (3_200 + 4 draws total) took 2 seconds.
 Only 2 samples in chain.
-Multiprocess sampling (2 chains in 2 jobs)
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 2654/2654 [00:03&lt;00:00, 868.36draws/s]
-Multiprocess sampling (2 chains in 2 jobs)
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='1327' class='' max='1327' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1327/1327 00:00<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='1327' class='' max='1327' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1327/1327 00:00<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 1_325 tune and 2 draw iterations (2_650 + 4 draws total) took 2 seconds.
+Sequential sampling (2 chains in 1 job)
 NUTS: [x]
-Sampling 2 chains: 100%|██████████| 11000/11000 [00:09&lt;00:00, 1206.30draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='5500' class='' max='5500' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [5500/5500 00:03<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='5500' class='' max='5500' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [5500/5500 00:03<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 500 tune and 5_000 draw iterations (1_000 + 10_000 draws total) took 7 seconds.
 
-time per effective sample: 0.75394 ms
+
+time per effective sample: 0.48053 ms
 </code></pre>
 <p>The computational efficiency of this method is similar to PyMC3&rsquo;s default performance on an isotropic Gaussian (within a factor of a few) and corresponds to an improvement of more than <em>three orders of magnitude</em> over the default PyMC3 performance on a correlated Gaussian.</p>
-<p>While I&rsquo;ve found that this procedure can substantially improve the sampling efficiency in many real world scenerios (especially during exploratory phases of a project), you shouldn&rsquo;t forget about reparameterization because that can provide even better performance and help identify problems with your model specification.
-Futhermore, this method might run into numerical issues for high dimensional problems because more samples will be needed to reliably estimate the off-diagonal elements of the mass matrix.
+<p>While I&rsquo;ve found that this procedure can substantially improve the sampling efficiency in many real world scenarios (especially during exploratory phases of a project), you shouldn&rsquo;t forget about reparameterization because that can provide even better performance and help identify problems with your model specification.
+Furthermore, this method might run into numerical issues for high dimensional problems because more samples will be needed to reliably estimate the off-diagonal elements of the mass matrix.
 Either way, hopefully this is helpful to folks until PyMC3 includes native support for this type of procedure.</p>
+<p><em>Edit: This feature is now available in PyMC3 using the</em> <code>init=&quot;adapt_full&quot;</code> <em>argument to</em> <code>pm.sample</code>.</p>
 
 
               
@@ -415,27 +810,39 @@ Either way, hopefully this is helpful to folks until PyMC3 includes native suppo
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -455,7 +862,7 @@ Either way, hopefully this is helpful to folks until PyMC3 includes native suppo
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

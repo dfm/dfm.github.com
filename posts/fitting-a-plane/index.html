@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">Fitting a plane to data</h1>
             <time datetime="2017-06-01 00:00:00 &#43;0000 UTC" class="post__date">Jun 1 2017</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--fitting-a-plane">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--fitting-a-plane/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -135,11 +147,11 @@ def plot_error_ellipses(ax, X, S, color=&quot;k&quot;):
         vals, vecs = np.linalg.eig(S[n])
         theta = np.degrees(np.arctan2(*vecs[::-1, 0]))
         w, h = 2 * np.sqrt(vals)
-        ell = Ellipse(xy=X[n], width=w, height=h,
-                      angle=theta, color=color, lw=0.5)
+        ell = Ellipse(xy=X[n], width=w, height=h, angle=theta, color=color, lw=0.5)
         ell.set_facecolor(&quot;none&quot;)
         ax.add_artist(ell)
     ax.plot(X[:, 0], X[:, 1], &quot;.&quot;, color=color, ms=4)
+
 
 # Generate the true coordinates of the data points.
 N = 10
@@ -163,14 +175,14 @@ for n in range(N):
 # Plot the simulated dataset.
 fig, ax = plt.subplots(1, 1, figsize=(5, 5))
 x0 = np.array([-2, 12])
-ax.plot(x0, m_true*x0 + b_true, lw=1)
+ax.plot(x0, m_true * x0 + b_true, lw=1)
 plot_error_ellipses(ax, X, S)
 ax.set_xlim(-2, 12)
 ax.set_ylim(-2, 12)
 ax.set_xlabel(&quot;x&quot;)
 ax.set_ylabel(&quot;y&quot;);
 </code></pre>
-<p><img src="output_3_0.png" alt="png"></p>
+<p><img src="output_1_0.png" alt="png"></p>
 <p>In this figure, you&rsquo;re seeing the simulated dataset with its error ellipses shown in black.
 The true linear relation that was used to simulate the data is shown in blue.</p>
 <h2 id="naïve-sampling">Naïve sampling<a class="anchor" href="#naïve-sampling">#</a></h2>
@@ -207,24 +219,27 @@ $$</div>
 Here&rsquo;s the model in code:</p>
 <pre><code class="language-python">def log_prior(params):
     m = params[0]
-    return -1.5 * np.log(1 + m*m)
+    return -1.5 * np.log(1 + m * m)
+
 
 # Pre-compute the inverses for speed.
 Sinv = np.array([np.linalg.inv(Sn) for Sn in S])
+
+
 def log_prob_naive(params):
     # Compute the &quot;true&quot; model predictions.
     m, b = params[:2]
     xhat = params[2:]
     yhat = m * xhat + b
-    
+
     # Compute the residuals.
     r = np.array(X)
     r[:, 0] -= xhat
     r[:, 1] -= yhat
-    
+
     # Use some numpy magic to compute the likelihood (up to a constant).
-    ll = -0.5*np.einsum(&quot;n...i,nij,n...j&quot;, r, Sinv, r)
-    
+    ll = -0.5 * np.einsum(&quot;n...i,nij,n...j&quot;, r, Sinv, r)
+
     return ll + log_prior(params)
 </code></pre>
 <p>Let&rsquo;s use <a href="http://dan.iel.fm/emcee" 
@@ -250,16 +265,16 @@ nsamples = len(samples_naive)
 print(&quot;{0:.0f} independent samples of m&quot;.format(nsamples / tau[0]))
 print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[1]))
 </code></pre>
-<pre><code>2217 independent samples of m
-3267 independent samples of b
+<pre><code>4473 independent samples of m
+4670 independent samples of b
 </code></pre>
 <p>And plot the posterior constraints on <code>$m$</code> and <code>$b$</code>:</p>
 <pre><code class="language-python">import corner
+
 rng = [(x.min(), x.max()) for x in samples_naive.T]
-corner.corner(samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths=[m_true, b_true],
-              range=rng);
+corner.corner(samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths=[m_true, b_true], range=rng);
 </code></pre>
-<p><img src="output_11_0.png" alt="png"></p>
+<p><img src="output_9_0.png" alt="png"></p>
 <p>Cool.
 That looks fine, but the problem here is that this won&rsquo;t really scale well to large datasets because we&rsquo;ll need a parameter <code>$\hat{x}_n$</code> for each data point.
 It turns out (thanks to the magic of Gaussians) that we can analytically marginalize over these nuisance parameters and reduce the problem back down to 2-D.</p>
@@ -302,16 +317,17 @@ The main thing to note about this equation is that you <em>must</em> include the
 <pre><code class="language-python">def log_marg_prob(params):
     m, b = params
     v = np.array([-m, 1.0])
-    
+
     # Compute \Sigma^2 and \Delta.
     # You can probably convince yourself that this formulation of
     # \Sigma^2 is equivalent to the one in the text.
     Sigma2 = np.dot(np.dot(S, v), v)
     Delta = m * X[:, 0] + b - X[:, 1]
-    
+
     # Compute the log likelihood up to a constant (zero, oops...).
     ll = -0.5 * np.sum(Delta**2 / Sigma2 + np.log(Sigma2))
     return ll + log_prior(params)
+
 
 # Run the MCMC with the same initialization as above.
 sampler_marg = emcee.EnsembleSampler(nwalkers, 2, log_marg_prob)
@@ -320,14 +336,15 @@ sampler_marg.reset()
 sampler_marg.run_mcmc(pos, 1000)
 samples_marg = sampler_marg.flatchain
 
-tau = sampler_marg.get_autocorr_time(c=4)
+tau = sampler_marg.get_autocorr_time(c=4, quiet=True)
 nsamples = len(samples_marg)
 print(&quot;{0:.0f} independent samples of m&quot;.format(nsamples / tau[0]))
 print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[1]))
 
 # Plot the posterior constraints for the naive sampling.
-fig = corner.corner(samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths=[m_true, b_true],
-                    range=rng)
+fig = corner.corner(
+    samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths=[m_true, b_true], range=rng
+)
 
 # Plot the constraints from the marginalized sampling.
 # We need to re-weight the samples because we didn't need to run
@@ -335,10 +352,15 @@ fig = corner.corner(samples_naive, labels=[&quot;m&quot;, &quot;b&quot;], truths
 w = len(samples_naive) / len(samples_marg) + np.zeros(len(samples_marg))
 corner.corner(samples_marg, range=rng, color=&quot;g&quot;, fig=fig, weights=w);
 </code></pre>
-<pre><code>4402 independent samples of m
-3998 independent samples of b
+<pre><code>The chain is shorter than 50 times the integrated autocorrelation time for 2 parameter(s). Use this estimate with caution and run a longer chain!
+N/50 = 20;
+tau: [24.93810686 24.60698793]
+
+
+2566 independent samples of m
+2601 independent samples of b
 </code></pre>
-<p><img src="output_13_1.png" alt="png"></p>
+<p><img src="output_11_2.png" alt="png"></p>
 <p>In this figure, you see the same results from before (in black) when we sampled in <code>$m$</code>, <code>$b$</code>, and <code>$\hat{x}_n$</code>.
 The green contours are what we got when we sampled the analytically marginalized probability density.
 As expected, these results are indistinguishable within the sampling error, but the latter is more scalable and easier to sample to convergence (we evaluated the model an order of magnitude fewer times to get the same number of independent samples).</p>
@@ -348,16 +370,16 @@ x0 = np.array([-2, 12])
 
 # Plot posterior predictions for a few samples.
 for m, b in samples_marg[np.random.randint(len(samples_marg), size=100)]:
-    ax.plot(x0, m*x0 + b, lw=1, alpha=0.1, color=&quot;g&quot;)
-    
-ax.plot(x0, m_true*x0 + b_true, &quot;k&quot;, lw=2)
+    ax.plot(x0, m * x0 + b, lw=1, alpha=0.1, color=&quot;g&quot;)
+
+ax.plot(x0, m_true * x0 + b_true, &quot;k&quot;, lw=2)
 plot_error_ellipses(ax, X, S)
 ax.set_xlim(-2, 12)
 ax.set_ylim(-2, 12)
 ax.set_xlabel(&quot;x&quot;)
 ax.set_ylabel(&quot;y&quot;);
 </code></pre>
-<p><img src="output_15_0.png" alt="png"></p>
+<p><img src="output_13_0.png" alt="png"></p>
 <p>In this figure, the true model is shown as the black line and several posterior samples are shown as light green lines.</p>
 <h2 id="intrinsic-scatter">Intrinsic scatter<a class="anchor" href="#intrinsic-scatter">#</a></h2>
 <p>Now, let&rsquo;s generalize our derivation from above to include an intrinsic width to the line.
@@ -429,21 +451,19 @@ X_scatter[:, 1] += lambda_true * np.random.randn(N)
 # Plot the updated dataset.
 fig, ax = plt.subplots(1, 1, figsize=(5, 5))
 x0 = np.array([-2, 12])
-ax.plot(x0, m_true*x0 + b_true, lw=1)
+ax.plot(x0, m_true * x0 + b_true, lw=1)
 plot_error_ellipses(ax, X_scatter, S)
 
 # Plot the displacement vectors.
 for n in range(N):
-    ax.plot([X[n, 0], X_scatter[n, 0]],
-            [X[n, 1], X_scatter[n, 1]],
-            &quot;k&quot;, lw=0.5)
+    ax.plot([X[n, 0], X_scatter[n, 0]], [X[n, 1], X_scatter[n, 1]], &quot;k&quot;, lw=0.5)
 
 ax.set_xlim(-2, 12)
 ax.set_ylim(-2, 12)
 ax.set_xlabel(&quot;x&quot;)
 ax.set_ylabel(&quot;y&quot;);
 </code></pre>
-<p><img src="output_17_0.png" alt="png"></p>
+<p><img src="output_15_0.png" alt="png"></p>
 <p>This is the same kind of figure that we had before but now I&rsquo;m indicating the extra scatter that was added to each data point with the black lines.
 You can see that all of these offsets are in the <code>$y$</code> direction.</p>
 <p>To sample this model, we&rsquo;ll need to choose a prior on <code>$\lambda$</code>.
@@ -457,18 +477,19 @@ $$</div>
 <pre><code class="language-python">def log_marg_prob_scatter(params):
     m, b, log_lambda = params
     v = np.array([-m, 1.0])
-    
-    # Enforce the log-uniform prior on lambda. 
+
+    # Enforce the log-uniform prior on lambda.
     if not -5.0 &lt; log_lambda &lt; 5.0:
         return -np.inf
-        
+
     # Compute \Sigma^2 and \Delta.
-    Sigma2 = np.dot(np.dot(S, v), v) + np.exp(2*log_lambda)
+    Sigma2 = np.dot(np.dot(S, v), v) + np.exp(2 * log_lambda)
     Delta = m * X_scatter[:, 0] + b - X_scatter[:, 1]
-    
+
     # Compute the log likelihood up to a constant.
     ll = -0.5 * np.sum(Delta**2 / Sigma2 + np.log(Sigma2))
     return ll + log_prior(params)
+
 
 # Run the MCMC.
 sampler_scatter = emcee.EnsembleSampler(nwalkers, 3, log_marg_prob_scatter)
@@ -485,14 +506,17 @@ print(&quot;{0:.0f} independent samples of m&quot;.format(nsamples / tau[0]))
 print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[1]))
 print(&quot;{0:.0f} independent samples of lambda&quot;.format(nsamples / tau[2]))
 
-corner.corner(samples_scatter, labels=[&quot;m&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
-              truths=[m_true, b_true, np.log(lambda_true)]);
+corner.corner(
+    samples_scatter,
+    labels=[&quot;m&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
+    truths=[m_true, b_true, np.log(lambda_true)],
+);
 </code></pre>
-<pre><code>7734 independent samples of m
-9528 independent samples of b
-5108 independent samples of lambda
+<pre><code>7352 independent samples of m
+7855 independent samples of b
+4381 independent samples of lambda
 </code></pre>
-<p><img src="output_19_1.png" alt="png"></p>
+<p><img src="output_17_1.png" alt="png"></p>
 <p>We can compare this sampling to the previous on (without scatter) by plotting some samples of the model in the &ldquo;data&rdquo; space.
 You can see that the constaints are wider than previously, but things seemed to have worked well.</p>
 <pre><code class="language-python">fig, ax = plt.subplots(1, 1, figsize=(5, 5))
@@ -500,16 +524,16 @@ x0 = np.array([-2, 12])
 
 # Plot posterior predictions for a few samples.
 for m, b, _ in samples_scatter[np.random.randint(len(samples_scatter), size=100)]:
-    ax.plot(x0, m*x0 + b, lw=1, alpha=0.1, color=&quot;g&quot;)
-    
-ax.plot(x0, m_true*x0 + b_true, &quot;k&quot;, lw=2)
+    ax.plot(x0, m * x0 + b, lw=1, alpha=0.1, color=&quot;g&quot;)
+
+ax.plot(x0, m_true * x0 + b_true, &quot;k&quot;, lw=2)
 plot_error_ellipses(ax, X_scatter, S)
 ax.set_xlim(-2, 12)
 ax.set_ylim(-2, 12)
 ax.set_xlabel(&quot;x&quot;)
 ax.set_ylabel(&quot;y&quot;);
 </code></pre>
-<p><img src="output_21_0.png" alt="png"></p>
+<p><img src="output_19_0.png" alt="png"></p>
 <h2 id="generalizing-to-higher-dimensions">Generalizing to higher dimensions<a class="anchor" href="#generalizing-to-higher-dimensions">#</a></h2>
 <p>Now let&rsquo;s extend our discussion to fitting a plane to data in <code>$D$</code> dimensions.
 Some people might have just been able to intuit the correct result here, but I wanted to derive it to make sure that I was happy so here it goes&hellip;</p>
@@ -624,7 +648,7 @@ for n in range(N):
     L[np.tril_indices_from(L, -1)] = 0.5 * np.random.randn()
     S[n] = np.dot(L, L.T)
     X[n] = np.random.multivariate_normal(X_true[n], S[n])
-    
+
 # Finally add some scatter.
 lambda_true = 2.0
 X[:, -1] += lambda_true * np.random.randn(N)
@@ -634,12 +658,11 @@ fig, axes = plt.subplots(2, 2, figsize=(5, 5))
 for xi, yi in product(range(3), range(3)):
     if yi &lt;= xi:
         continue
-    ax = axes[yi-1, xi]
-    plot_error_ellipses(ax, X[:, [xi, yi]],
-                        S[:,
-                          [[xi, xi], [yi, yi]],
-                          [[xi, yi], [xi, yi]]])
-    
+    ax = axes[yi - 1, xi]
+    plot_error_ellipses(
+        ax, X[:, [xi, yi]], S[:, [[xi, xi], [yi, yi]], [[xi, yi], [xi, yi]]]
+    )
+
     ax.set_xlim(-7, 17)
     ax.set_ylim(-7, 17)
 
@@ -660,23 +683,24 @@ ax.set_xlabel(&quot;$x_2$&quot;)
 ax.set_yticklabels([])
 fig.subplots_adjust(wspace=0, hspace=0)
 </code></pre>
-<p><img src="output_23_0.png" alt="png"></p>
+<p><img src="output_21_0.png" alt="png"></p>
 <pre><code class="language-python">def log_prob_D(params):
     m = params[:2]
     b, log_lambda = params[2:]
     v = np.append(-m, 1.0)
-    
-    # Enforce the log-uniform prior on lambda. 
+
+    # Enforce the log-uniform prior on lambda.
     if not -5.0 &lt; log_lambda &lt; 5.0:
         return -np.inf
-        
+
     # Compute \Sigma^2 and \Delta.
-    Sigma2 = np.dot(np.dot(S, v), v) + np.exp(2*log_lambda)
+    Sigma2 = np.dot(np.dot(S, v), v) + np.exp(2 * log_lambda)
     Delta = np.dot(X, v) - b
-    
+
     # Compute the log likelihood up to a constant.
     ll = -0.5 * np.sum(Delta**2 / Sigma2 + np.log(Sigma2))
     return ll
+
 
 # Run the MCMC.
 sampler_D = emcee.EnsembleSampler(nwalkers, 4, log_prob_D)
@@ -694,15 +718,18 @@ print(&quot;{0:.0f} independent samples of m2&quot;.format(nsamples / tau[1]))
 print(&quot;{0:.0f} independent samples of b&quot;.format(nsamples / tau[2]))
 print(&quot;{0:.0f} independent samples of ln(lambda)&quot;.format(nsamples / tau[3]))
 
-corner.corner(samples_D, labels=[&quot;$m_1$&quot;, &quot;$m_2$&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
-              truths=np.append(m_true, [b_true, np.log(lambda_true)]));
+corner.corner(
+    samples_D,
+    labels=[&quot;$m_1$&quot;, &quot;$m_2$&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
+    truths=np.append(m_true, [b_true, np.log(lambda_true)]),
+);
 </code></pre>
-<pre><code>11514 independent samples of m1
-5614 independent samples of m2
-9536 independent samples of b
-4105 independent samples of ln(lambda)
+<pre><code>6760 independent samples of m1
+7442 independent samples of m2
+7049 independent samples of b
+6926 independent samples of ln(lambda)
 </code></pre>
-<p><img src="output_24_1.png" alt="png"></p>
+<p><img src="output_22_1.png" alt="png"></p>
 <p>If you made it this far, you might notice that I don&rsquo;t really have a reasonable prior for the slopes.
 The current prior (uniform in <code>$\vec{m}$</code>) will have the same problems that <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/#Prior-on-Slope-and-Intercept" 
   
@@ -785,27 +812,39 @@ Hope this is helpful and please let me know of any mistakes in my work via the c
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -825,7 +864,7 @@ Hope this is helpful and please let me know of any mistakes in my work via the c
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

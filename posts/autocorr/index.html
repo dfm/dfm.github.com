@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">Autocorrelation time estimation</h1>
             <time datetime="2017-10-16 00:00:00 &#43;0000 UTC" class="post__date">Oct 16 2017</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--autocorr">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--autocorr/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -200,11 +212,12 @@ np.random.seed(123456)
 # Build the celerite model:
 import celerite
 from celerite import terms
+
 kernel = terms.RealTerm(log_a=0.0, log_c=-6.0)
 kernel += terms.RealTerm(log_a=0.0, log_c=-2.0)
 
 # The true autocorrelation time can be calculated analytically:
-true_tau = sum(2*np.exp(t.log_a-t.log_c) for t in kernel.terms)
+true_tau = sum(2 * np.exp(t.log_a - t.log_c) for t in kernel.terms)
 true_tau /= sum(np.exp(t.log_a) for t in kernel.terms)
 true_tau
 
@@ -221,13 +234,14 @@ plt.xlabel(&quot;step number&quot;)
 plt.ylabel(&quot;$f$&quot;)
 plt.title(&quot;$\\tau_\mathrm{{true}} = {0:.0f}$&quot;.format(true_tau), fontsize=14);
 </code></pre>
-<p><img src="output_6_0.png" alt="png"></p>
+<p><img src="output_4_0.png" alt="png"></p>
 <p>Now we&rsquo;ll estimate the empirical autocorrelation function for each of these parallel chains and compare this to the true function.</p>
 <pre><code class="language-python">def next_pow_two(n):
     i = 1
     while i &lt; n:
         i = i &lt;&lt; 1
     return i
+
 
 def autocorr_func_1d(x, norm=True):
     x = np.atleast_1d(x)
@@ -236,19 +250,20 @@ def autocorr_func_1d(x, norm=True):
     n = next_pow_two(len(x))
 
     # Compute the FFT and then (from that) the auto-correlation function
-    f = np.fft.fft(x - np.mean(x), n=2*n)
-    acf = np.fft.ifft(f * np.conjugate(f))[:len(x)].real
-    acf /= 4*n
-    
+    f = np.fft.fft(x - np.mean(x), n=2 * n)
+    acf = np.fft.ifft(f * np.conjugate(f))[: len(x)].real
+    acf /= 4 * n
+
     # Optionally normalize
     if norm:
         acf /= acf[0]
 
     return acf
 
+
 # Make plots of ACF estimate for a few different chain lengths
-window = int(2*true_tau)
-tau = np.arange(window+1)
+window = int(2 * true_tau)
+tau = np.arange(window + 1)
 f0 = kernel.get_value(tau) / kernel.get_value(0.0)
 
 # Loop over chain lengths:
@@ -256,7 +271,7 @@ fig, axes = plt.subplots(1, 3, figsize=(12, 4), sharex=True, sharey=True)
 for n, ax in zip([10, 100, 1000], axes):
     nn = int(true_tau * n)
     ax.plot(tau / true_tau, f0, &quot;k&quot;, label=&quot;true&quot;)
-    ax.plot(tau / true_tau, autocorr_func_1d(y[0, :nn])[:window+1], label=&quot;estimate&quot;)
+    ax.plot(tau / true_tau, autocorr_func_1d(y[0, :nn])[: window + 1], label=&quot;estimate&quot;)
     ax.set_title(r&quot;$N = {0}\,\tau_\mathrm{{true}}$&quot;.format(n), fontsize=14)
     ax.set_xlabel(r&quot;$\tau / \tau_\mathrm{true}$&quot;)
 
@@ -265,7 +280,7 @@ axes[-1].set_xlim(0, window / true_tau)
 axes[-1].set_ylim(-0.05, 1.05)
 axes[-1].legend(fontsize=14);
 </code></pre>
-<p><img src="output_8_0.png" alt="png"></p>
+<p><img src="output_6_0.png" alt="png"></p>
 <p>This figure shows how the empirical estimate of the normalized autocorrelation function changes as more samples are generated.
 In each panel, the true autocorrelation function is shown as a black curve and the empricial estimator is shown as a blue line.</p>
 <p>Instead of estimating the autocorrelation function using a single chain, we can assume that each chain is sampled from the same stochastic process and average the estimate over ensemble members to reduce the variance.
@@ -274,8 +289,10 @@ It turns out that we&rsquo;ll actually do this averaging later in the process be
 for n, ax in zip([10, 100, 1000], axes):
     nn = int(true_tau * n)
     ax.plot(tau / true_tau, f0, &quot;k&quot;, label=&quot;true&quot;)
-    f = np.mean([autocorr_func_1d(y[i, :nn], norm=False)[:window+1]
-                 for i in range(len(y))], axis=0)
+    f = np.mean(
+        [autocorr_func_1d(y[i, :nn], norm=False)[: window + 1] for i in range(len(y))],
+        axis=0,
+    )
     f /= f[0]
     ax.plot(tau / true_tau, f, label=&quot;estimate&quot;)
     ax.set_title(r&quot;$N = {0}\,\tau_\mathrm{{true}}$&quot;.format(n), fontsize=14)
@@ -286,7 +303,7 @@ axes[-1].set_xlim(0, window / true_tau)
 axes[-1].set_ylim(-0.05, 1.05)
 axes[-1].legend(fontsize=14);
 </code></pre>
-<p><img src="output_10_0.png" alt="png"></p>
+<p><img src="output_8_0.png" alt="png"></p>
 <p>Now let&rsquo;s estimate the autocorrelation time using these estimated autocorrelation functions.
 Goodman &amp; Weare (2010) suggested averaging the ensemble over walkers and computing the autocorrelation function of the mean chain to lower the variance of the estimator and that was what was originally implemented in emcee.
 Since then, @fardal on GitHub <a href="https://github.com/dfm/emcee/issues/209" 
@@ -302,21 +319,24 @@ def auto_window(taus, c):
         return np.argmin(m)
     return len(taus) - 1
 
+
 # Following the suggestion from Goodman &amp; Weare (2010)
 def autocorr_gw2010(y, c=5.0):
     f = autocorr_func_1d(np.mean(y, axis=0))
-    taus = 2.0*np.cumsum(f)-1.0
+    taus = 2.0 * np.cumsum(f) - 1.0
     window = auto_window(taus, c)
     return taus[window]
+
 
 def autocorr_new(y, c=5.0):
     f = np.zeros(y.shape[1])
     for yy in y:
         f += autocorr_func_1d(yy)
     f /= len(y)
-    taus = 2.0*np.cumsum(f)-1.0
+    taus = 2.0 * np.cumsum(f) - 1.0
     window = auto_window(taus, c)
     return taus[window]
+
 
 # Compute the estimators for a few different chain lengths
 N = np.exp(np.linspace(np.log(100), np.log(y.shape[1]), 10)).astype(int)
@@ -327,7 +347,7 @@ for i, n in enumerate(N):
     new[i] = autocorr_new(y[:, :n])
 
 # Plot the comparisons
-plt.loglog(N, gw2010, &quot;o-&quot;, label=&quot;G\&amp;W 2010&quot;)
+plt.loglog(N, gw2010, &quot;o-&quot;, label=&quot;G&amp;W 2010&quot;)
 plt.loglog(N, new, &quot;o-&quot;, label=&quot;DFM 2017&quot;)
 ylim = plt.gca().get_ylim()
 plt.plot(N, N / 50.0, &quot;--k&quot;, label=r&quot;$\tau = N/50$&quot;)
@@ -337,7 +357,7 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_12_0.png" alt="png"></p>
+<p><img src="output_10_0.png" alt="png"></p>
 <p>In this figure, the true autocorrelation time is shown as a horizontal line and it should be clear that both estimators give outrageous results for the short chains.
 It should also be clear that the new algorithm has lower variance than the original method based on Goodman &amp; Weare.
 In fact, even for moderately long chains, the old method can give dangerously over-confident estimates.
@@ -349,15 +369,19 @@ Larger values of <code>$F$</code> will be more conservative, but they will also 
 So that the sampling isn&rsquo;t completely trivial, we&rsquo;ll sample a multimodal density in three dimensions.</p>
 <pre><code class="language-python">import emcee
 
+
 def log_prob(p):
-    return np.logaddexp(-0.5*np.sum(p**2), -0.5*np.sum((p-4.0)**2))
+    return np.logaddexp(-0.5 * np.sum(p**2), -0.5 * np.sum((p - 4.0) ** 2))
+
 
 sampler = emcee.EnsembleSampler(32, 3, log_prob)
-sampler.run_mcmc(np.concatenate((np.random.randn(16, 3),
-                                 4.0+np.random.randn(16, 3)), axis=0),
-                 500000, progress=True);
+sampler.run_mcmc(
+    np.concatenate((np.random.randn(16, 3), 4.0 + np.random.randn(16, 3)), axis=0),
+    500000,
+    progress=True,
+);
 </code></pre>
-<pre><code>100%|██████████| 500000/500000 [08:08&lt;00:00, 1023.55it/s]
+<pre><code>You must install the tqdm library to use progress indicators with emcee
 </code></pre>
 <p>Here&rsquo;s the marginalized density in the first dimension.</p>
 <pre><code class="language-python">chain = sampler.get_chain()[:, :, 0].T
@@ -367,7 +391,7 @@ plt.gca().set_yticks([])
 plt.xlabel(r&quot;$\theta$&quot;)
 plt.ylabel(r&quot;$p(\theta)$&quot;);
 </code></pre>
-<p><img src="output_17_0.png" alt="png"></p>
+<p><img src="output_15_0.png" alt="png"></p>
 <p>And here&rsquo;s the comparison plot showing how the autocorrelation time estimates converge with longer chains.</p>
 <pre><code class="language-python"># Compute the estimators for a few different chain lengths
 N = np.exp(np.linspace(np.log(100), np.log(chain.shape[1]), 10)).astype(int)
@@ -387,7 +411,7 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_19_0.png" alt="png"></p>
+<p><img src="output_17_0.png" alt="png"></p>
 <p>As before, the short chains give absurd estimates of <code>$\tau$</code>, but the new method converges faster and with lower variance than the old method.
 The <code>$\tau = N/50$</code> line is also included as above as an indication of where we might start trusting the estimates.</p>
 <h2 id="what-about-shorter-chains">What about shorter chains?<a class="anchor" href="#what-about-shorter-chains">#</a></h2>
@@ -404,18 +428,23 @@ One example would be to fit an <a href="https://en.wikipedia.org/wiki/Autoregres
 The celerite model that we&rsquo;re using is equivalent to a second-order ARMA model and it appears to be a good choice for this example, but we&rsquo;re not going to promise anything here about the general applicability and we caution care whenever estimating autocorrelation times using short chains.</p>
 <pre><code class="language-python">from scipy.optimize import minimize
 
+
 def autocorr_ml(y, thin=1, c=5.0):
     # Compute the initial estimate of tau using the standard method
     init = autocorr_new(y, c=c)
     z = y[:, ::thin]
     N = z.shape[1]
-    
+
     # Build the GP model
-    tau = max(1.0, init/thin)
-    kernel = terms.RealTerm(np.log(0.9*np.var(z)), -np.log(tau),
-                        bounds=[(-5.0, 5.0), (-np.log(N), 0.0)])
-    kernel += terms.RealTerm(np.log(0.1*np.var(z)), -np.log(0.5*tau),
-                            bounds=[(-5.0, 5.0), (-np.log(N), 0.0)])
+    tau = max(1.0, init / thin)
+    kernel = terms.RealTerm(
+        np.log(0.9 * np.var(z)), -np.log(tau), bounds=[(-5.0, 5.0), (-np.log(N), 0.0)]
+    )
+    kernel += terms.RealTerm(
+        np.log(0.1 * np.var(z)),
+        -np.log(0.5 * tau),
+        bounds=[(-5.0, 5.0), (-np.log(N), 0.0)],
+    )
     gp = celerite.GP(kernel, mean=np.mean(z))
     gp.compute(np.arange(z.shape[1]))
 
@@ -423,13 +452,10 @@ def autocorr_ml(y, thin=1, c=5.0):
     def nll(p):
         # Update the GP model
         gp.set_parameter_vector(p)
-        
+
         # Loop over the chains and compute likelihoods
-        v, g = zip(*(
-            gp.grad_log_likelihood(z0, quiet=True)
-            for z0 in z
-        ))
-        
+        v, g = zip(*(gp.grad_log_likelihood(z0, quiet=True) for z0 in z))
+
         # Combine the datasets
         return -np.sum(v), -np.sum(g, axis=0)
 
@@ -438,18 +464,19 @@ def autocorr_ml(y, thin=1, c=5.0):
     bounds = gp.get_parameter_bounds()
     soln = minimize(nll, p0, jac=True, bounds=bounds)
     gp.set_parameter_vector(soln.x)
-    
+
     # Compute the maximum likelihood tau
     a, c = kernel.coefficients[:2]
-    tau = thin * 2*np.sum(a / c) / np.sum(a)
+    tau = thin * 2 * np.sum(a / c) / np.sum(a)
     return tau
+
 
 # Calculate the estimate for a set of different chain lengths
 ml = np.empty(len(N))
 ml[:] = np.nan
 for j, n in enumerate(N[1:8]):
-    i = j+1
-    thin = max(1, int(0.05*new[i]))
+    i = j + 1
+    thin = max(1, int(0.05 * new[i]))
     ml[i] = autocorr_ml(chain[:, :n], thin=thin)
 </code></pre>
 <pre><code class="language-python"># Plot the comparisons
@@ -463,7 +490,7 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_23_0.png" alt="png"></p>
+<p><img src="output_21_0.png" alt="png"></p>
 <p>This figure is the same as the previous one, but we&rsquo;ve added the maximum likelihood estimates for <code>$\tau$</code> in green.
 In this case, this estimate seems to be robust even for very short chains with <code>$N \sim \tau$</code>.</p>
 
@@ -533,27 +560,39 @@ In this case, this estimate seems to be robust even for very short chains with <
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -573,7 +612,7 @@ In this case, this estimate seems to be robust even for very short chains with <
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

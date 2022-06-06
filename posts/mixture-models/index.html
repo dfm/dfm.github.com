@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">Mixture Models</h1>
             <time datetime="2014-12-12 00:00:00 &#43;0000 UTC" class="post__date">Dec 12 2014</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--mixture-models">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--mixture-models/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -162,12 +174,12 @@ y = true_params[0] * x + true_params[1] + yerr * np.random.randn(len(x))
 # them with outliers.
 m_bkg = np.random.rand(len(x)) &gt; true_frac
 y[m_bkg] = true_outliers[0]
-y[m_bkg] += np.sqrt(true_outliers[1]+yerr[m_bkg]**2) * np.random.randn(sum(m_bkg))
+y[m_bkg] += np.sqrt(true_outliers[1] + yerr[m_bkg] ** 2) * np.random.randn(sum(m_bkg))
 </code></pre>
 <p>Here&rsquo;s what these data look like. In this plot, the empty, square points are the true outliers. The purple line is the fit if we don&rsquo;t account for the fact that there are outliers and just treat all the points equally. Compare this to the correct answer (shown as the black line).</p>
 <pre><code class="language-python"># First, fit the data and find the maximum likelihood model ignoring outliers.
 A = np.vander(x, 2)
-p = np.linalg.solve(np.dot(A.T, A / yerr[:, None]**2), np.dot(A.T, y / yerr**2))
+p = np.linalg.solve(np.dot(A.T, A / yerr[:, None] ** 2), np.dot(A.T, y / yerr**2))
 
 # Then save the *true* line.
 x0 = np.linspace(-2.1, 2.1, 200)
@@ -175,7 +187,7 @@ y0 = np.dot(np.vander(x0, 2), true_params)
 
 # Plot the data and the truth.
 pl.errorbar(x, y, yerr=yerr, fmt=&quot;,k&quot;, ms=0, capsize=0, lw=1, zorder=999)
-pl.scatter(x[m_bkg], y[m_bkg], marker=&quot;s&quot;, s=22, c=&quot;w&quot;, zorder=1000)
+pl.scatter(x[m_bkg], y[m_bkg], marker=&quot;s&quot;, s=22, c=&quot;w&quot;, edgecolor=&quot;k&quot;, zorder=1000)
 pl.scatter(x[~m_bkg], y[~m_bkg], marker=&quot;o&quot;, s=22, c=&quot;k&quot;, zorder=1000)
 pl.plot(x0, y0, color=&quot;k&quot;, lw=1.5)
 
@@ -187,7 +199,7 @@ pl.ylabel(&quot;$y$&quot;)
 pl.ylim(-2.5, 2.5)
 pl.xlim(-2.1, 2.1);
 </code></pre>
-<p><img src="output_6_0.png" alt="png"></p>
+<p><img src="output_4_0.png" alt="png"></p>
 <p>The purple line is <em>clearly</em> a terrible fit because we ignored the outliers. To fix this, let&rsquo;s generalize this model and add a binary flag <code>$q_k$</code> for each data point <code>$k$</code>. If <code>$q_k$</code> is zero, then the point is &ldquo;good&rdquo; and the likelihood is given by the usual Gaussian:</p>
 <div>$$p(y_k\,|\,x_k,\,\sigma_k,\,\theta,\,q_k=0) = \frac{1}{\sqrt{2\,\pi\,\sigma_k^2}} \exp \left(-\frac{[y_k - f_\theta (x_k)]^2}{2\,\sigma_k^2}\right)$$</div>
 <p>where <code>$f_\theta (x_k) = \theta_1 \, x_k + \theta_2$</code> is the linear model.</p>
@@ -230,11 +242,14 @@ Q & \mathrm{if}\,q_k=0 \\
 # Define the probabilistic model...
 # A simple prior:
 bounds = [(0.1, 1.9), (-0.9, 0.9), (0, 1), (-2.4, 2.4), (-7.2, 5.2)]
+
+
 def lnprior(p):
     # We'll just put reasonable uniform priors on all the parameters.
     if not all(b[0] &lt; v &lt; b[1] for v, b in zip(p, bounds)):
         return -np.inf
     return 0
+
 
 # The &quot;foreground&quot; linear likelihood:
 def lnlike_fg(p):
@@ -242,36 +257,39 @@ def lnlike_fg(p):
     model = m * x + b
     return -0.5 * (((model - y) / yerr) ** 2 + 2 * np.log(yerr))
 
+
 # The &quot;background&quot; outlier likelihood:
 def lnlike_bg(p):
     _, _, Q, M, lnV = p
     var = np.exp(lnV) + yerr**2
     return -0.5 * ((M - y) ** 2 / var + np.log(var))
 
+
 # Full probabilistic model.
 def lnprob(p):
     m, b, Q, M, lnV = p
-    
+
     # First check the prior.
     lp = lnprior(p)
     if not np.isfinite(lp):
-        return -np.inf, None
-    
+        return -np.inf, np.zeros_like(y), np.zeros_like(y)
+
     # Compute the vector of foreground likelihoods and include the q prior.
     ll_fg = lnlike_fg(p)
     arg1 = ll_fg + np.log(Q)
-    
+
     # Compute the vector of background likelihoods and include the q prior.
     ll_bg = lnlike_bg(p)
     arg2 = ll_bg + np.log(1.0 - Q)
-    
+
     # Combine these using log-add-exp for numerical stability.
     ll = np.sum(np.logaddexp(arg1, arg2))
-    
+
     # We're using emcee's &quot;blobs&quot; feature in order to keep track of the
     # foreground and background likelihoods for reasons that will become
     # clear soon.
-    return lp + ll, (arg1, arg2)
+    return lp + ll, arg1, arg2
+
 
 # Initialize the walkers at a reasonable location.
 ndim, nwalkers = 5, 32
@@ -282,20 +300,23 @@ p0 = [p0 + 1e-5 * np.random.randn(ndim) for k in range(nwalkers)]
 sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob)
 
 # Run a burn-in chain and save the final location.
-pos, _, _, _ = sampler.run_mcmc(p0, 500)
+state = sampler.run_mcmc(p0, 500)
 
 # Run the production chain.
 sampler.reset()
-sampler.run_mcmc(pos, 1500);
+sampler.run_mcmc(state, 1500);
 </code></pre>
 <p>This code should only take about a minute to run. Compare that to any attempt you&rsquo;ve ever made at sampling the same problem with another 15 or more parameters and you should be pretty stoked!</p>
 <p>Let&rsquo;s show the resulting parameter constraints and compare them to the <em>true</em> values (indicated in blue) used to generate the synthetic dataset. This should encourage us that we&rsquo;ve done something reasonable.</p>
-<pre><code class="language-python">import triangle
+<pre><code class="language-python">import corner
+
 labels = [&quot;$m$&quot;, &quot;$b$&quot;, &quot;$Q$&quot;, &quot;$M$&quot;, &quot;$\ln V$&quot;]
 truths = true_params + [true_frac, true_outliers[0], np.log(true_outliers[1])]
-triangle.corner(sampler.flatchain, bins=35, extents=bounds, labels=labels, truths=truths);
+corner.corner(sampler.flatchain, bins=35, extents=bounds, labels=labels, truths=truths);
 </code></pre>
-<p><img src="output_13_0.png" alt="png"></p>
+<pre><code>WARNING:root:Deprecated keyword argument 'extents'. Use 'range' instead.
+</code></pre>
+<p><img src="output_11_1.png" alt="png"></p>
 <p>Similarly, the predicted constraint on the linear model is:</p>
 <pre><code class="language-python"># Compute the quantiles of the predicted line and plot them.
 A = np.vander(x0, 2)
@@ -315,7 +336,7 @@ pl.ylabel(&quot;$y$&quot;)
 pl.ylim(-2.5, 2.5)
 pl.xlim(-2.1, 2.1);
 </code></pre>
-<p><img src="output_15_0.png" alt="png"></p>
+<p><img src="output_13_0.png" alt="png"></p>
 <p>Great! Comparing the purple swath to the true line (shown in black), I think that we can all agree that this is a much better fit! But now, how do we label the points to decide which ones are outliers?</p>
 <h2 id="mixture-membership-probabilities">Mixture membership probabilities<a class="anchor" href="#mixture-membership-probabilities">#</a></h2>
 <p>Okay. So now we have a model that we can sample and it seems to give us reasonable results but didn&rsquo;t we throw away a lot of information when we used the marginalized likelihood instead of sampling in the <code>$q_k$</code> parameters? If we sampled the full model, we would, after all, get marginalized posterior constraints on the <em>outlierness</em> of each point. This is a very common question when I suggest that people use this model so I wanted to show that you&rsquo;re actually not throwing anything away and with a tiny bit of extra computation, you can recover these constraints!</p>
@@ -342,7 +363,7 @@ post_prob /= norm
 <p>Therefore, from left to right, the marginalized posterior probability that each point is part of the foreground model is:</p>
 <pre><code class="language-python">print(&quot;, &quot;.join(map(&quot;{0:.3f}&quot;.format, post_prob)))
 </code></pre>
-<pre><code>0.357, 0.936, 0.000, 0.954, 0.000, 0.890, 0.885, 0.830, 0.858, 0.966, 0.000, 0.994, 0.995, 0.995, 0.979
+<pre><code>0.357, 0.941, 0.000, 0.954, 0.000, 0.888, 0.883, 0.825, 0.852, 0.968, 0.000, 0.994, 0.995, 0.995, 0.976
 </code></pre>
 <p>This model works pretty well&hellip; so well, in fact, that the strong outliers are given nearly zero probability of being in the foreground model!</p>
 <p>Finally, it can be useful to label outliers on the final plot so let&rsquo;s use a color scale on the points to show this probability. In the figure below, darker points are more likely to be drawn from the line. This plot is pretty satisfying because the model has done a good job labeling all but one outlier at high confidence!</p>
@@ -352,9 +373,30 @@ pl.fill_between(x0, quantiles[0], quantiles[1], color=&quot;#8d44ad&quot;, alpha
 # Plot the data points.
 pl.errorbar(x, y, yerr=yerr, fmt=&quot;,k&quot;, ms=0, capsize=0, lw=1, zorder=999)
 # Plot the (true) outliers.
-pl.scatter(x[m_bkg], y[m_bkg], marker=&quot;s&quot;, s=22, c=post_prob[m_bkg], cmap=&quot;gray_r&quot;, vmin=0, vmax=1, zorder=1000)
+pl.scatter(
+    x[m_bkg],
+    y[m_bkg],
+    marker=&quot;s&quot;,
+    s=22,
+    c=post_prob[m_bkg],
+    cmap=&quot;gray_r&quot;,
+    edgecolor=&quot;k&quot;,
+    vmin=0,
+    vmax=1,
+    zorder=1000,
+)
 # Plot the (true) good points.
-pl.scatter(x[~m_bkg], y[~m_bkg], marker=&quot;o&quot;, s=22, c=post_prob[~m_bkg], cmap=&quot;gray_r&quot;, vmin=0, vmax=1, zorder=1000)
+pl.scatter(
+    x[~m_bkg],
+    y[~m_bkg],
+    marker=&quot;o&quot;,
+    s=22,
+    c=post_prob[~m_bkg],
+    cmap=&quot;gray_r&quot;,
+    vmin=0,
+    vmax=1,
+    zorder=1000,
+)
 
 # Plot the true line.
 pl.plot(x0, y0, color=&quot;k&quot;, lw=1.5)
@@ -364,7 +406,7 @@ pl.ylabel(&quot;$y$&quot;)
 pl.ylim(-2.5, 2.5)
 pl.xlim(-2.1, 2.1);
 </code></pre>
-<p><img src="output_22_0.png" alt="png"></p>
+<p><img src="output_20_0.png" alt="png"></p>
 <p><strong>Acknowledgments</strong>  
 <em>I&rsquo;d like to thank <a href="http://ruthang.us" 
   
@@ -437,27 +479,39 @@ pl.xlim(-2.1, 2.1);
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -477,7 +531,7 @@ pl.xlim(-2.1, 2.1);
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

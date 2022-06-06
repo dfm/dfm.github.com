@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">emcee &#43; PyMC3</h1>
             <time datetime="2018-08-21 00:00:00 &#43;0000 UTC" class="post__date">Aug 21 2018</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--emcee-pymc3">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--emcee-pymc3/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -121,7 +133,7 @@ Thomas Wiecki <a href="http://twiecki.github.io/blog/2013/09/23/emcee-pymc/"
    target="_blank" rel="noreferrer noopener" 
 >wrote about how to do this this with an earlier version of PyMC</a>, but I needed an update since I wanted to do a comparison and PyMC&rsquo;s interface has changed a lot since he wrote his post.
 This isn&rsquo;t necessarily something that you&rsquo;ll <em>want</em> to do (and I definitely don&rsquo;t recommend it in general), but I figured that I would post it here for posterity.</p>
-<p>For simplicity, let&rsquo;s use the simulated data from my <a href="/posts/pymc-tensorflow" 
+<p>For simplicity, let&rsquo;s use the simulated data from my <a href="../../posts/pymc-tensorflow" 
   
   
 >previous blog post</a>:</p>
@@ -139,12 +151,12 @@ y = x * true_params[0] + true_params[1]
 y_obs = y + np.exp(true_params[-1]) * np.random.randn(N)
 
 plt.plot(x, y_obs, &quot;.k&quot;, label=&quot;observations&quot;)
-plt.plot(t, true_params[0]*t + true_params[1], label=&quot;truth&quot;)
+plt.plot(t, true_params[0] * t + true_params[1], label=&quot;truth&quot;)
 plt.xlabel(&quot;x&quot;)
 plt.ylabel(&quot;y&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_3_0.png" alt="png"></p>
+<p><img src="output_1_0.png" alt="png"></p>
 <p>Then, we can code up the model in PyMC3 following <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/" 
   
    target="_blank" rel="noreferrer noopener" 
@@ -153,37 +165,81 @@ plt.legend(fontsize=14);
 import theano.tensor as tt
 
 with pm.Model() as model:
-    logs = pm.Uniform(&quot;logs&quot;, lower=-10, upper=10)
-    alphaperp = pm.Uniform(&quot;alphaperp&quot;, lower=-10, upper=10)
-    theta = pm.Uniform(&quot;theta&quot;, -2*np.pi, 2*np.pi, testval=0.0)
+    logs = pm.Normal(&quot;logs&quot;, mu=0.0, sigma=3.0)
+    alphaperp = pm.Normal(&quot;alphaperp&quot;, mu=0.0, sigma=3.0)
+    theta = pm.Uniform(&quot;theta&quot;, -np.pi, np.pi, testval=0.0)
 
     # alpha_perp = alpha * cos(theta)
     alpha = pm.Deterministic(&quot;alpha&quot;, alphaperp / tt.cos(theta))
-    
+
     # beta = tan(theta)
     beta = pm.Deterministic(&quot;beta&quot;, tt.tan(theta))
-    
+
     # The observation model
     mu = alpha * x + beta
     pm.Normal(&quot;obs&quot;, mu=mu, sd=tt.exp(logs), observed=y_obs)
-    
-    trace = pm.sample(draws=2000, tune=2000)
+
+    trace = pm.sample(
+        draws=2000,
+        tune=5000,
+        chains=2,
+        cores=1,
+        target_accept=0.9,
+        return_inferencedata=True,
+        init=&quot;adapt_full&quot;,
+    )
 </code></pre>
 <pre><code>Auto-assigning NUTS sampler...
-Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (2 chains in 2 jobs)
+Initializing NUTS using adapt_full...
+/opt/hostedtoolcache/Python/3.9.13/x64/lib/python3.9/site-packages/pymc3/step_methods/hmc/quadpotential.py:510: UserWarning: QuadPotentialFullAdapt is an experimental feature
+  warnings.warn(&quot;QuadPotentialFullAdapt is an experimental feature&quot;)
+Sequential sampling (2 chains in 1 job)
 NUTS: [theta, alphaperp, logs]
-Sampling 2 chains: 100%|██████████| 8000/8000 [00:04&lt;00:00, 1881.78draws/s]
+</code></pre>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='7000' class='' max='7000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [7000/7000 00:07<00:00 Sampling chain 0, 0 divergences]
+</div>
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='7000' class='' max='7000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [7000/7000 00:07<00:00 Sampling chain 1, 0 divergences]
+</div>
+<pre><code>Sampling 2 chains for 5_000 tune and 2_000 draw iterations (10_000 + 4_000 draws total) took 15 seconds.
 </code></pre>
 <p>And we can take a look at the <a href="https://corner.readthedocs.io/en/latest/" 
   
    target="_blank" rel="noreferrer noopener" 
 >corner plot</a>:</p>
 <pre><code class="language-python">import corner
-samples = np.vstack([trace[k] for k in [&quot;alpha&quot;, &quot;beta&quot;, &quot;logs&quot;]]).T
-corner.corner(samples, truths=true_params);
+
+names = [&quot;alpha&quot;, &quot;beta&quot;, &quot;logs&quot;]
+corner.corner(trace, var_names=names, truths=dict(zip(names, true_params)));
 </code></pre>
-<p><img src="output_7_0.png" alt="png"></p>
+<p><img src="output_5_0.png" alt="png"></p>
 <h2 id="sampling-the-pymc3-model-using-emcee">Sampling the PyMC3 model using emcee<a class="anchor" href="#sampling-the-pymc3-model-using-emcee">#</a></h2>
 <p>To sample this using emcee, we&rsquo;ll need to do a little bit of bookkeeping.
 I&rsquo;ve coded this up using version 3 of emcee that is currently available as <a href="https://github.com/dfm/emcee" 
@@ -201,8 +257,10 @@ There is a version of this built into PyMC3, but I also want to return the value
 <pre><code class="language-python">import theano
 
 with model:
-    f = theano.function(model.vars, [model.logpt] + model.deterministics)
-    
+    f = theano.function(
+        model.vars, [model.logpt] + list(model.vars) + list(model.deterministics)
+    )
+
     def log_prob_func(params):
         dct = model.bijection.rmap(params)
         args = (dct[k.name] for k in model.vars)
@@ -217,36 +275,60 @@ with model:
     res = pm.find_MAP()
     vec = model.bijection.map(res)
     initial_blobs = log_prob_func(vec)[1:]
-    dtype = [(var.name, float, np.shape(b)) for var, b in zip(model.deterministics, initial_blobs)]
-    
+    dtype = [
+        (var.name, float, np.shape(b))
+        for var, b in zip(list(model.vars) + list(model.deterministics), initial_blobs)
+    ]
+
     # Then sample as usual
     coords = vec + 1e-5 * np.random.randn(25, len(vec))
     nwalkers, ndim = coords.shape
     sampler = emcee.EnsembleSampler(nwalkers, ndim, log_prob_func, blobs_dtype=dtype)
     sampler.run_mcmc(coords, 5000, progress=True)
 </code></pre>
-<pre><code>logp = -63.46, ||grad|| = 386.74: 100%|██████████| 28/28 [00:00&lt;00:00, 4362.09it/s]
-100%|██████████| 5000/5000 [00:08&lt;00:00, 578.23it/s]
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+<div>
+  <progress value='27' class='' max='27' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [27/27 00:00<00:00 logp = -60.475, ||grad|| = 11.236]
+</div>
+<pre><code>You must install the tqdm library to use progress indicators with emcee
 </code></pre>
 <p>And we can use this to make the same corner plot as above:</p>
 <pre><code class="language-python">import pandas as pd
+
 df = pd.DataFrame.from_records(sampler.get_blobs(flat=True, discard=100, thin=30))
 corner.corner(df[[&quot;alpha&quot;, &quot;beta&quot;, &quot;logs&quot;]], truths=true_params);
 </code></pre>
-<p><img src="output_13_0.png" alt="png"></p>
-<p>The last thing that we might want to look at is <a href="/posts/autocorr/" 
+<pre><code>WARNING:root:Pandas support in corner is deprecated; use ArviZ directly
+</code></pre>
+<p><img src="output_11_1.png" alt="png"></p>
+<p>The last thing that we might want to look at is <a href="../../posts/autocorr/" 
   
   
 >the integrated autocorrelation time</a> for each method.
 First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):</p>
-<pre><code class="language-python">[float(emcee.autocorr.integrated_time(np.array(trace.get_values(var.name, combine=False)).T)) for var in model.free_RVs]
+<pre><code class="language-python">[
+    float(emcee.autocorr.integrated_time(np.array(trace.posterior[var].values).T))
+    for var in [&quot;logs&quot;, &quot;alphaperp&quot;, &quot;theta&quot;]
+]
 </code></pre>
-<pre><code>[1.263846510183499, 0.8891706657305904, 0.9649242063729033]
+<pre><code>[1.3573344137965568, 1.458729906244515, 1.4597259928196067]
 </code></pre>
 <p>And, the autocorrelation for emcee is about 40 steps:</p>
 <pre><code class="language-python">sampler.get_autocorr_time(discard=100)
 </code></pre>
-<pre><code>array([39.37563208, 39.56714997, 38.32092758])
+<pre><code>array([36.56826715, 38.72133344, 31.81170595])
 </code></pre>
 <p>If you want to compare these results in detail, you&rsquo;ll want to make sure that you take into account the fact that each step of NUTS is significantly more expensive than one step with emcee, but that&rsquo;s way beyond the scope of this post&hellip;</p>
 <p><em>11/22/18: This post has been updated with suggestions from Thomas Wiecki. The <code>find_MAP</code> call has been removed from the PyMC sampling, and <code>model.bijection</code> is now used to map between arrays and dicts of parameters.</em></p>
@@ -317,27 +399,39 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -357,7 +451,7 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>

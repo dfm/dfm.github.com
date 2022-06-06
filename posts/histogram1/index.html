@@ -21,7 +21,7 @@
   <meta name="twitter:creator" content="https://twitter.com/exoplaneteer" />
   
 
-  <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
 
 
   
@@ -35,10 +35,10 @@
   
   
     
-    <link type="text/css" rel="stylesheet" href="/css/post.min.b60e0932fe1c50c3d7c5b4f83ee9e4592363654d0f2abf05bbd0678d5b8a214c.css" integrity="sha256-tg4JMv4cUMPXxbT4PunkWSNjZU0PKr8Fu9BnjVuKIUw="/>
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
   
     
-    <link type="text/css" rel="stylesheet" href="/css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.ababf9469c50f82854b25f46557a3ab4d683728134d6c7a55f0169a9446b66cd.css" integrity="sha256-q6v5RpxQ&#43;ChUsl9GVXo6tNaDcoE01selXwFpqURrZs0="/>
   
   
    
@@ -77,15 +77,15 @@
     
     
       <li>
-        <a  href="/"> home</a>
+        <a  href="../../"> home</a>
       </li>
     
       <li>
-        <a  href="/about">about</a>
+        <a  href="../../about">about</a>
       </li>
     
       <li>
-        <a  href="/posts">blog</a>
+        <a  href="../../posts">blog</a>
       </li>
     
       <li>
@@ -106,6 +106,18 @@
           <header class="post__header">
             <h1 id="post__title">The Histogram (Part 1)</h1>
             <time datetime="2014-07-29 00:00:00 &#43;0000 UTC" class="post__date">Jul 29 2014</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/post--histogram1">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+              <p>
+                This post is implemented as a Jupyter notebook;
+                <a href="https://mybinder.org/v2/gh/dfm-io/post--histogram1/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
+              </p>
+            
+            </i>
           </header>
           <article class="post__content">
               
@@ -196,10 +208,11 @@ In this example, there is a single bin <code>$(0 &lt;= w &lt; 1)$</code> where t
 <p>The following figure shows a plot of this example:</p>
 <pre><code class="language-python">import numpy as np
 import matplotlib.pyplot as pl
+
 np.random.seed(12345)
 
 # Define the completeness function.
-Q = lambda w: 1.0 / (1 + np.exp((w-0.5)/0.01))
+Q = lambda w: 1.0 / (1 + np.exp((w - 0.5) / 0.01))
 
 # Sample some points from a constant rate function
 K = np.random.poisson(50)
@@ -207,8 +220,8 @@ w = np.random.uniform(0, 1, size=K)
 wobs = w[np.random.rand(K) &lt; Q(w)]
 
 # Plot the observations.
-pl.plot(w, 0.5*np.ones(K), &quot;.r&quot;)
-pl.plot(wobs, 0.5*np.ones(len(wobs)), &quot;.k&quot;)
+pl.plot(w, 0.5 * np.ones(K), &quot;.r&quot;)
+pl.plot(wobs, 0.5 * np.ones(len(wobs)), &quot;.k&quot;)
 pl.text(0.25, 0.53, &quot;observed&quot;, ha=&quot;center&quot;)
 pl.text(0.75, 0.53, &quot;not observed&quot;, ha=&quot;center&quot;, color=&quot;red&quot;)
 
@@ -221,12 +234,12 @@ pl.ylim(-0.1, 1.1)
 pl.ylabel(r&quot;$Q(w)$&quot;)
 pl.xlabel(r&quot;$w$&quot;);
 </code></pre>
-<p><img src="output_12_0.png" alt="png"></p>
+<p><img src="output_10_0.png" alt="png"></p>
 <p>In this figure, the black points show the locations of the points that get detected and the red points indicate points that would have been observed with a perfectly complete sample but were missed because of <code>$Q(w)$</code>.
 If you look at the code above, you&rsquo;ll see that the true step height should be 50 but, if you evaluate the IDE approximation, you&rsquo;ll find that it gives</p>
 <pre><code class="language-python">th = sum(1.0 / Q(wobs))
 sigma_th = th / np.sqrt(len(wobs))
-print &quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th)
+print(&quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th))
 </code></pre>
 <pre><code>28.5 ± 5.5
 </code></pre>
@@ -251,7 +264,7 @@ weight = np.mean(Q(np.random.rand(50000)))
 # Compute the maximum-likelihood step height.
 th = len(wobs) / weight
 sigma_th = th / np.sqrt(len(wobs))
-print &quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th)
+print(&quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th))
 </code></pre>
 <pre><code>54.0 ± 10.4
 </code></pre>
@@ -272,10 +285,12 @@ For this example, we&rsquo;ll consider a two-dimensional problem with parameters
 def detection_efficiency(a, b):
     return 0.8 / (1 + np.exp((a**2 / np.sqrt(b) - 1) / 0.1))
 
+
 # Plot this function on a grid.
 amn, amx, bmn, bmx = 1, 2, 1, 10
-A, B = np.meshgrid(np.linspace(amn, amx, 101), np.linspace(bmn, bmx, 103),
-                   indexing=&quot;ij&quot;)
+A, B = np.meshgrid(
+    np.linspace(amn, amx, 101), np.linspace(bmn, bmx, 103), indexing=&quot;ij&quot;
+)
 pl.pcolor(A, B, detection_efficiency(A, B), cmap=&quot;gray&quot;, vmin=0, vmax=1)
 pl.xlim(amn, amx)
 pl.ylim(bmn, bmx)
@@ -283,7 +298,7 @@ pl.xlabel(r&quot;$a$&quot;)
 pl.ylabel(r&quot;$b$&quot;)
 pl.colorbar(label=r&quot;$Q(a,\,b)$&quot;);
 </code></pre>
-<p><img src="output_25_0.png" alt="png"></p>
+<p><img src="output_23_0.png" alt="png"></p>
 <p><strong>A synthetic dataset</strong>  
 Now let&rsquo;s generate a sample dataset and censor it using this completeness function.
 For simplicity, we&rsquo;ll use a <em>uniform</em> population where a complete sample would be uniformly distributed in <code>$a$</code> and <code>$b$</code>:</p>
@@ -291,10 +306,12 @@ For simplicity, we&rsquo;ll use a <em>uniform</em> population where a complete s
 np.random.seed(1234)
 true_rate = 500
 K = np.random.poisson(true_rate * (amx - amn) * (bmx - bmn))
-samples = np.vstack([
-    np.random.uniform(amn, amx, size=K),
-    np.random.uniform(bmn, bmx, size=K),
-]).T
+samples = np.vstack(
+    [
+        np.random.uniform(amn, amx, size=K),
+        np.random.uniform(bmn, bmx, size=K),
+    ]
+).T
 
 # Censor this dataset using the completeness function.
 q = detection_efficiency(samples[:, 0], samples[:, 1])
@@ -302,7 +319,7 @@ m = np.random.rand(K) &lt; q
 dataset = samples[m]
 q = q[m]
 
-# Overplot the dataset on the completeness function. 
+# Overplot the dataset on the completeness function.
 pl.pcolor(A, B, detection_efficiency(A, B), cmap=&quot;gray&quot;, vmin=0, vmax=1, alpha=0.5)
 pl.plot(samples[:, 0], samples[:, 1], &quot;.r&quot;, ms=4)
 pl.plot(dataset[:, 0], dataset[:, 1], &quot;.b&quot;, ms=4)
@@ -312,7 +329,7 @@ pl.xlabel(r&quot;$a$&quot;)
 pl.ylabel(r&quot;$b$&quot;)
 pl.colorbar(label=r&quot;$Q(a,\,b)$&quot;);
 </code></pre>
-<p><img src="output_27_0.png" alt="png"></p>
+<p><img src="output_25_0.png" alt="png"></p>
 <p>In this figure, the blue points are objects that passed the completeness cut and made it into the catalog and the red points were missed even though they would have been detected in a complete catalog.</p>
 <p><strong>Using inverse detection efficiency</strong>  
 Now, let&rsquo;s say that we&rsquo;re only interested in the <code>$b$</code> distribution and even though we know that it should be a flat line, we&rsquo;ll model it as a histogram with a few bins.
@@ -331,17 +348,23 @@ def plot_hist(bin_edges, bin_heights, reluncert=None, offset=0, **kwargs):
     y = np.array(list(zip(bh, bh))).flatten()
     pl.plot(x, y, **kwargs)
     if reluncert is not None:
-        pl.errorbar(0.5 * (bin_edges[:-1] + bin_edges[1:]) + offset,
-                    bh, yerr=bh * reluncert, fmt=&quot;+&quot;,
-                    capsize=0, color=kwargs.get(&quot;color&quot;, &quot;k&quot;))
-        
+        pl.errorbar(
+            0.5 * (bin_edges[:-1] + bin_edges[1:]) + offset,
+            bh,
+            yerr=bh * reluncert,
+            fmt=&quot;+&quot;,
+            capsize=0,
+            color=kwargs.get(&quot;color&quot;, &quot;k&quot;),
+        )
+
+
 pl.gca().axhline(true_rate, lw=3, color=&quot;k&quot;, alpha=0.1)
-plot_hist(bin_edges, n_ide, reluncert=1/np.sqrt(n), color=&quot;k&quot;)
+plot_hist(bin_edges, n_ide, reluncert=1 / np.sqrt(n), color=&quot;k&quot;)
 pl.xlabel(r&quot;$b$&quot;)
 pl.ylabel(r&quot;$\Gamma(b)$&quot;)
 pl.ylim(0, 800);
 </code></pre>
-<p><img src="output_29_0.png" alt="png"></p>
+<p><img src="output_27_0.png" alt="png"></p>
 <p>In this figure, the <em>correct</em> result (the rate that was used to generate the dataset) is shown as the thick gray line and the IDE estimate of this function is shown as the step function with error bars.
 As expected, the estimate is noisy and the error bars seem to be overly confident (especially in the regions of lower detection efficiency).</p>
 <p><strong>The maximum-likelihood</strong>  
@@ -357,22 +380,23 @@ for i in range(len(bq)):
     bq[i] = np.mean(detection_efficiency(a0, b0))
 
 # Plot the integrated completeness function.
-plot_histogram(bin_edges, bq, color=&quot;k&quot;)
+plot_hist(bin_edges, bq, color=&quot;k&quot;)
 pl.xlabel(r&quot;$b$&quot;)
 pl.ylabel(r&quot;$Q_\mathrm{int}(b)$&quot;)
 pl.ylim(0, 1);
 </code></pre>
-<p><img src="output_32_0.png" alt="png"></p>
+<p><img src="output_30_0.png" alt="png"></p>
 <p>Using this integrated detection efficiency function, we can easily compute the ML step function given the prescription derived above and compare it to the IDE result.</p>
 <pre><code class="language-python">pl.gca().axhline(true_rate, lw=3, color=&quot;k&quot;, alpha=0.1)
-plot_hist(bin_edges, n_ide, reluncert=1/np.sqrt(n), offset=-0.05,
-          ls=&quot;dotted&quot;, color=&quot;k&quot;)
-plot_hist(bin_edges, n / bq, reluncert=1/np.sqrt(n), offset=0.05, color=&quot;k&quot;)
+plot_hist(
+    bin_edges, n_ide, reluncert=1 / np.sqrt(n), offset=-0.05, ls=&quot;dotted&quot;, color=&quot;k&quot;
+)
+plot_hist(bin_edges, n / bq, reluncert=1 / np.sqrt(n), offset=0.05, color=&quot;k&quot;)
 pl.xlabel(r&quot;$b$&quot;)
 pl.ylabel(r&quot;$\Gamma(b)$&quot;)
 pl.ylim(0, 800);
 </code></pre>
-<p><img src="output_34_0.png" alt="png"></p>
+<p><img src="output_32_0.png" alt="png"></p>
 <p>In this figure, the IDE result is shown as a dotted line and the ML result is given by the solid black line with error bars.
 As before, the correct result is shown as the thick gray line.
 It&rsquo;s clear from this comparison that the ML result is <em>much</em> better than the IDE computation—the results are consistent with the truth!</p>
@@ -473,27 +497,39 @@ Therefore, in my next post, I&rsquo;ll relax the assumption of negligible uncert
   
      
     
-      <a class="social-icons__link" rel="me" title="GitHub"
-         href="https://github.com/dfm"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Email"
-         href="mailto:dfm@dfm.io"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:dfm@dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
       </a>
     
   
      
     
-      <a class="social-icons__link" rel="me" title="Twitter"
-         href="https://twitter.com/exoplaneteer"
-         target="_blank" rel="noopener">
+      <a
+        class="social-icons__link"
+        title="Twitter"
+        href="https://twitter.com/exoplaneteer"
+        target="_blank"
+        rel="me noopener"
+      >
         <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/twitter.svg')"></div>
       </a>
     
@@ -513,7 +549,7 @@ Therefore, in my next post, I&rsquo;ll relax the assumption of negligible uncert
    
 
   
-  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
   
   
   <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
