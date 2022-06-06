@@ -246,7 +246,7 @@ print(&quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th))
 <p>This result is about <em>half</em> of what it should be and if you look at the figure above, I think you&rsquo;ll see what went wrong: only about half of the points were observed and each of those points was in a region where <code>$Q(w) \approx 1$</code>, meaning that each point gets a weight of 1.
 It&rsquo;s clear that in this case each point should get a weight of 2 (or one-over-a-half) but let&rsquo;s see if we can derive this intuition more formally.</p>
 <p><strong>The maximum-likelihood (ML) solution</strong>  
-The first thing to note is that when we have an incomplete catalog, the likelihood of the data given the population is exactly the same as our previous expression (Equation <code>$\ref{eq:poisson}$</code>) but the rate <code>$\Gamma_\theta (w)$</code> is replaced by the <em>observable rate</em> <code>$\hat{\Gamma}_\theta(w) = Q(w)\,\Gamma_\theta (w)$</code>.
+The first thing to note is that when we have an incomplete catalog, the likelihood of the data given the population is exactly the same as our previous expression, but the rate <code>$\Gamma_\theta (w)$</code> is replaced by the <em>observable rate</em> <code>$\hat{\Gamma}_\theta(w) = Q(w)\,\Gamma_\theta (w)$</code>.
 Therefore, for a piecewise constant model of <code>$\Gamma_\theta(w)$</code>, the log-likelihood becomes</p>
 <div>$$ \ell(\theta) = -\sum_{n=1}^N \theta_n \int_{\Delta_n} Q(w)\,\mathrm{d}w + \sum_{k=1}^K \left[\ln Q(w_k) + \sum_{n=1}^N  \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \right] \quad.$$</div>
 <p>As before, let&rsquo;s take the derivative of this with respect to a specific step height <code>$\theta_m$</code> to find</p>
@@ -403,14 +403,14 @@ It&rsquo;s clear from this comparison that the ML result is <em>much</em> better
 <h2 id="summary--conclusions">Summary &amp; Conclusions<a class="anchor" href="#summary--conclusions">#</a></h2>
 <p>In this post, we&rsquo;ve derived a simple, maximum-likelihood method for making histograms of incomplete datasets.
 This method should <em>always</em> give less biased results—at minimal extra computational cost—than the standard techniques used in astronomy and in some cases the results will be <em>drastically different</em>.
-How different the results are from the two methods is going to be very problem dependent and it&rsquo;s possible that the existing results in the literature aren&rsquo;t very wrong because of this effect.
-That being said, the &ldquo;correct&rdquo; method isn&rsquo;t really any more complicated than what we&rsquo;re doing already so I hope that someone will read this and do The Right Thing™ next time!</p>
+How different the results are from the two methods is going to be very problem dependent, and it&rsquo;s possible that the existing results in the literature aren&rsquo;t very wrong because of this effect.
+That being said, the &ldquo;correct&rdquo; method isn&rsquo;t really any more complicated than what we&rsquo;re doing already, so I hope that someone will read this and do The Right Thing™ next time!</p>
 <p>Another huge benefit of casting the histogram procedure as a problem in probabilistic data analysis is that it forces us to think explicitly about our assumptions.
 The result derived here is going to be the best possible result under the following assumptions:</p>
 <ol>
 <li>The data are independent samples from an inhomogeneous Poisson process where the rate function is a piecewise constant step function,</li>
 <li>the measurement uncertainties on the data are negligible, and</li>
-<li>the detection efficiency function <code>$Q(w)$</code> is known but it doesn&rsquo;t need to be constant.</li>
+<li>the detection efficiency function <code>$Q(w)$</code> is known, but it doesn&rsquo;t need to be constant.</li>
 </ol>
 <p>In contrast, the IDE procedure is <em>only</em> correct if the detection efficiency is <em>constant</em> across each bin!
 These assumptions are slightly less restrictive than the standard histogram procedure but assumption (2) is still a fairly glaring simplification and it is rarely satisfied in real astronomical datasets.
@@ -418,7 +418,7 @@ Therefore, in my next post, I&rsquo;ll relax the assumption of negligible uncert
 <p>Let me know if you have any comments by adding it below, <a href="https://twitter.com/exoplaneteer" 
   
    target="_blank" rel="noreferrer noopener" 
->tweeting at me</a>, and/or <a href="https://github.com/dfm/dfm.io/issues" 
+>tweeting at me</a>, and/or <a href="https://github.com/dfm-io/post--histogram1/issues" 
   
    target="_blank" rel="noreferrer noopener" 
 >opening a GitHub issue</a>.</p>

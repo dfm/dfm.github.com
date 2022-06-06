@@ -117,14 +117,6 @@
           </header>
           <article class="post__content">
               
-<pre><code class="language-python">%matplotlib inline
-%config InlineBackend.figure_format = &quot;retina&quot;
-
-from matplotlib import rcParams
-rcParams[&quot;savefig.dpi&quot;] = 100
-rcParams[&quot;figure.dpi&quot;] = 100
-rcParams[&quot;font.size&quot;] = 20
-</code></pre>
 <p>In this blog post, I&rsquo;ll demonstrate how to use a custom C++ function in a <a href="http://mc-stan.org/" 
   
    target="_blank" rel="noreferrer noopener" 
@@ -196,7 +188,7 @@ plt.annotate(&quot;period = {0:.6f} days&quot;.format(lit_period),
 plt.ylabel(&quot;radial velocity [m/s]&quot;)
 plt.xlabel(&quot;phase&quot;);
 </code></pre>
-<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_3_0.png" alt="png"></p>
+<p><img src="stan-c++_3_0.png" alt="png"></p>
 <h2 id="the-problem-statement-a-kepler-solver-in-c">The problem statement: a Kepler solver in C++<a class="anchor" href="#the-problem-statement-a-kepler-solver-in-c">#</a></h2>
 <p>We want to fit this dataset using a Keplerian model where the radial velocity is given by</p>
 <p>$$
@@ -468,7 +460,7 @@ plt.annotate(&quot;period = {0:.6f} days&quot;.format(period),
 plt.ylabel(&quot;radial velocity [m/s]&quot;)
 plt.xlabel(&quot;phase&quot;);
 </code></pre>
-<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_17_0.png" alt="png"></p>
+<p><img src="stan-c++_17_0.png" alt="png"></p>
 <p>Now, starting from the MAP coordinates, we&rsquo;ll run 4 parallel MCMC chains of 2000 steps using the default settings in Stan. By default, Stan discards 50% of the chain as &ldquo;warmup&rdquo; so we&rsquo;ll end up with 4000 samples (1000 from each chain).</p>
 <pre><code class="language-python">strt = time.time()
 fit = model.sampling(iter=2000, data=data, init=lambda *args: best[&quot;par&quot;])
@@ -517,7 +509,7 @@ samples = np.array(samples[[&quot;period&quot;, &quot;K&quot;, &quot;e&quot;]])
 labels = [&quot;period [days]&quot;, &quot;semi-amplitude [m/s]&quot;, &quot;eccentricity&quot;]
 corner.corner(samples, labels=labels);
 </code></pre>
-<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_23_0.png" alt="png"></p>
+<p><img src="stan-c++_23_0.png" alt="png"></p>
 <p>Another good plot is the posterior model predictions overplotted on the data. In the following figure, the green &ldquo;line&rdquo; is actually a <em>contour</em> showing the 68% credible region for the model RV as a function of phase.</p>
 <pre><code class="language-python">samples = fit.extract(permuted=True)
 pred = samples[&quot;rv_pred&quot;]
@@ -537,7 +529,7 @@ plt.annotate(&quot;period = {0:.6f} days&quot;.format(period),
 plt.ylabel(&quot;radial velocity [m/s]&quot;)
 plt.xlabel(&quot;phase&quot;);
 </code></pre>
-<p><img src="stan-c%2B%2B_files/stan-c%2B%2B_25_0.png" alt="png"></p>
+<p><img src="stan-c++_25_0.png" alt="png"></p>
 <h2 id="results--summary">Results &amp; summary<a class="anchor" href="#results--summary">#</a></h2>
 <p>Now that we have a sufficiently converged MCMC chain, we can compare our results to the literature values. In particular, let&rsquo;s look at the measured period and semi-amplitude. The literature values of these properties are (<a href="http://adsabs.harvard.edu/abs/2006ApJ...646..505B" 
   
@@ -598,8 +590,6 @@ model_autodiff = pystan.StanModel(model_code=model_code, allow_undefined=True,
                                   include_dirs=[&quot;.&quot;])
 </code></pre>
 <pre><code>INFO:pystan:COMPILING THE C++ CODE FOR MODEL anon_model_8a556093ae546532f90fa3f7e850eea0 NOW.
-</code></pre>
-<pre><code class="language-python">
 </code></pre>
 
 
