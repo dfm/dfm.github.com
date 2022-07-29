@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© 2014-{year} Dan Foreman-Mackey</copyright>
-    <lastBuildDate>Thu, 18 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>An astronomer&#39;s introduction to numpyro</title>
+      <link>https://dfm.io/posts/intro-to-numpyro/</link>
+      <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/intro-to-numpyro/</guid>
+      <description>Over the past year or so, I&amp;rsquo;ve been using JAX extensively for my research, and I&amp;rsquo;ve also been encouraging other astronomers to give it a try. In particular, I&amp;rsquo;ve been using JAX as the computation engine for probabilistic inference tasks. There&amp;rsquo;s more to it, but one way that I like to think about JAX is as NumPy with just-in-time compilation and automatic differentiation. The just-in-time compilation features of JAX can be used to speed up you NumPy computations by removing some Python overhead and by executing it on your GPU.</description>
+    </item>
+    
     <item>
       <title>What if I want to reuse my Python functions?</title>
       <link>https://dfm.io/posts/simple-python-module/</link>
