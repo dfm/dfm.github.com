@@ -247,7 +247,7 @@ This choice of parameterization is discussed on <a href="http://jakevdp.github.i
   
    target="_blank" rel="noreferrer noopener" 
 >Jake VanderPlas' blog</a>, and it&rsquo;s not terribly important for this dataset, but it will let us demonstrate how to re-parameterize models.</p>
-<p>In NumPyro a probabilistic model is defined as a Python function that takes the dataset as input.
+<p>In NumPyro, a probabilistic model is defined as a Python function that takes the dataset as input.
 In the body of the function, we start by defining the priors on our parameters using the <code>numpyro.sample</code> function and probability distributions defined in the <code>numpyro.distributions</code> module.
 Then we use these parameters to evaluate our model, making sure that we always use <code>jax.numpy</code> functions instead of <code>numpy</code> functions.
 Finally, we define the sampling distribution for the data, again using the <code>numpyro.sample</code> function and a distribution.</p>
@@ -296,8 +296,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(0), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 4.46 s, sys: 63 ms, total: 4.52 s
-Wall time: 4.49 s
+<pre><code>CPU times: user 4.18 s, sys: 28.8 ms, total: 4.21 s
+Wall time: 4.18 s
 </code></pre>
 <p>The published version of this post is executed on GitHub Actions with a pretty teeny CPU, but the full runtime for this model is less than 2 seconds on my laptop.
 In this case, the runtime is actually probably dominated by JIT compilation and Python overheads, but it&rsquo;s also a pretty simple model with only 2 parameters, so we&rsquo;d expect it to be fast.</p>
@@ -493,8 +493,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 7.11 s, sys: 11.4 ms, total: 7.12 s
-Wall time: 7.05 s
+<pre><code>CPU times: user 6.86 s, sys: 67.4 ms, total: 6.93 s
+Wall time: 6.86 s
 </code></pre>
 <p>This model is a bit more complicated, but it still runs pretty quickly, with the runtime again dominated by just-in-time compilation (try increasing the number of samples if you don&rsquo;t believe me!).
 As before, we can check convergence and make a corner plot:</p>
@@ -629,6 +629,58 @@ az.summary(inf_data)
 </div>
 <p><img src="output_15_1.png" alt="png"></p>
 <p>This time we recover the true values of the slope, intercept, and outlier probability!</p>
+<p><em>Added 2022-08-03:</em> We can also use this model to identify which points are outliers.
+The <a href="https://dfm.io/posts/mixture-models/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>mixture models post</a> describes the math, and you should check out the <a href="https://dfm.io/posts/mixture-models/#mixture-membership-probabilities" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>mixture membership probabilities</a> section of that post for more details, but in the meantime, here&rsquo;s an example of how to implement this in NumPyro using out above model:</p>
+<pre><code class="language-python">def linear_mixture_member_prob_model(x, yerr, y=None):
+    # Most of the model is identiacal to the one above...
+    theta = numpyro.sample(&quot;theta&quot;, dist.Uniform(-0.5 * jnp.pi, 0.5 * jnp.pi))
+    b_perp = numpyro.sample(&quot;b_perp&quot;, dist.Normal(0.0, 1.0))
+    m = numpyro.deterministic(&quot;m&quot;, jnp.tan(theta))
+    b = numpyro.deterministic(&quot;b&quot;, b_perp / jnp.cos(theta))
+    fg_dist = dist.Normal(m * x + b, yerr)
+    bg_mean = numpyro.sample(&quot;bg_mean&quot;, dist.Normal(0.0, 1.0))
+    bg_sigma = numpyro.sample(&quot;bg_sigma&quot;, dist.HalfNormal(3.0))
+    bg_dist = dist.Normal(bg_mean, jnp.sqrt(bg_sigma**2 + yerr**2))
+    Q = numpyro.sample(&quot;Q&quot;, dist.Uniform(0.0, 1.0))
+    mixture = MixtureGeneral(
+        dist.Categorical(probs=jnp.array([Q, 1.0 - Q])), [fg_dist, bg_dist]
+    )
+    with numpyro.plate(&quot;data&quot;, len(x)):
+        y_ = numpyro.sample(&quot;obs&quot;, mixture, obs=y)
+
+        # Until here, where we can track the membership probability of each sample
+        log_probs = mixture.component_log_probs(y_)
+        numpyro.deterministic(
+            &quot;p&quot;, log_probs - jax.nn.logsumexp(log_probs, axis=-1, keepdims=True)
+        )
+
+
+# Our inference procedure is identical to the one above.
+sampler = infer.MCMC(
+    infer.NUTS(linear_mixture_member_prob_model),
+    num_warmup=2000,
+    num_samples=2000,
+    num_chains=2,
+    progress_bar=True,
+)
+%time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
+</code></pre>
+<pre><code>CPU times: user 7.42 s, sys: 20.1 ms, total: 7.44 s
+Wall time: 7.37 s
+</code></pre>
+<p>As in the mixture models post, we can use the mixture membership probabilities to plot the data points colored by their probability of being an outlier:</p>
+<pre><code class="language-python">p_fg = jnp.mean(jnp.exp(sampler.get_samples()[&quot;p&quot;][..., 0]), axis=0)
+plot_data()
+plt.scatter(x, y, marker=&quot;s&quot;, s=22, c=1 - p_fg, edgecolor=&quot;k&quot;, zorder=1000, cmap=&quot;gray&quot;)
+plt.colorbar(label=&quot;outlier probability&quot;);
+</code></pre>
+<p><img src="output_19_0.png" alt="png"></p>
 <h2 id="example-2-measuring-distances-using-gaia-parallaxes">Example 2: Measuring distances using Gaia parallaxes<a class="anchor" href="#example-2-measuring-distances-using-gaia-parallaxes">#</a></h2>
 <p>In astronomy, we often want to measure distances (to stars, galaxies, etc.), but this is actually quite a difficult measurement to make in general.
 One approach for measuring distances to &ldquo;nearby&rdquo; stars is to use the <a href="https://en.wikipedia.org/wiki/Stellar_parallax" 
@@ -682,8 +734,8 @@ plt.ylabel(&quot;count&quot;)
 plt.title(&quot;Gaia DR3 targets around M67&quot;)
 plt.xlim(0.2, 3.0);
 </code></pre>
-<p><img src="output_17_0.png" alt="png"></p>
-<p><img src="output_17_1.png" alt="png"></p>
+<p><img src="output_21_0.png" alt="png"></p>
+<p><img src="output_21_1.png" alt="png"></p>
 <p>We can see the M67 over-density of stars in both sky position, and parallax.
 By the end of this example, we will use (just) these parallax measurements to constrain the distance to M67.</p>
 <p>But to start with, we need to estimate the expected parallax zero point offsets for all of our targets.
@@ -727,9 +779,10 @@ When I first started writing this post I couldn&rsquo;t figure out how to sample
   
    target="_blank" rel="noreferrer noopener" 
 >chi-squared distribution</a> with 6 degrees of freedom.
+More explicitly, if some variable <code>$u$</code> is distributed as a chi-squared distribution with 6 degrees of freedom, then <code>$r = u \times L / 2$</code> is distributed following the distribution above.
 To implement this in NumPyro, we can use the <code>Chi2</code> distribution, and then scale it by the appropriate factor.
 Let&rsquo;s check to make sure that that gives the correct results:</p>
-<pre><code class="language-python">L = 370.0
+<pre><code class="language-python">L = 370.0  # A totally arbitrary choice!
 prior = dist.TransformedDistribution(
     dist.Chi2(6),
     dist.transforms.AffineTransform(0.0, 0.5 * L),
@@ -743,7 +796,7 @@ plt.xlabel(&quot;distance [pc]&quot;)
 plt.yticks([])
 plt.legend();
 </code></pre>
-<p><img src="output_21_0.png" alt="png"></p>
+<p><img src="output_25_0.png" alt="png"></p>
 <p>That looks good!</p>
 <p>We have also just introduced two new NumPyro features: the <code>TransformedDistribution</code> distribution and the <code>AffineTransform</code>.
 The former allows us to specify a distribution that is a transformation of another distribution, and the latter provides an interface for linearly transforming a distribution.
@@ -771,7 +824,7 @@ fig = corner.corner(
 )
 fig.suptitle(&quot;prior predictive distribution&quot;);
 </code></pre>
-<p><img src="output_25_0.png" alt="png"></p>
+<p><img src="output_29_0.png" alt="png"></p>
 <p>Note that in this figure the relationship between distance and parallax is not one-to-one because this distribution takes the sampling distribution for the parallax into account.
 Therefore, this shows the prior distribution over <em>mean observed parallax</em> given some parallax uncertainty, which we provided above.
 These prior predictive samples can be useful for (at least qualitatively) checking that your priors are sensible when projected into the space of the data.</p>
@@ -797,10 +850,10 @@ plt.ylabel(&quot;posterior density&quot;)
 plt.legend(loc=1)
 plt.yticks([]);
 </code></pre>
-<pre><code>CPU times: user 3.06 s, sys: 3.85 ms, total: 3.06 s
-Wall time: 3.03 s
+<pre><code>CPU times: user 3.09 s, sys: 7.88 ms, total: 3.09 s
+Wall time: 3.07 s
 </code></pre>
-<p><img src="output_27_1.png" alt="png"></p>
+<p><img src="output_31_1.png" alt="png"></p>
 <p>This is a case where the inferred distance is somewhat inconsistent with the value computed by inverting the parallax as a distance estimator.</p>
 <h3 id="inferring-the-distance-to-m67-using-a-hierarchical-model-for-parallax">Inferring the distance to M67 using a hierarchical model for parallax<a class="anchor" href="#inferring-the-distance-to-m67-using-a-hierarchical-model-for-parallax">#</a></h3>
 <p>Now that we&rsquo;ve seen how the single target model works, let&rsquo;s build a more sophisticated model that combines everything that we&rsquo;ve learned so far.
@@ -904,7 +957,7 @@ plt.xlabel(&quot;mean parallax [mas]&quot;)
 plt.ylabel(&quot;count&quot;)
 plt.xlim(0.2, 3);
 </code></pre>
-<p><img src="output_31_0.png" alt="png"></p>
+<p><img src="output_35_0.png" alt="png"></p>
 <p>Comparing the observed distribution of parallax measurements to the prior samples, this doesn&rsquo;t look like an outrageously implausible realization.
 So let&rsquo;s just bite the bullet and run the MCMC:</p>
 <pre><code class="language-python">sampler = infer.MCMC(
@@ -916,8 +969,8 @@ So let&rsquo;s just bite the bullet and run the MCMC:</p>
 )
 %time sampler.run(jax.random.PRNGKey(7), plx_err, plx=plx, plx_zp=plx_zp)
 </code></pre>
-<pre><code>CPU times: user 16min 35s, sys: 950 ms, total: 16min 36s
-Wall time: 8min 25s
+<pre><code>CPU times: user 15min 54s, sys: 1.05 s, total: 15min 55s
+Wall time: 8min 4s
 </code></pre>
 <p>Again, the published version of this post was executed on GitHub Actions, so you&rsquo;ll probably find that this runs a little faster on your own machine (this takes about 5 minutes on my laptop).
 Even so, this model definitely takes a little longer to run than the earlier examples, but remember that we&rsquo;re fitting thousands of parameters here, so I&rsquo;m willing to take this hit as long as the results are sensible.
@@ -1012,7 +1065,7 @@ az.summary(inf_data, var_names=[&quot;L&quot;, &quot;D&quot;, &quot;approx_size&
   </tbody>
 </table>
 </div>
-<p><img src="output_35_1.png" alt="png"></p>
+<p><img src="output_39_1.png" alt="png"></p>
 <p>The sampling efficiency isn&rsquo;t quite as good as it has been for the simpler models, but the <code>$\hat{R}$</code> statistics are good and we&rsquo;ve still generated hundreds of effective samples, with thousands of effective samples for the cluster distance.
 Given these results, we estimate the distance to M67 to be:</p>
 <pre><code class="language-python">print(f&quot;D = {np.mean(samples['D']):.1f} ± {np.std(samples['D']):.1f} pc&quot;)
@@ -1053,7 +1106,7 @@ plt.xlabel(&quot;mean parallax [mas]&quot;)
 plt.ylabel(&quot;count&quot;)
 plt.xlim(bins[0], bins[-1]);
 </code></pre>
-<p><img src="output_41_0.png" alt="png"></p>
+<p><img src="output_45_0.png" alt="png"></p>
 <p>This looks overall pretty good.
 We see some systematic differences at small values of parallax that may have been introduced by our initial cut on the parallax measurements.
 We may also be somewhat overestimating the number of cluster members, possibly since our &ldquo;Gaussian in log distance&rdquo; model for the cluster is not quite right.
@@ -1068,6 +1121,7 @@ If you have any comments or questions, please <a href="https://github.com/dfm-io
   
    target="_blank" rel="noreferrer noopener" 
 >Tweet at me</a>, or (if you must :D) send an email.</p>
+<p><em>Edit 2022-08-03:</em> Incorporated some comments from Morgan Fouesneau.</p>
 
 
               
