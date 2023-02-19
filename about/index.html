@@ -220,6 +220,7 @@ Unable to load publication list.
         data = data.map(value => {
           value.authorsFormat = formatAuthors(value.authors);
           value.codeLink = codeMap[value.doi];
+          value.title = value.title.replace("{\\&}", "&");
           return value;
         });
 
