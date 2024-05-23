@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© 2014-{year} Dan Foreman-Mackey</copyright>
-    <lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 08 Apr 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Marginalized linear models in NumPyro</title>
+      <link>https://dfm.io/posts/numpyro-marginalized-linear-model/</link>
+      <pubDate>Sat, 08 Apr 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://dfm.io/posts/numpyro-marginalized-linear-model/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>An astronomer&#39;s introduction to NumPyro</title>
       <link>https://dfm.io/posts/intro-to-numpyro/</link>
@@ -163,7 +172,9 @@ In astronomy, the most common reason for using a mixture model is to fit data wi
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://dfm.io/about/</guid>
-      <description>Hi, I&amp;rsquo;m Dan Foreman-Mackey I&amp;rsquo;m a Research Scientist at the Flatiron Institute&amp;rsquo;s Center for Computational Astrophysics. My main research interest is the application of probabilistic data analysis techniques to solve fundamental problems in astronomy. These days, I&amp;rsquo;m mostly using time domain surveys to discover new exoplanets, interpret the underlying population of these planets, and learn more about the variability of stars. I am also interested in the development of scientific software and open-source practices.</description>
+      <description>Hi, I&amp;rsquo;m Dan Foreman-Mackey I&amp;rsquo;m a Research Engineer at Google Deepmind in New York City. I&amp;rsquo;m currently working on JAX. I used to be an astrophysicist who developed some open source scientific software.
+Code I write a lot of code for work and in my spare time. All my projects live in public repositories on GitHub. Here are some of my most popular research codes:
+{{#codes}}  {{name}} &amp;mdash; {{description}}  {{/codes}} {{^codes}} Unable to load of software.</description>
     </item>
     
   </channel>
