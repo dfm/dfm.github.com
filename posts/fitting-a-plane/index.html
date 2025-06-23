@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--fitting-a-plane">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/fitting-a-plane/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--fitting-a-plane/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -512,11 +508,17 @@ corner.corner(
     truths=[m_true, b_true, np.log(lambda_true)],
 );
 </code></pre>
-<pre><code>7352 independent samples of m
+<pre><code>&lt;&gt;:35: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:35: SyntaxWarning: invalid escape sequence '\l'
+/tmp/ipykernel_2153/3914491319.py:35: SyntaxWarning: invalid escape sequence '\l'
+  labels=[&quot;m&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
+
+
+7352 independent samples of m
 7855 independent samples of b
 4381 independent samples of lambda
 </code></pre>
-<p><img src="output_17_1.png" alt="png"></p>
+<p><img src="output_17_2.png" alt="png"></p>
 <p>We can compare this sampling to the previous on (without scatter) by plotting some samples of the model in the &ldquo;data&rdquo; space.
 You can see that the constaints are wider than previously, but things seemed to have worked well.</p>
 <pre><code class="language-python">fig, ax = plt.subplots(1, 1, figsize=(5, 5))
@@ -724,12 +726,18 @@ corner.corner(
     truths=np.append(m_true, [b_true, np.log(lambda_true)]),
 );
 </code></pre>
-<pre><code>6760 independent samples of m1
-7442 independent samples of m2
-7049 independent samples of b
-6926 independent samples of ln(lambda)
+<pre><code>&lt;&gt;:37: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:37: SyntaxWarning: invalid escape sequence '\l'
+/tmp/ipykernel_2153/1785233684.py:37: SyntaxWarning: invalid escape sequence '\l'
+  labels=[&quot;$m_1$&quot;, &quot;$m_2$&quot;, &quot;b&quot;, &quot;$\ln\lambda$&quot;],
+
+
+7138 independent samples of m1
+7247 independent samples of m2
+6841 independent samples of b
+6925 independent samples of ln(lambda)
 </code></pre>
-<p><img src="output_22_1.png" alt="png"></p>
+<p><img src="output_22_2.png" alt="png"></p>
 <p>If you made it this far, you might notice that I don&rsquo;t really have a reasonable prior for the slopes.
 The current prior (uniform in <code>$\vec{m}$</code>) will have the same problems that <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/#Prior-on-Slope-and-Intercept" 
   
@@ -864,7 +872,7 @@ Hope this is helpful and please let me know of any mistakes in my work via the c
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

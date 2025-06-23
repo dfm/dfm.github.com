@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--autocorr">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/autocorr/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--autocorr/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -234,7 +230,12 @@ plt.xlabel(&quot;step number&quot;)
 plt.ylabel(&quot;$f$&quot;)
 plt.title(&quot;$\\tau_\mathrm{{true}} = {0:.0f}$&quot;.format(true_tau), fontsize=14);
 </code></pre>
-<p><img src="output_4_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:29: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:29: SyntaxWarning: invalid escape sequence '\m'
+/tmp/ipykernel_2145/167104486.py:29: SyntaxWarning: invalid escape sequence '\m'
+  plt.title(&quot;$\\tau_\mathrm{{true}} = {0:.0f}$&quot;.format(true_tau), fontsize=14);
+</code></pre>
+<p><img src="output_4_1.png" alt="png"></p>
 <p>Now we&rsquo;ll estimate the empirical autocorrelation function for each of these parallel chains and compare this to the true function.</p>
 <pre><code class="language-python">def next_pow_two(n):
     i = 1
@@ -411,7 +412,12 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_17_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:10: SyntaxWarning: invalid escape sequence '\&amp;'
+&lt;&gt;:10: SyntaxWarning: invalid escape sequence '\&amp;'
+/tmp/ipykernel_2145/933029486.py:10: SyntaxWarning: invalid escape sequence '\&amp;'
+  plt.loglog(N, gw2010, &quot;o-&quot;, label=&quot;G\&amp;W 2010&quot;)
+</code></pre>
+<p><img src="output_17_1.png" alt="png"></p>
 <p>As before, the short chains give absurd estimates of <code>$\tau$</code>, but the new method converges faster and with lower variance than the old method.
 The <code>$\tau = N/50$</code> line is also included as above as an indication of where we might start trusting the estimates.</p>
 <h2 id="what-about-shorter-chains">What about shorter chains?<a class="anchor" href="#what-about-shorter-chains">#</a></h2>
@@ -490,7 +496,12 @@ plt.xlabel(&quot;number of samples, $N$&quot;)
 plt.ylabel(r&quot;$\tau$ estimates&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_21_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:2: SyntaxWarning: invalid escape sequence '\&amp;'
+&lt;&gt;:2: SyntaxWarning: invalid escape sequence '\&amp;'
+/tmp/ipykernel_2145/652797860.py:2: SyntaxWarning: invalid escape sequence '\&amp;'
+  plt.loglog(N, gw2010, &quot;o-&quot;, label=&quot;G\&amp;W 2010&quot;)
+</code></pre>
+<p><img src="output_21_1.png" alt="png"></p>
 <p>This figure is the same as the previous one, but we&rsquo;ve added the maximum likelihood estimates for <code>$\tau$</code> in green.
 In this case, this estimate seems to be robust even for very short chains with <code>$N \sim \tau$</code>.</p>
 
@@ -612,7 +623,7 @@ In this case, this estimate seems to be robust even for very short chains with <
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--pymc3-mass-matrix">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/pymc3-mass-matrix/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--pymc3-mass-matrix/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -179,12 +175,15 @@ stats = az.summary(simple_trace)
 simple_time_per_eff = simple_time / stats.ess_bulk.values.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(simple_time_per_eff * 1000))
 </code></pre>
-<pre><code>PyMC3 version 3.11.5
+<pre><code>WARNING (theano.tensor.blas): Using NumPy C-API based implementation for BLAS functions.
+
+
+PyMC3 version 3.11.5
 
 
 Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -195,34 +194,21 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:02<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:02<00:00 Sampling chain 1, 0 divergences]
+  <progress value='12000' class='' max='12000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [12000/12000 00:02&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 5 seconds.
+<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 4 seconds.
 
 
-time per effective sample: 1.34803 ms
+time per effective sample: 1.10811 ms
 </code></pre>
 <p>On my laptop with two CPUs, I find that the computational cost per effective sample is a fraction of a millisecond.
 That&rsquo;s how things should be!</p>
@@ -267,7 +253,7 @@ print(&quot;time per effective sample: {0:.5f} ms&quot;.format(default_time_per_
 </code></pre>
 <pre><code>Auto-assigning NUTS sampler...
 Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -278,38 +264,24 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 09:03<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 08:59<00:00 Sampling chain 1, 0 divergences]
+  <progress value='12000' class='' max='12000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [12000/12000 07:41&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 1083 seconds.
-The acceptance probability does not match the target. It is 0.8914101254030794, but should be close to 0.8. Try to increase the number of tuning steps.
+<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 462 seconds.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The number of effective samples is smaller than 10% for some parameters.
 
 
-time per effective sample: 2003.80742 ms
+time per effective sample: 787.83428 ms
 </code></pre>
 <p>Yes, the units here are the same and the computational efficiency is orders of magnitude worse than the isotropic case.
 The standard recommendation would be to re-parameterize (we can see that that&rsquo;s what PyMC3 is telling us to do here too), but I&rsquo;m not really clever or patient enough to do that in every case.
@@ -401,7 +373,7 @@ dense_time_per_eff = dense_time / stats.ess_bulk.values.min()
 print(&quot;time per effective sample: {0:.5f} ms&quot;.format(dense_time_per_eff * 1000))
 </code></pre>
 <pre><code>Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -412,35 +384,22 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='27' class='' max='27' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [27/27 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='27' class='' max='27' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [27/27 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='54' class='' max='54' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [54/54 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
 <pre><code>Sampling 2 chains for 25 tune and 2 draw iterations (50 + 4 draws total) took 1 seconds.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -451,33 +410,20 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='52' class='' max='52' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [52/52 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='52' class='' max='52' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [52/52 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='104' class='' max='104' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [104/104 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 50 tune and 2 draw iterations (100 + 4 draws total) took 1 seconds.
+<pre><code>Sampling 2 chains for 50 tune and 2 draw iterations (100 + 4 draws total) took 0 seconds.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -488,33 +434,20 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='102' class='' max='102' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [102/102 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='102' class='' max='102' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [102/102 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='204' class='' max='204' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [204/204 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
 <pre><code>Sampling 2 chains for 100 tune and 2 draw iterations (200 + 4 draws total) took 0 seconds.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -525,33 +458,20 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='202' class='' max='202' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [202/202 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='202' class='' max='202' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [202/202 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='404' class='' max='404' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [404/404 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
 <pre><code>Sampling 2 chains for 200 tune and 2 draw iterations (400 + 4 draws total) took 0 seconds.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -562,33 +482,20 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='402' class='' max='402' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [402/402 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='402' class='' max='402' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [402/402 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='804' class='' max='804' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [804/804 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 400 tune and 2 draw iterations (800 + 4 draws total) took 1 seconds.
+<pre><code>Sampling 2 chains for 400 tune and 2 draw iterations (800 + 4 draws total) took 0 seconds.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -599,33 +506,20 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='802' class='' max='802' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [802/802 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='802' class='' max='802' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [802/802 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='1604' class='' max='1604' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [1604/1604 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
 <pre><code>Sampling 2 chains for 800 tune and 2 draw iterations (1_600 + 4 draws total) took 1 seconds.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -636,33 +530,20 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='1602' class='' max='1602' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [1602/1602 00:01<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='1602' class='' max='1602' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [1602/1602 00:01<00:00 Sampling chain 1, 0 divergences]
+  <progress value='3204' class='' max='3204' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [3204/3204 00:01&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 1_600 tune and 2 draw iterations (3_200 + 4 draws total) took 2 seconds.
+<pre><code>Sampling 2 chains for 1_600 tune and 2 draw iterations (3_200 + 4 draws total) took 1 seconds.
 Only 2 samples in chain.
-Sequential sampling (2 chains in 1 job)
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -673,32 +554,19 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='1327' class='' max='1327' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [1327/1327 00:00<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='1327' class='' max='1327' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [1327/1327 00:00<00:00 Sampling chain 1, 0 divergences]
+  <progress value='2654' class='' max='2654' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [2654/2654 00:01&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 1_325 tune and 2 draw iterations (2_650 + 4 draws total) took 2 seconds.
-Sequential sampling (2 chains in 1 job)
+<pre><code>Sampling 2 chains for 1_325 tune and 2 draw iterations (2_650 + 4 draws total) took 1 seconds.
+Multiprocess sampling (2 chains in 2 jobs)
 NUTS: [x]
 </code></pre>
 <style>
@@ -709,34 +577,21 @@ NUTS: [x]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
-    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-        background: #F44336;
-    }
-</style>
-<div>
-  <progress value='5500' class='' max='5500' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [5500/5500 00:03<00:00 Sampling chain 0, 0 divergences]
-</div>
-<style>
-    /* Turns off some styling */
-    progress {
-        /* gets rid of default border in Firefox and Opera. */
-        border: none;
-        /* Needs to be in here for Safari polyfill so background images work as expected. */
-        background-size: auto;
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
     }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
-  <progress value='5500' class='' max='5500' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [5500/5500 00:03<00:00 Sampling chain 1, 0 divergences]
+  <progress value='11000' class='' max='11000' style='width:300px; height:20px; vertical-align: middle;'></progress>
+  100.00% [11000/11000 00:03&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 500 tune and 5_000 draw iterations (1_000 + 10_000 draws total) took 7 seconds.
+<pre><code>Sampling 2 chains for 500 tune and 5_000 draw iterations (1_000 + 10_000 draws total) took 4 seconds.
 
 
-time per effective sample: 0.48053 ms
+time per effective sample: 0.29566 ms
 </code></pre>
 <p>The computational efficiency of this method is similar to PyMC3&rsquo;s default performance on an isotropic Gaussian (within a factor of a few) and corresponds to an improvement of more than <em>three orders of magnitude</em> over the default PyMC3 performance on a correlated Gaussian.</p>
 <p>While I&rsquo;ve found that this procedure can substantially improve the sampling efficiency in many real world scenarios (especially during exploratory phases of a project), you shouldn&rsquo;t forget about reparameterization because that can provide even better performance and help identify problems with your model specification.
@@ -862,7 +717,7 @@ Either way, hopefully this is helpful to folks until PyMC3 includes native suppo
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

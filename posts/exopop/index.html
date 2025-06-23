@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--exopop">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/exopop/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--exopop/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -219,6 +215,8 @@ stlr = pd.DataFrame(stlr[m])
 print(&quot;Selected {0} targets after cuts&quot;.format(len(stlr)))
 </code></pre>
 <pre><code>Using cached data file.
+
+
 Selected 91446 targets after cuts
 </code></pre>
 <p>After applying these same cuts to a pre-release version of this catalog, Burke et al. found 91,567 targets.</p>
@@ -233,7 +231,16 @@ pl.ylim(5.5, 3)
 pl.ylabel(&quot;$\log g$&quot;)
 pl.xlabel(&quot;$T_\mathrm{eff}$&quot;);
 </code></pre>
-<p><img src="output_6_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:7: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:8: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:7: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:8: SyntaxWarning: invalid escape sequence '\m'
+/tmp/ipykernel_2249/1651322040.py:7: SyntaxWarning: invalid escape sequence '\l'
+  pl.ylabel(&quot;$\log g$&quot;)
+/tmp/ipykernel_2249/1651322040.py:8: SyntaxWarning: invalid escape sequence '\m'
+  pl.xlabel(&quot;$T_\mathrm{eff}$&quot;);
+</code></pre>
+<p><img src="output_6_1.png" alt="png"></p>
 <p>Next up, let&rsquo;s make the cuts on the KOI list:</p>
 <ul>
 <li>disposition from the Q1-Q16 pipeline run: <code>CANDIDATE</code>,</li>
@@ -287,7 +294,12 @@ pl.ylim(rp_rng + 0.5 * np.array([-1, 1]))
 pl.xlabel(&quot;period [days]&quot;)
 pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
 </code></pre>
-<p><img src="output_10_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:18: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:18: SyntaxWarning: invalid escape sequence '\,'
+/tmp/ipykernel_2249/3333329861.py:18: SyntaxWarning: invalid escape sequence '\,'
+  pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
+</code></pre>
+<p><img src="output_10_1.png" alt="png"></p>
 <h2 id="the-detection-efficiency-model">The detection efficiency model<a class="anchor" href="#the-detection-efficiency-model">#</a></h2>
 <p>For this problem of population inference, an important ingredient is a detailed model of the efficiency with which the transit search pipeline detects transit signals. Burke et al. implement an analytic model for the detection efficiency that has been calibrated using simulations in a (submitted but unavailable) paper by Jessie Christiansen. The details of this model are given in the Burke et al. paper so I&rsquo;ll just go ahead and implement it and if you&rsquo;re interested, check out <a href="http://arxiv.org/abs/1506.04175" 
   
@@ -464,7 +476,12 @@ pl.xlabel(&quot;period [days]&quot;)
 pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;)
 pl.title(&quot;det. eff. for KIC10593626&quot;);
 </code></pre>
-<p><img src="output_14_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:14: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:14: SyntaxWarning: invalid escape sequence '\,'
+/tmp/ipykernel_2249/2038380559.py:14: SyntaxWarning: invalid escape sequence '\,'
+  pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;)
+</code></pre>
+<p><img src="output_14_1.png" alt="png"></p>
 <p>In practice, the only detection efficiency function that enters our analysis is <em>integrated across the stellar sample</em>. In fact, the function <code>$Q(w)$</code> needs to be integrated (marginalized) over <em>all the parameters that affect it but aren&rsquo;t of interest</em>, for example, <a href="http://arxiv.org/abs/1408.1393" 
   
    target="_blank" rel="noreferrer noopener" 
@@ -484,7 +501,12 @@ pl.title(&quot;mean pipeline detection efficiency&quot;)
 pl.xlabel(&quot;period [days]&quot;)
 pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
 </code></pre>
-<p><img src="output_18_0.png" alt="png"></p>
+<pre><code>&lt;&gt;:6: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:6: SyntaxWarning: invalid escape sequence '\,'
+/tmp/ipykernel_2249/993405964.py:6: SyntaxWarning: invalid escape sequence '\,'
+  pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
+</code></pre>
+<p><img src="output_18_1.png" alt="png"></p>
 <h2 id="population-inference">Population inference<a class="anchor" href="#population-inference">#</a></h2>
 <p>Now that we have our sample and our completeness model, we need to specify the underlying population model. Like Burke et al., I&rsquo;ve found that the data don&rsquo;t support a broken power law in planet radius so let&rsquo;s just model the population as the product of indpendent power laws in <code>$P$</code> and <code>$R_p$</code>.</p>
 <pre><code class="language-python"># A double power law model for the population.
@@ -537,16 +559,16 @@ theta_0 = np.array([np.log(0.75), -0.53218, -1.5])
 r = minimize(nll, theta_0, method=&quot;L-BFGS-B&quot;, bounds=bounds)
 print(r)
 </code></pre>
-<pre><code>      fun: 1162.5264684357785
- hess_inv: &lt;3x3 LbfgsInvHessProduct with dtype=float64&gt;
-      jac: array([4.54747351e-05, 2.27373674e-05, 0.00000000e+00])
-  message: 'CONVERGENCE: REL_REDUCTION_OF_F_&lt;=_FACTR*EPSMCH'
-     nfev: 44
-      nit: 8
-     njev: 11
-   status: 0
+<pre><code>  message: CONVERGENCE: RELATIVE REDUCTION OF F &lt;= FACTR*EPSMCH
   success: True
-        x: array([-0.41010522, -0.57993216, -1.23312798])
+   status: 0
+      fun: 1162.5264684357792
+        x: [-4.101e-01 -5.799e-01 -1.233e+00]
+      nit: 8
+      jac: [ 2.274e-05  2.274e-05  0.000e+00]
+     nfev: 44
+     njev: 11
+ hess_inv: &lt;3x3 LbfgsInvHessProduct with dtype=float64&gt;
 </code></pre>
 <p>&hellip;and plot it:</p>
 <pre><code class="language-python"># We'll reuse these functions to plot all of our results.
@@ -620,9 +642,43 @@ def plot_results(samples):
 
 print(plot_results(r.x));
 </code></pre>
-<pre><code>[0.5096066]
+<pre><code>&lt;&gt;:34: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:35: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:42: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:43: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:56: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:57: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:64: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:65: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:34: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:35: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:42: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:43: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:56: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:57: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:64: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:65: SyntaxWarning: invalid escape sequence '\m'
+/tmp/ipykernel_2249/627950470.py:34: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$R_p\,[R_\oplus]$&quot;)
+/tmp/ipykernel_2249/627950470.py:35: SyntaxWarning: invalid escape sequence '\#'
+  ax.set_ylabel(&quot;\# of detected planets&quot;)
+/tmp/ipykernel_2249/627950470.py:42: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$R_p\,[R_\oplus]$&quot;)
+/tmp/ipykernel_2249/627950470.py:43: SyntaxWarning: invalid escape sequence '\m'
+  ax.set_ylabel(&quot;$\mathrm{d}N / \mathrm{d}R$; $\Delta R = 0.25\,R_\oplus$&quot;)
+/tmp/ipykernel_2249/627950470.py:56: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$P\,[\mathrm{days}]$&quot;)
+/tmp/ipykernel_2249/627950470.py:57: SyntaxWarning: invalid escape sequence '\#'
+  ax.set_ylabel(&quot;\# of detected planets&quot;)
+/tmp/ipykernel_2249/627950470.py:64: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$P\,[\mathrm{days}]$&quot;)
+/tmp/ipykernel_2249/627950470.py:65: SyntaxWarning: invalid escape sequence '\m'
+  ax.set_ylabel(&quot;$\mathrm{d}N / \mathrm{d}P$; $\Delta P = 31.25\,\mathrm{days}$&quot;)
+
+
+[0.50960663]
 </code></pre>
-<p><img src="output_24_1.png" alt="png"></p>
+<p><img src="output_24_2.png" alt="png"></p>
 <p>Finally, let&rsquo;s sample from the posterior probability for the population parameters using <a href="http://dfm.io/emcee" 
   
    target="_blank" rel="noreferrer noopener" 
@@ -787,7 +843,7 @@ pl.xlabel(
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

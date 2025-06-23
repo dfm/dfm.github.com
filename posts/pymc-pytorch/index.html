@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--pymc-pytorch">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/pymc-pytorch/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--pymc-pytorch/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -164,7 +160,9 @@ plt.xlabel(&quot;x&quot;)
 plt.ylabel(&quot;y&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<p><img src="output_1_0.png" alt="png"></p>
+<pre><code>Matplotlib is building the font cache; this may take a moment.
+</code></pre>
+<p><img src="output_1_1.png" alt="png"></p>
 <p>Next, let&rsquo;s implement the likelihood function for this simple linear model using PyTorch.</p>
 <p><strong>Disclaimer:</strong> I&rsquo;m definitely not a PyTorch expert so there might be a better way to do this, but this should at least demonstrate the idea.</p>
 <pre><code class="language-python">import torch
@@ -234,6 +232,8 @@ class TorchOp(tt.Op):
                 )
         return [gradients[0] * d for d in self(*inputs)[1:]]
 </code></pre>
+<pre><code>WARNING (theano.tensor.blas): Using NumPy C-API based implementation for BLAS functions.
+</code></pre>
 <p>Here&rsquo;s how we can combine these into a Theano op that knows how to evaluate the linear model using PyTorch:</p>
 <pre><code class="language-python"># Instantiate the PyTorch model
 model = torch.jit.script(LinearModel())
@@ -277,13 +277,16 @@ NUTS: [logs, b, m]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:22<00:00 Sampling chain 0, 0 divergences]
+  100.00% [6000/6000 00:16&lt;00:00 Sampling chain 0, 0 divergences]
 </div>
 <style>
     /* Turns off some styling */
@@ -293,15 +296,18 @@ NUTS: [logs, b, m]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:21<00:00 Sampling chain 1, 0 divergences]
+  100.00% [6000/6000 00:15&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 44 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 31 seconds.
 </code></pre>
 <p>Note that unlike the TensorFlow implementation, there&rsquo;s no problem using multiple cores with this model and we actually get more than a factor of two increase in efficiency (probably because PyTorch has less Python overhead per call).</p>
 <p>For comparison, we can reimplement the same model directly in PyMC3:</p>
@@ -331,13 +337,16 @@ NUTS: [logs, b, m]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:06<00:00 Sampling chain 0, 0 divergences]
+  100.00% [6000/6000 00:04&lt;00:00 Sampling chain 0, 0 divergences]
 </div>
 <style>
     /* Turns off some styling */
@@ -347,15 +356,18 @@ NUTS: [logs, b, m]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:06<00:00 Sampling chain 1, 0 divergences]
+  100.00% [6000/6000 00:04&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 13 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 9 seconds.
 </code></pre>
 <p>In this case, the PyMC3 model is about a factor of 2 faster than the PyTorch model, but this is a simple enough model that it&rsquo;s not really a fair comparison.
 I expect that this gap would close for more expensive models where the overhead is less important.
@@ -397,38 +409,38 @@ az.summary(torch_trace)
   <tbody>
     <tr>
       <th>m</th>
-      <td>0.483</td>
+      <td>0.484</td>
       <td>0.037</td>
-      <td>0.415</td>
+      <td>0.416</td>
       <td>0.550</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>912.0</td>
-      <td>941.0</td>
+      <td>806.0</td>
+      <td>1075.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>-2.226</td>
-      <td>0.197</td>
-      <td>-2.570</td>
-      <td>-1.832</td>
+      <td>-2.230</td>
+      <td>0.195</td>
+      <td>-2.624</td>
+      <td>-1.887</td>
       <td>0.007</td>
       <td>0.005</td>
-      <td>891.0</td>
-      <td>964.0</td>
+      <td>746.0</td>
+      <td>967.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>logs</th>
-      <td>-0.299</td>
-      <td>0.101</td>
-      <td>-0.500</td>
-      <td>-0.118</td>
+      <td>-0.301</td>
+      <td>0.102</td>
+      <td>-0.484</td>
+      <td>-0.104</td>
       <td>0.003</td>
       <td>0.002</td>
-      <td>1054.0</td>
-      <td>1131.0</td>
+      <td>1050.0</td>
+      <td>1143.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
@@ -469,38 +481,38 @@ az.summary(torch_trace)
     <tr>
       <th>m</th>
       <td>0.483</td>
-      <td>0.037</td>
-      <td>0.413</td>
-      <td>0.548</td>
+      <td>0.036</td>
+      <td>0.418</td>
+      <td>0.553</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>954.0</td>
-      <td>1140.0</td>
-      <td>1.0</td>
+      <td>880.0</td>
+      <td>1026.0</td>
+      <td>1.00</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>-2.232</td>
-      <td>0.195</td>
-      <td>-2.590</td>
-      <td>-1.863</td>
-      <td>0.006</td>
+      <td>-2.224</td>
+      <td>0.194</td>
+      <td>-2.575</td>
+      <td>-1.849</td>
+      <td>0.007</td>
       <td>0.005</td>
-      <td>918.0</td>
-      <td>1071.0</td>
-      <td>1.0</td>
+      <td>839.0</td>
+      <td>1031.0</td>
+      <td>1.00</td>
     </tr>
     <tr>
       <th>logs</th>
-      <td>-0.303</td>
-      <td>0.102</td>
-      <td>-0.493</td>
-      <td>-0.110</td>
+      <td>-0.302</td>
+      <td>0.098</td>
+      <td>-0.472</td>
+      <td>-0.112</td>
       <td>0.003</td>
       <td>0.002</td>
-      <td>1037.0</td>
-      <td>1101.0</td>
-      <td>1.0</td>
+      <td>1219.0</td>
+      <td>1168.0</td>
+      <td>1.01</td>
     </tr>
   </tbody>
 </table>
@@ -632,7 +644,7 @@ Either way, I&rsquo;d love to hear if you have any feedback, tips, questions, pi
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

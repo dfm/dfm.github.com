@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--emcee-pymc3">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/emcee-pymc3/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--emcee-pymc3/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -189,9 +185,10 @@ with pm.Model() as model:
         init=&quot;adapt_full&quot;,
     )
 </code></pre>
-<pre><code>Auto-assigning NUTS sampler...
+<pre><code>WARNING (theano.tensor.blas): Using NumPy C-API based implementation for BLAS functions.
+Auto-assigning NUTS sampler...
 Initializing NUTS using adapt_full...
-/opt/hostedtoolcache/Python/3.9.13/x64/lib/python3.9/site-packages/pymc3/step_methods/hmc/quadpotential.py:510: UserWarning: QuadPotentialFullAdapt is an experimental feature
+/home/runner/work/dfm.io/dfm.io/posts/emcee-pymc3/.venv/lib/python3.9/site-packages/pymc3/step_methods/hmc/quadpotential.py:510: UserWarning: QuadPotentialFullAdapt is an experimental feature
   warnings.warn(&quot;QuadPotentialFullAdapt is an experimental feature&quot;)
 Sequential sampling (2 chains in 1 job)
 NUTS: [theta, alphaperp, logs]
@@ -204,13 +201,16 @@ NUTS: [theta, alphaperp, logs]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='7000' class='' max='7000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [7000/7000 00:07<00:00 Sampling chain 0, 0 divergences]
+  100.00% [7000/7000 00:06&lt;00:00 Sampling chain 0, 0 divergences]
 </div>
 <style>
     /* Turns off some styling */
@@ -220,15 +220,18 @@ NUTS: [theta, alphaperp, logs]
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='7000' class='' max='7000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [7000/7000 00:07<00:00 Sampling chain 1, 0 divergences]
+  100.00% [7000/7000 00:06&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 2_000 draw iterations (10_000 + 4_000 draws total) took 15 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 2_000 draw iterations (10_000 + 4_000 draws total) took 12 seconds.
 </code></pre>
 <p>And we can take a look at the <a href="https://corner.readthedocs.io/en/latest/" 
   
@@ -294,13 +297,16 @@ with model:
         /* Needs to be in here for Safari polyfill so background images work as expected. */
         background-size: auto;
     }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
     .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
         background: #F44336;
     }
 </style>
 <div>
   <progress value='27' class='' max='27' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [27/27 00:00<00:00 logp = -60.475, ||grad|| = 11.236]
+  100.00% [27/27 00:00&lt;00:00 logp = -60.475, ||grad|| = 11.236]
 </div>
 <pre><code>You must install the tqdm library to use progress indicators with emcee
 </code></pre>
@@ -310,7 +316,7 @@ with model:
 df = pd.DataFrame.from_records(sampler.get_blobs(flat=True, discard=100, thin=30))
 corner.corner(df[[&quot;alpha&quot;, &quot;beta&quot;, &quot;logs&quot;]], truths=true_params);
 </code></pre>
-<pre><code>WARNING:root:Pandas support in corner is deprecated; use ArviZ directly
+<pre><code>Pandas support in corner is deprecated; use ArviZ directly
 </code></pre>
 <p><img src="output_11_1.png" alt="png"></p>
 <p>The last thing that we might want to look at is <a href="../../posts/autocorr/" 
@@ -323,12 +329,12 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
     for var in [&quot;logs&quot;, &quot;alphaperp&quot;, &quot;theta&quot;]
 ]
 </code></pre>
-<pre><code>[1.3573344137965568, 1.458729906244515, 1.4597259928196067]
+<pre><code>[1.334548254067617, 1.3190172164161442, 1.19597488084929]
 </code></pre>
 <p>And, the autocorrelation for emcee is about 40 steps:</p>
 <pre><code class="language-python">sampler.get_autocorr_time(discard=100)
 </code></pre>
-<pre><code>array([36.56826715, 38.72133344, 31.81170595])
+<pre><code>array([35.01199991, 34.21983345, 37.38879886])
 </code></pre>
 <p>If you want to compare these results in detail, you&rsquo;ll want to make sure that you take into account the fact that each step of NUTS is significantly more expensive than one step with emcee, but that&rsquo;s way beyond the scope of this post&hellip;</p>
 <p><em>11/22/18: This post has been updated with suggestions from Thomas Wiecki. The <code>find_MAP</code> call has been removed from the PyMC sampling, and <code>model.bijection</code> is now used to map between arrays and dicts of parameters.</em></p>
@@ -451,7 +457,7 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

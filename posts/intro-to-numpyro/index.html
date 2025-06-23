@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--intro-to-numpyro">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/intro-to-numpyro/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--intro-to-numpyro/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -296,8 +292,11 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(0), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 4.93 s, sys: 47.8 ms, total: 4.98 s
-Wall time: 4.94 s
+<pre><code>No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+
+
+CPU times: user 2.94 s, sys: 32.6 ms, total: 2.97 s
+Wall time: 2.91 s
 </code></pre>
 <p>The published version of this post is executed on GitHub Actions with a pretty teeny CPU, but the full runtime for this model is less than 2 seconds on my laptop.
 In this case, the runtime is actually probably dominated by JIT compilation and Python overheads, but it&rsquo;s also a pretty simple model with only 2 parameters, so we&rsquo;d expect it to be fast.</p>
@@ -342,38 +341,38 @@ az.summary(inf_data)
   <tbody>
     <tr>
       <th>b</th>
-      <td>0.123</td>
-      <td>0.052</td>
-      <td>0.025</td>
+      <td>0.122</td>
+      <td>0.051</td>
+      <td>0.023</td>
       <td>0.215</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>4188.0</td>
-      <td>2913.0</td>
+      <td>4040.0</td>
+      <td>2815.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b_perp</th>
-      <td>0.098</td>
+      <td>0.097</td>
       <td>0.041</td>
       <td>0.021</td>
-      <td>0.172</td>
+      <td>0.174</td>
       <td>0.001</td>
       <td>0.000</td>
-      <td>4198.0</td>
-      <td>2936.0</td>
+      <td>4035.0</td>
+      <td>2751.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>m</th>
-      <td>0.758</td>
+      <td>0.757</td>
       <td>0.035</td>
       <td>0.695</td>
-      <td>0.824</td>
+      <td>0.827</td>
       <td>0.001</td>
       <td>0.000</td>
-      <td>4019.0</td>
-      <td>2531.0</td>
+      <td>3434.0</td>
+      <td>2598.0</td>
       <td>1.0</td>
     </tr>
     <tr>
@@ -381,11 +380,11 @@ az.summary(inf_data)
       <td>0.648</td>
       <td>0.022</td>
       <td>0.608</td>
-      <td>0.689</td>
+      <td>0.691</td>
       <td>0.000</td>
       <td>0.000</td>
-      <td>4019.0</td>
-      <td>2531.0</td>
+      <td>3434.0</td>
+      <td>2598.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
@@ -434,21 +433,7 @@ We&rsquo;ll use the same mixture model as in the <a href="https://dfm.io/posts/m
 >mixture models post</a>, and you should take a look at that post for a more detailed explanation of the model.
 But, in summary, out &ldquo;foreground&rdquo; model is the same as the one above, and the &ldquo;background&rdquo; model is a Gaussian with a floating mean and standard deviation.
 Besides <code>$\theta$</code> and <code>$b_\perp$</code>, we&rsquo;ll also fit for the mean and standard deviation of the background model, and the mixture weight (called <code>$Q$</code> in the previous blog post).</p>
-<p>NumPyro doesn&rsquo;t actually include a mixture <code>Distribution</code> that is flexible enough for everything we need in this post.
-There is a <a href="https://num.pyro.ai/en/stable/distributions.html#mixturesamefamily" 
-  
-   target="_blank" rel="noreferrer noopener" 
-><code>MixtureSameFamily</code> distribution</a>, that would be sufficient for this example, but below we&rsquo;ll need a more general model that allows the different components to have distributions from different families, so let&rsquo;s use the custom <code>MixtureGeneral</code> distribution from my <a href="https://github.com/dfm/numpyro-ext" 
-  
-   target="_blank" rel="noreferrer noopener" 
-><code>numpyro-ext</code> library</a>.
-You can install the version used in this post with the following command:</p>
-<pre><code class="language-bash">pip install git+https://github.com/dfm/numpyro-ext.git@8a777010e2b4eb135493cf984b8a9a40e2d99a90#egg=numpyro-ext
-</code></pre>
-<pre><code class="language-python">from numpyro_ext.distributions import MixtureGeneral
-
-
-def linear_mixture_model(x, yerr, y=None):
+<pre><code class="language-python">def linear_mixture_model(x, yerr, y=None):
     # Our &quot;foreground&quot; model is identical to the one we used previously: a line
     # parameterized by &quot;theta&quot; and &quot;b_perp&quot;. Note that we don't wrap the actual
     # sampling distribution in a `numpyro.sample` here because we're going to
@@ -480,7 +465,7 @@ def linear_mixture_model(x, yerr, y=None):
         # one that I implemented in the `numpyro-ext` package. (This is sort of
         # a lie: the `MixtureSameFamily` distribution in NumPyro _would_ work
         # here, but not in our next example, so bear with me!)
-        numpyro.sample(&quot;obs&quot;, MixtureGeneral(mix, [fg_dist, bg_dist]), obs=y)
+        numpyro.sample(&quot;obs&quot;, dist.MixtureGeneral(mix, [fg_dist, bg_dist]), obs=y)
 
 
 # Our inference procedure is identical to the one above.
@@ -493,8 +478,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 8.37 s, sys: 27.8 ms, total: 8.4 s
-Wall time: 8.32 s
+<pre><code>CPU times: user 4.68 s, sys: 36.3 ms, total: 4.71 s
+Wall time: 4.58 s
 </code></pre>
 <p>This model is a bit more complicated, but it still runs pretty quickly, with the runtime again dominated by just-in-time compilation (try increasing the number of samples if you don&rsquo;t believe me!).
 As before, we can check convergence and make a corner plot:</p>
@@ -542,86 +527,86 @@ az.summary(inf_data)
   <tbody>
     <tr>
       <th>Q</th>
-      <td>0.666</td>
-      <td>0.127</td>
-      <td>0.429</td>
-      <td>0.889</td>
+      <td>0.668</td>
+      <td>0.126</td>
+      <td>0.428</td>
+      <td>0.893</td>
       <td>0.002</td>
       <td>0.001</td>
-      <td>3729.0</td>
-      <td>2680.0</td>
+      <td>3656.0</td>
+      <td>2613.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>0.051</td>
-      <td>0.078</td>
-      <td>-0.101</td>
-      <td>0.195</td>
-      <td>0.001</td>
-      <td>0.001</td>
-      <td>3029.0</td>
-      <td>2191.0</td>
+      <td>0.053</td>
+      <td>0.083</td>
+      <td>-0.095</td>
+      <td>0.202</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>2636.0</td>
+      <td>2495.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b_perp</th>
-      <td>0.037</td>
-      <td>0.055</td>
-      <td>-0.069</td>
-      <td>0.140</td>
+      <td>0.038</td>
+      <td>0.061</td>
+      <td>-0.065</td>
+      <td>0.145</td>
       <td>0.001</td>
-      <td>0.001</td>
-      <td>2990.0</td>
-      <td>2326.0</td>
+      <td>0.002</td>
+      <td>2608.0</td>
+      <td>2430.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>bg_mean</th>
-      <td>-0.425</td>
-      <td>0.409</td>
-      <td>-1.173</td>
-      <td>0.399</td>
+      <td>-0.414</td>
+      <td>0.408</td>
+      <td>-1.193</td>
+      <td>0.344</td>
       <td>0.008</td>
       <td>0.006</td>
-      <td>2696.0</td>
-      <td>1858.0</td>
+      <td>2776.0</td>
+      <td>1926.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>bg_sigma</th>
-      <td>0.779</td>
-      <td>0.539</td>
-      <td>0.009</td>
-      <td>1.689</td>
-      <td>0.010</td>
+      <td>0.773</td>
+      <td>0.524</td>
+      <td>0.041</td>
+      <td>1.647</td>
+      <td>0.011</td>
       <td>0.007</td>
-      <td>2367.0</td>
-      <td>1634.0</td>
+      <td>2168.0</td>
+      <td>1581.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>m</th>
       <td>1.007</td>
-      <td>0.056</td>
-      <td>0.894</td>
-      <td>1.106</td>
+      <td>0.059</td>
+      <td>0.902</td>
+      <td>1.117</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>3129.0</td>
-      <td>2495.0</td>
+      <td>2368.0</td>
+      <td>2178.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>theta</th>
       <td>0.788</td>
-      <td>0.028</td>
-      <td>0.738</td>
-      <td>0.844</td>
+      <td>0.030</td>
+      <td>0.734</td>
+      <td>0.840</td>
+      <td>0.001</td>
       <td>0.000</td>
-      <td>0.000</td>
-      <td>3129.0</td>
-      <td>2495.0</td>
+      <td>2368.0</td>
+      <td>2178.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
@@ -638,7 +623,7 @@ The <a href="https://dfm.io/posts/mixture-models/"
    target="_blank" rel="noreferrer noopener" 
 >mixture membership probabilities</a> section of that post for more details, but in the meantime, here&rsquo;s an example of how to implement this in NumPyro using out above model:</p>
 <pre><code class="language-python">def linear_mixture_member_prob_model(x, yerr, y=None):
-    # Most of the model is identiacal to the one above...
+    # Most of the model is identical to the one above...
     theta = numpyro.sample(&quot;theta&quot;, dist.Uniform(-0.5 * jnp.pi, 0.5 * jnp.pi))
     b_perp = numpyro.sample(&quot;b_perp&quot;, dist.Normal(0.0, 1.0))
     m = numpyro.deterministic(&quot;m&quot;, jnp.tan(theta))
@@ -648,7 +633,7 @@ The <a href="https://dfm.io/posts/mixture-models/"
     bg_sigma = numpyro.sample(&quot;bg_sigma&quot;, dist.HalfNormal(3.0))
     bg_dist = dist.Normal(bg_mean, jnp.sqrt(bg_sigma**2 + yerr**2))
     Q = numpyro.sample(&quot;Q&quot;, dist.Uniform(0.0, 1.0))
-    mixture = MixtureGeneral(
+    mixture = dist.MixtureGeneral(
         dist.Categorical(probs=jnp.array([Q, 1.0 - Q])), [fg_dist, bg_dist]
     )
     with numpyro.plate(&quot;data&quot;, len(x)):
@@ -671,8 +656,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 8.46 s, sys: 55.7 ms, total: 8.52 s
-Wall time: 8.43 s
+<pre><code>CPU times: user 4.82 s, sys: 42.6 ms, total: 4.86 s
+Wall time: 4.72 s
 </code></pre>
 <p>As in the mixture models post, we can use the mixture membership probabilities to plot the data points colored by their probability of being an outlier:</p>
 <pre><code class="language-python">p_fg = jnp.mean(jnp.exp(sampler.get_samples()[&quot;p&quot;][..., 0]), axis=0)
@@ -850,8 +835,8 @@ plt.ylabel(&quot;posterior density&quot;)
 plt.legend(loc=1)
 plt.yticks([]);
 </code></pre>
-<pre><code>CPU times: user 3.06 s, sys: 0 ns, total: 3.06 s
-Wall time: 3.03 s
+<pre><code>CPU times: user 2.02 s, sys: 19 µs, total: 2.02 s
+Wall time: 1.97 s
 </code></pre>
 <p><img src="output_31_1.png" alt="png"></p>
 <p>This is a case where the inferred distance is somewhat inconsistent with the value computed by inverting the parallax as a distance estimator.</p>
@@ -899,10 +884,7 @@ This model has 4304 parameters (4 population parameters and then one distance fo
         # equivalent, but we need to specify a single distribution here for use
         # in the MixtureGeneral distribution below.
         dist_bg = dist.TransformedDistribution(
-            dist.Chi2(6),
-            dist.transforms.AffineTransform(
-                0.0, 0.5 * L, domain=dist.constraints.positive
-            ),
+            dist.Chi2(6), ScaleTransform(0.5 * L)
         )
 
         # The foreground distribution is a Gaussian in log distance. Like with
@@ -915,7 +897,7 @@ This model has 4304 parameters (4 population parameters and then one distance fo
 
         # Now we &quot;mix&quot; the foreground and background distributions using the
         # &quot;cluster membership fraction&quot; parameter to specify the mixing weights.
-        mixture = MixtureGeneral(
+        mixture = dist.MixtureGeneral(
             dist.Categorical(probs=jnp.stack((Q, 1 - Q), axis=-1)),
             [dist_fg, dist_bg],
         )
@@ -936,6 +918,16 @@ This model has 4304 parameters (4 population parameters and then one distance fo
         # Finally, we convert the distance to parallax and add the zero-point offset.
         plx_true = numpyro.deterministic(&quot;plx_true&quot;, 1000.0 / r + plx_zp)
         numpyro.sample(&quot;plx_obs&quot;, dist.Normal(plx_true, plx_err), obs=plx)
+
+
+# This is a custom AffineTransform class that properly propagates positive support.
+class ScaleTransform(dist.transforms.AffineTransform):
+    def __init__(self, scale):
+        super().__init__(0.0, scale, domain=dist.constraints.positive)
+    
+    @property
+    def codomain(self):
+        return dist.constraints.positive
 </code></pre>
 <p>As above, let&rsquo;s see what our prior predictive distribution looks like:</p>
 <pre><code class="language-python"># The array parallax errors is required by the model even when prior sampling.
@@ -981,8 +973,8 @@ So let&rsquo;s just bite the bullet and run the MCMC:</p>
 )
 %time sampler.run(jax.random.PRNGKey(7), plx_err, plx=plx, plx_zp=plx_zp)
 </code></pre>
-<pre><code>CPU times: user 21min 50s, sys: 1.48 s, total: 21min 52s
-Wall time: 11min 3s
+<pre><code>CPU times: user 11min 24s, sys: 1.9 s, total: 11min 26s
+Wall time: 6min 57s
 </code></pre>
 <p>Again, the published version of this post was executed on GitHub Actions, so you&rsquo;ll probably find that this runs a little faster on your own machine (this takes about 5 minutes on my laptop).
 Even so, this model definitely takes a little longer to run than the earlier examples, but remember that we&rsquo;re fitting thousands of parameters here, so I&rsquo;m willing to take this hit as long as the results are sensible.
@@ -1028,51 +1020,51 @@ az.summary(inf_data, var_names=[&quot;L&quot;, &quot;D&quot;, &quot;approx_size&
   <tbody>
     <tr>
       <th>L</th>
-      <td>469.582</td>
-      <td>7.079</td>
-      <td>456.132</td>
-      <td>482.660</td>
-      <td>0.126</td>
-      <td>0.089</td>
-      <td>3145.0</td>
-      <td>6311.0</td>
+      <td>469.437</td>
+      <td>7.012</td>
+      <td>457.100</td>
+      <td>483.498</td>
+      <td>0.153</td>
+      <td>0.108</td>
+      <td>2114.0</td>
+      <td>4688.0</td>
       <td>1.00</td>
     </tr>
     <tr>
       <th>D</th>
-      <td>836.914</td>
-      <td>0.988</td>
-      <td>835.085</td>
-      <td>838.780</td>
-      <td>0.017</td>
-      <td>0.012</td>
-      <td>3370.0</td>
-      <td>6108.0</td>
+      <td>836.899</td>
+      <td>1.000</td>
+      <td>835.069</td>
+      <td>838.822</td>
+      <td>0.019</td>
+      <td>0.014</td>
+      <td>2759.0</td>
+      <td>4851.0</td>
       <td>1.00</td>
     </tr>
     <tr>
       <th>approx_size</th>
-      <td>14.580</td>
-      <td>1.245</td>
-      <td>12.247</td>
-      <td>16.947</td>
-      <td>0.086</td>
-      <td>0.061</td>
-      <td>209.0</td>
-      <td>559.0</td>
+      <td>14.574</td>
+      <td>1.291</td>
+      <td>12.246</td>
+      <td>17.148</td>
+      <td>0.075</td>
+      <td>0.053</td>
+      <td>298.0</td>
+      <td>474.0</td>
       <td>1.01</td>
     </tr>
     <tr>
       <th>Q</th>
-      <td>0.424</td>
+      <td>0.423</td>
       <td>0.011</td>
-      <td>0.404</td>
-      <td>0.446</td>
+      <td>0.403</td>
+      <td>0.445</td>
       <td>0.001</td>
-      <td>0.000</td>
-      <td>369.0</td>
-      <td>882.0</td>
-      <td>1.00</td>
+      <td>0.001</td>
+      <td>165.0</td>
+      <td>705.0</td>
+      <td>1.02</td>
     </tr>
   </tbody>
 </table>
@@ -1089,7 +1081,7 @@ Given these results, we estimate the distance to M67 to be:</p>
     f&quot;sigma = {np.mean(samples['approx_size']):.1f} ± {np.std(samples['approx_size']):.1f} pc&quot;
 )
 </code></pre>
-<pre><code>sigma = 14.6 ± 1.2 pc
+<pre><code>sigma = 14.6 ± 1.3 pc
 </code></pre>
 <p>Please note that specifics of these results should be taken with a grain of salt, since there are several subtleties that have not been carefully handled.
 This result is quite sensitive to the parallax zero point offsets, and any uncertainty in that should be taken into account.
@@ -1209,11 +1201,6 @@ If you have any comments or questions, please <a href="https://github.com/dfm-io
   
 
   
-    <a class="pagination__item" href="https://dfm.io/posts/numpyro-marginalized-linear-model/">
-      <span class="pagination__label">Next Post</span>
-      <span class="pagination__title" >Marginalized linear models in NumPyro</span>
-    </a>
-  
 </div>
 
           
@@ -1277,7 +1264,7 @@ If you have any comments or questions, please <a href="https://github.com/dfm-io
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>

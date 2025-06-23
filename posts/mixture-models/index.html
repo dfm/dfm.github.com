@@ -109,12 +109,8 @@
             <i>
             
               <p>
-                The source for this post can be found <a href="https://github.com/dfm-io/post--mixture-models">here</a>.
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/mixture-models/">here</a>.
                 Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
-              </p>
-              <p>
-                This post is implemented as a Jupyter notebook;
-                <a href="https://mybinder.org/v2/gh/dfm-io/post--mixture-models/executed?labpath=post.ipynb">launch an executable version of this post on MyBinder.org</a>.
               </p>
             
             </i>
@@ -314,7 +310,11 @@ labels = [&quot;$m$&quot;, &quot;$b$&quot;, &quot;$Q$&quot;, &quot;$M$&quot;, &q
 truths = true_params + [true_frac, true_outliers[0], np.log(true_outliers[1])]
 corner.corner(sampler.flatchain, bins=35, extents=bounds, labels=labels, truths=truths);
 </code></pre>
-<pre><code>WARNING:root:Deprecated keyword argument 'extents'. Use 'range' instead.
+<pre><code>&lt;&gt;:3: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:3: SyntaxWarning: invalid escape sequence '\l'
+/tmp/ipykernel_2151/3333219463.py:3: SyntaxWarning: invalid escape sequence '\l'
+  labels = [&quot;$m$&quot;, &quot;$b$&quot;, &quot;$Q$&quot;, &quot;$M$&quot;, &quot;$\ln V$&quot;]
+WARNING:root:Deprecated keyword argument 'extents'. Use 'range' instead.
 </code></pre>
 <p><img src="output_11_1.png" alt="png"></p>
 <p>Similarly, the predicted constraint on the linear model is:</p>
@@ -531,7 +531,7 @@ pl.xlim(-2.1, 2.1);
      
 </div>
 
-            <p>© 2014-2024 Dan Foreman-Mackey</p>
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
           </footer>
           </div>
       </div>
