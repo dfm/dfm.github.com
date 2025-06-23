@@ -160,9 +160,7 @@ plt.xlabel(&quot;x&quot;)
 plt.ylabel(&quot;y&quot;)
 plt.legend(fontsize=14);
 </code></pre>
-<pre><code>Matplotlib is building the font cache; this may take a moment.
-</code></pre>
-<p><img src="output_1_1.png" alt="png"></p>
+<p><img src="output_1_0.png" alt="png"></p>
 <p>Next, let&rsquo;s implement the likelihood function for this simple linear model using PyTorch.</p>
 <p><strong>Disclaimer:</strong> I&rsquo;m definitely not a PyTorch expert so there might be a better way to do this, but this should at least demonstrate the idea.</p>
 <pre><code class="language-python">import torch
@@ -307,7 +305,7 @@ NUTS: [logs, b, m]
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
   100.00% [6000/6000 00:15&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 31 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 32 seconds.
 </code></pre>
 <p>Note that unlike the TensorFlow implementation, there&rsquo;s no problem using multiple cores with this model and we actually get more than a factor of two increase in efficiency (probably because PyTorch has less Python overhead per call).</p>
 <p>For comparison, we can reimplement the same model directly in PyMC3:</p>
@@ -367,7 +365,7 @@ NUTS: [logs, b, m]
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
   100.00% [6000/6000 00:04&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 9 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 10 seconds.
 </code></pre>
 <p>In this case, the PyMC3 model is about a factor of 2 faster than the PyTorch model, but this is a simple enough model that it&rsquo;s not really a fair comparison.
 I expect that this gap would close for more expensive models where the overhead is less important.

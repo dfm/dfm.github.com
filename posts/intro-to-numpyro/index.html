@@ -295,8 +295,8 @@ sampler = infer.MCMC(
 <pre><code>No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
 
 
-CPU times: user 2.94 s, sys: 32.6 ms, total: 2.97 s
-Wall time: 2.91 s
+CPU times: user 2.96 s, sys: 39.1 ms, total: 3 s
+Wall time: 2.94 s
 </code></pre>
 <p>The published version of this post is executed on GitHub Actions with a pretty teeny CPU, but the full runtime for this model is less than 2 seconds on my laptop.
 In this case, the runtime is actually probably dominated by JIT compilation and Python overheads, but it&rsquo;s also a pretty simple model with only 2 parameters, so we&rsquo;d expect it to be fast.</p>
@@ -478,8 +478,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 4.68 s, sys: 36.3 ms, total: 4.71 s
-Wall time: 4.58 s
+<pre><code>CPU times: user 5.08 s, sys: 49.5 ms, total: 5.13 s
+Wall time: 5.02 s
 </code></pre>
 <p>This model is a bit more complicated, but it still runs pretty quickly, with the runtime again dominated by just-in-time compilation (try increasing the number of samples if you don&rsquo;t believe me!).
 As before, we can check convergence and make a corner plot:</p>
@@ -656,8 +656,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 4.82 s, sys: 42.6 ms, total: 4.86 s
-Wall time: 4.72 s
+<pre><code>CPU times: user 5.35 s, sys: 40.5 ms, total: 5.39 s
+Wall time: 5.26 s
 </code></pre>
 <p>As in the mixture models post, we can use the mixture membership probabilities to plot the data points colored by their probability of being an outlier:</p>
 <pre><code class="language-python">p_fg = jnp.mean(jnp.exp(sampler.get_samples()[&quot;p&quot;][..., 0]), axis=0)
@@ -835,8 +835,8 @@ plt.ylabel(&quot;posterior density&quot;)
 plt.legend(loc=1)
 plt.yticks([]);
 </code></pre>
-<pre><code>CPU times: user 2.02 s, sys: 19 µs, total: 2.02 s
-Wall time: 1.97 s
+<pre><code>CPU times: user 2.18 s, sys: 3.02 ms, total: 2.19 s
+Wall time: 2.14 s
 </code></pre>
 <p><img src="output_31_1.png" alt="png"></p>
 <p>This is a case where the inferred distance is somewhat inconsistent with the value computed by inverting the parallax as a distance estimator.</p>
@@ -973,8 +973,8 @@ So let&rsquo;s just bite the bullet and run the MCMC:</p>
 )
 %time sampler.run(jax.random.PRNGKey(7), plx_err, plx=plx, plx_zp=plx_zp)
 </code></pre>
-<pre><code>CPU times: user 11min 24s, sys: 1.9 s, total: 11min 26s
-Wall time: 6min 57s
+<pre><code>CPU times: user 11min 28s, sys: 2.06 s, total: 11min 30s
+Wall time: 7min
 </code></pre>
 <p>Again, the published version of this post was executed on GitHub Actions, so you&rsquo;ll probably find that this runs a little faster on your own machine (this takes about 5 minutes on my laptop).
 Even so, this model definitely takes a little longer to run than the earlier examples, but remember that we&rsquo;re fitting thousands of parameters here, so I&rsquo;m willing to take this hit as long as the results are sensible.

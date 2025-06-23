@@ -208,7 +208,7 @@ NUTS: [x]
 <pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 4 seconds.
 
 
-time per effective sample: 1.10811 ms
+time per effective sample: 1.12288 ms
 </code></pre>
 <p>On my laptop with two CPUs, I find that the computational cost per effective sample is a fraction of a millisecond.
 That&rsquo;s how things should be!</p>
@@ -273,15 +273,15 @@ NUTS: [x]
 </style>
 <div>
   <progress value='12000' class='' max='12000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [12000/12000 07:41&lt;00:00 Sampling 2 chains, 0 divergences]
+  100.00% [12000/12000 07:46&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 462 seconds.
+<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 467 seconds.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The number of effective samples is smaller than 10% for some parameters.
 
 
-time per effective sample: 787.83428 ms
+time per effective sample: 797.28110 ms
 </code></pre>
 <p>Yes, the units here are the same and the computational efficiency is orders of magnitude worse than the isotropic case.
 The standard recommendation would be to re-parameterize (we can see that that&rsquo;s what PyMC3 is telling us to do here too), but I&rsquo;m not really clever or patient enough to do that in every case.
@@ -591,7 +591,7 @@ NUTS: [x]
 <pre><code>Sampling 2 chains for 500 tune and 5_000 draw iterations (1_000 + 10_000 draws total) took 4 seconds.
 
 
-time per effective sample: 0.29566 ms
+time per effective sample: 0.30648 ms
 </code></pre>
 <p>The computational efficiency of this method is similar to PyMC3&rsquo;s default performance on an isotropic Gaussian (within a factor of a few) and corresponds to an improvement of more than <em>three orders of magnitude</em> over the default PyMC3 performance on a correlated Gaussian.</p>
 <p>While I&rsquo;ve found that this procedure can substantially improve the sampling efficiency in many real world scenarios (especially during exploratory phases of a project), you shouldn&rsquo;t forget about reparameterization because that can provide even better performance and help identify problems with your model specification.
