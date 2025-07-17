@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>The Histogram (Part 1) | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.1f57f8800830abb72375a261f1dce94fd4baa8d1e1cb788d1a2c0961fe963544.css" integrity="sha256-H1f4gAgwq7cjdaJh8dzpT9S6qNHhy3iNGiwJYf6WNUQ="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/histogram1\/",
+      "name": "The Histogram (Part 1)",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="../../"> home</a>
+      </li>
+    
+      <li>
+        <a  href="../../about">about</a>
+      </li>
+    
+      <li>
+        <a  href="../../posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">The Histogram (Part 1)</h1>
+            <time datetime="2014-07-29 00:00:00 &#43;0000 UTC" class="post__date">Jul 29 2014</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/histogram1/">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+            
+            </i>
+          </header>
+          <article class="post__content">
+              
+<p>When I was writing <a href="http://arxiv.org/abs/1406.3020" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>my recent paper</a> where I infer the population of exoplanets from an incomplete catalog of noisy measurements, I spent a lot of time thinking about histograms and I came across a few cute results that I wanted to share.
+Histograms are commonly used as simple &ldquo;non-parametric&rdquo; estimates of probability distributions but they get something of a bad rap (<em>binning is sinning</em>) because it&rsquo;s easy to use them inappropriately!
+For example, in astronomy, it&rsquo;s not uncommon for people to make a histogram of their data then fit a model to the bin heights (think luminosity functions, mass functions, <em>etc.</em>) instead of just modeling the points directly.
+This definitely isn&rsquo;t the right thing to do in that case and maybe this should be the topic of a future post but there are some situations where making a histogram of your data isn&rsquo;t such a bad idea.
+Even if a histogram <em>is</em> a good model for the data, we&rsquo;re often still left with the question of what we should do in the face of incompleteness and finite measurement uncertainties.
+In this post, I derive the maximum-likelihood &ldquo;histogram&rdquo; when your data are censored by some (known) detection efficiency function and in a later post, I&rsquo;ll generalize this to include a treatment of measurement uncertainties (following <a href="http://arXiv.org/abs/1008.4146" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Hogg, Myers &amp; Bovy 2010</a> and <a href="http://arxiv.org/abs/1406.3020" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>DFM, Hogg &amp; Morton</a>).
+For all the results in this post, we will fix the bin locations and widths <em>a priori</em> but it would be interesting to generalize this derivation to include adaptive widths (see, for example, <a href="http://jakevdp.github.io/blog/2012/09/12/dynamic-programming-in-python/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Jake VanderPlas' excellent post</a>).</p>
+<h2 id="the-maximum-likelihood-histogram">The Maximum-Likelihood Histogram<a class="anchor" href="#the-maximum-likelihood-histogram">#</a></h2>
+<p>The act of making a histogram is often thought of as a (very intuitive) <em>procedure</em>: count the number of points that fall in each bin and normalize by the bin volume to get the bin heights.
+It can be difficult to generalize a procedure like this to deal with more complicated models so I prefer to think of data analysis in terms of <em>probabilities</em>.
+When we do this, it&rsquo;s easy to derive the above procedure as the <em>analytic maximum-likelihood result for a specific model!</em></p>
+<p>To set this up, we have a set of <code>$K$</code> data points <code>$\{ w_k \}_{k=1}^K$</code> where each <code>$w_k$</code> is a vector in an arbitrary number of dimensions <code>$D$</code>.
+We&rsquo;re going to assume that these points are independent draws from the inhomogeneous Poisson process generated by the rate density</p>
+<div>$$ \Gamma_\theta (w) = \frac{\mathrm{d}N}{\mathrm{d}w} $$</div>
+<p>where <code>$\theta$</code> is the set of parameters describing this function.
+Under this assumption, the log-likelihood of the entire dataset is the commonly used result</p>
+<div>$$\ln p(\{ w_k \}_{k=1}^K\,|\,\theta) = \ell (\theta) = -\int \Gamma_\theta (w)\,\mathrm{d}w + \sum_{k=1}^K \ln \Gamma_\theta (w_k) \quad.\label{eq:poisson}
+$$</div>
+<p>This derivation is left to the interested reader… I&rsquo;ve always wanted to say that!
+A good starting place is Section 3.2 of <a href="http://arxiv.org/abs/astro-ph/0202141" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>this PhD thesis</a>.</p>
+<p>Note that the derivation up to this point isn&rsquo;t specific to a histogram model and you can (and should) use a physical model for <code>$\Gamma_\theta$</code> if you have one and fit for <code>$\theta$</code> numerically.
+But now, for the purposes of today&rsquo;s discussion, let&rsquo;s model <code>$\Gamma_\theta$</code> as a piecewise constant step function</p>
+<div>$$
+\Gamma_\theta (w) = \left\{\begin{array}{ll}
+    \theta_1 & w \in \Delta_1 \\
+    \theta_2 & w \in \Delta_2 \\
+    \vdots & \\
+    \theta_N & w \in \Delta_N \\
+    0 & \mathrm{otherwise}
+\end{array}\right.
+$$</div>
+<p>where the <code>$N$</code> parameters <code>$\theta_n$</code> are the step heights and the step volumes <code>$\Delta_n$</code> have been fixed in advance.
+When we use this model for the rate density in the likelihood expression above (Equation <code>$\ref{eq:poisson}$</code>), we find</p>
+<div>$$ \ell(\theta) = -\sum_{n=1}^N \Delta_n\,\theta_n + \sum_{k=1}^K \,\sum_{n=1}^N \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \quad.$$</div>
+<p>where <code>$\Delta_n$</code> is the volume of the <code>$n$</code>-th bin and the function <code>$\mathbf{1}[\cdot]$</code> is one if its argument evaluates to true and zero otherwise.</p>
+<p>The maximum-likelihood parameters <code>$\theta$</code> are the values that maximize the log-likelihood <code>$\ell(\theta)$</code>.
+To find these, we can just compute the derivative of <code>$\ell(\theta)$</code>, set it to zero, and solve.
+For a specific step <code>$m$</code>, this works out to give</p>
+<div>$$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\Delta_m + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\Delta_m}$$</div>
+<p>where <code>$N_m = \sum_{k=1}^K \mathbf{1}[w_k \in \Delta_m]$</code> is the number of points that fall in the <code>$m$</code>-th bin.
+<em>This is exactly what you would get if you made a histogram!</em></p>
+<p>Now we can go one step further and estimate the uncertainty <code>$\sigma_{\theta_m^*}$</code> on <code>$\theta_m^*$</code> using the second derivative of <code>$\ell (\theta)$</code></p>
+<div>$$\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2} = -\frac{N_m}{{\theta_m}^2}$$</div>
+<p>giving</p>
+<div>$$
+\begin{eqnarray}
+\sigma_{\theta_m^*}^2 &=& -\left[\frac{\mathrm{d}^2\ell(\theta)}{{\mathrm{d}\theta_m}^2}\right]_{\theta_m = \theta_m^*}^{-1} \\
+&=& \frac{N_m}{\Delta_m^2}
+\end{eqnarray}
+$$</div>
+<p>the familiar <code>$\sqrt{N}$</code> counting statistics.</p>
+<p>Okay. Now that we&rsquo;ve done all this work to derive this trivial and familiar result, let&rsquo;s get on to generalizing it!</p>
+<h2 id="the-censored-histogram">The Censored Histogram<a class="anchor" href="#the-censored-histogram">#</a></h2>
+<p>The generalization that we&rsquo;ll work through in this post is relevant for a lot of projects in astronomy and I expect that it occurs in many other fields too.
+Suppose that you have a censored dataset where the completeness or detection efficiency <code>$Q(w)$</code> is a function of the parameters <code>$w$</code> and you want to determine the underlying population, not the observed distribution.
+This occurs when studying the population of transiting exoplanets because smaller planets on longer periods are harder to detect than larger ones on shorter periods.
+For the luminosity function of stars or quasars, this occurs because the detection efficiency scales with apparent brightness.</p>
+<p>In what follows, we&rsquo;ll assume that we know (from some other means) the completeness function <code>$Q(w)$</code> of our data but you could relax this and infer the parameters of <code>$Q(w)$</code> simultaneously with <code>$\theta$</code>.
+Unfortunately the result of this joint inference will no longer be analytic and, in practice, there will probably be large degeneracies.</p>
+<p><strong>Inverse detection efficiency (IDE)</strong>  
+The standard practice in these fields is to make the <em>weighted</em> histogram of the points where each point is counted with a weight inversely proportional to the detection efficiency at that point.
+In other words, the estimated step height becomes</p>
+<div>$$ \theta_m^* = \frac{1}{\Delta_m} \, \sum_{k=1}^K \frac{\mathbf{1}[w_k \in \Delta_m]}{Q(w_k)} $$</div>
+<p>where <code>$Q(w_k)$</code> is the absolute probability of detecting an object at <code>$w_k$</code>.
+<strong>Don&rsquo;t do this!</strong>
+As you&rsquo;ll see in a moment, while this procedure seems intuitively correct, it gives biased results and the maximum-likelihood result is actually <em>very simple</em>.</p>
+<p>To see qualitatively why this procedure will, in general, yield biased inferences, let&rsquo;s consider a slightly pathological example.
+In this example, there is a single bin <code>$(0 &lt;= w &lt; 1)$</code> where the completeness function is</p>
+<div>$$Q(w) = \frac{1}{1 + \exp((w - 0.5)/0.01)} \quad.$$</div>
+<p>The following figure shows a plot of this example:</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as pl
+
+np.random.seed(12345)
+
+# Define the completeness function.
+Q = lambda w: 1.0 / (1 + np.exp((w - 0.5) / 0.01))
+
+# Sample some points from a constant rate function
+K = np.random.poisson(50)
+w = np.random.uniform(0, 1, size=K)
+wobs = w[np.random.rand(K) &lt; Q(w)]
+
+# Plot the observations.
+pl.plot(w, 0.5 * np.ones(K), &quot;.r&quot;)
+pl.plot(wobs, 0.5 * np.ones(len(wobs)), &quot;.k&quot;)
+pl.text(0.25, 0.53, &quot;observed&quot;, ha=&quot;center&quot;)
+pl.text(0.75, 0.53, &quot;not observed&quot;, ha=&quot;center&quot;, color=&quot;red&quot;)
+
+# Plot the completeness function.
+w0 = np.linspace(0, 1, 5000)
+pl.plot(w0, Q(w0), &quot;k&quot;)
+
+pl.xlim(-0.1, 1.1)
+pl.ylim(-0.1, 1.1)
+pl.ylabel(r&quot;$Q(w)$&quot;)
+pl.xlabel(r&quot;$w$&quot;);
+</code></pre>
+<p><img src="output_10_0.png" alt="png"></p>
+<p>In this figure, the black points show the locations of the points that get detected and the red points indicate points that would have been observed with a perfectly complete sample but were missed because of <code>$Q(w)$</code>.
+If you look at the code above, you&rsquo;ll see that the true step height should be 50 but, if you evaluate the IDE approximation, you&rsquo;ll find that it gives</p>
+<pre><code class="language-python">th = sum(1.0 / Q(wobs))
+sigma_th = th / np.sqrt(len(wobs))
+print(&quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th))
+</code></pre>
+<pre><code>28.5 ± 5.5
+</code></pre>
+<p>This result is about <em>half</em> of what it should be and if you look at the figure above, I think you&rsquo;ll see what went wrong: only about half of the points were observed and each of those points was in a region where <code>$Q(w) \approx 1$</code>, meaning that each point gets a weight of 1.
+It&rsquo;s clear that in this case each point should get a weight of 2 (or one-over-a-half) but let&rsquo;s see if we can derive this intuition more formally.</p>
+<p><strong>The maximum-likelihood (ML) solution</strong>  
+The first thing to note is that when we have an incomplete catalog, the likelihood of the data given the population is exactly the same as our previous expression, but the rate <code>$\Gamma_\theta (w)$</code> is replaced by the <em>observable rate</em> <code>$\hat{\Gamma}_\theta(w) = Q(w)\,\Gamma_\theta (w)$</code>.
+Therefore, for a piecewise constant model of <code>$\Gamma_\theta(w)$</code>, the log-likelihood becomes</p>
+<div>$$ \ell(\theta) = -\sum_{n=1}^N \theta_n \int_{\Delta_n} Q(w)\,\mathrm{d}w + \sum_{k=1}^K \left[\ln Q(w_k) + \sum_{n=1}^N  \mathbf{1}[w_k \in \Delta_n]\,\ln \theta_n \right] \quad.$$</div>
+<p>As before, let&rsquo;s take the derivative of this with respect to a specific step height <code>$\theta_m$</code> to find</p>
+<div>$$\frac{\mathrm{d}\ell(\theta)}{\mathrm{d}\theta_m} = -\int_{\Delta_m} Q(w)\,\mathrm{d}w + \frac{N_m}{\theta_m} \to \theta_m^* = \frac{N_m}{\int_{\Delta_m}Q(w)\,\mathrm{d}w}$$</div>
+<p>with uncertainty</p>
+<div>$$\sigma_{\theta_m^*} = \frac{\sqrt{N_m}}{\int_{\Delta_m}Q(w)\,\mathrm{d}w} \quad.$$</div>
+<p>This result shows that the maximum-likelihood result is also a weighted histogram but instead of weighting the points by their <em>per-object</em> completeness, the weight of each point should be the <em>mean completeness in that bin</em>.
+In the limit of a constant completeness function, the IDE procedure will give the correct result but whenever the detection efficiency varies across the bin (or if there are latent dimensions; I&rsquo;ll come back to this in the next example), <strong>the IDE result is just plain wrong!</strong>
+To make matters worse, as you collect more data, the IDE result gets more precise but it&rsquo;s still just as wrong.</p>
+<p>Luckily, the ML solution will probably be easy to compute, even if you need to compute the weighting integrals numerically.
+For our extreme example from above, the integral becomes <code>$\sim 0.5$</code> and the maximum-likelihood estimate of the step height is</p>
+<pre><code class="language-python"># Evaluate the completeness integral numerically.
+weight = np.mean(Q(np.random.rand(50000)))
+
+# Compute the maximum-likelihood step height.
+th = len(wobs) / weight
+sigma_th = th / np.sqrt(len(wobs))
+print(&quot;{0:.1f} ± {1:.1f}&quot;.format(th, sigma_th))
+</code></pre>
+<pre><code>54.0 ± 10.4
+</code></pre>
+<p>which is consistent with the correct result: 50.</p>
+<h2 id="a-more-realistic-example">A More Realistic Example<a class="anchor" href="#a-more-realistic-example">#</a></h2>
+<p>Now that we&rsquo;ve derived a formalism and developed some intuition for working with censored datasets, let&rsquo;s work through a more realistic example to see whether or not this machinery matters.
+In this example, we&rsquo;ll add another level of complexity that is especially relevant in the study of exoplanets: latent dimensions.</p>
+<p>For transiting exoplanets, the detection efficiency scales approximately with the signal strength times the geometric transit probability</p>
+<div>$$Q(w) \propto \frac{R_\star}{P^{2/3}\,{M_\star}^{1/3}}\,\left[\frac{R}{R_\star}\right]^2\,\frac{1}{\sqrt{P}}$$</div>
+<p>where <code>$R_\star$</code> is the star&rsquo;s radius, <code>$M_\star$</code> is the stellar mass, <code>$P$</code> is the planet&rsquo;s orbital period, and <code>$R$</code> is the planet&rsquo;s radius.
+Then, if you want to measure the radius distribution of exoplanets, the standard practice is to run the one-dimensional IDE on the observed data computing the detection efficiency independently for each data point and ignoring the fact that the distribution is actually four-dimensional.
+We won&rsquo;t work through exactly this example but instead, we&rsquo;ll use a simpler two-dimensional toy problem.</p>
+<p><strong>The setup</strong>  
+For this example, we&rsquo;ll consider a two-dimensional problem with parameters <code>$a \in [1,\,2]$</code> and <code>$b \in [1,\,10]$</code> where the detection efficiency is given by</p>
+<div>$$Q(a,\,b) = 0.8 \, \left[ 1+ \exp \left(10\,\frac{a^2}{\sqrt{b}} - 10\right) \right]^{-1} \quad.$$</div>
+<p>Here&rsquo;s a plot of this function:</p>
+<pre><code class="language-python"># Define the detection efficiency function.
+def detection_efficiency(a, b):
+    return 0.8 / (1 + np.exp((a**2 / np.sqrt(b) - 1) / 0.1))
+
+
+# Plot this function on a grid.
+amn, amx, bmn, bmx = 1, 2, 1, 10
+A, B = np.meshgrid(
+    np.linspace(amn, amx, 101), np.linspace(bmn, bmx, 103), indexing=&quot;ij&quot;
+)
+pl.pcolor(A, B, detection_efficiency(A, B), cmap=&quot;gray&quot;, vmin=0, vmax=1)
+pl.xlim(amn, amx)
+pl.ylim(bmn, bmx)
+pl.xlabel(r&quot;$a$&quot;)
+pl.ylabel(r&quot;$b$&quot;)
+pl.colorbar(label=r&quot;$Q(a,\,b)$&quot;);
+</code></pre>
+<p><img src="output_23_0.png" alt="png"></p>
+<p><strong>A synthetic dataset</strong>  
+Now let&rsquo;s generate a sample dataset and censor it using this completeness function.
+For simplicity, we&rsquo;ll use a <em>uniform</em> population where a complete sample would be uniformly distributed in <code>$a$</code> and <code>$b$</code>:</p>
+<pre><code class="language-python"># Generate the true (uncensored) samples.
+np.random.seed(1234)
+true_rate = 500
+K = np.random.poisson(true_rate * (amx - amn) * (bmx - bmn))
+samples = np.vstack(
+    [
+        np.random.uniform(amn, amx, size=K),
+        np.random.uniform(bmn, bmx, size=K),
+    ]
+).T
+
+# Censor this dataset using the completeness function.
+q = detection_efficiency(samples[:, 0], samples[:, 1])
+m = np.random.rand(K) &lt; q
+dataset = samples[m]
+q = q[m]
+
+# Overplot the dataset on the completeness function.
+pl.pcolor(A, B, detection_efficiency(A, B), cmap=&quot;gray&quot;, vmin=0, vmax=1, alpha=0.5)
+pl.plot(samples[:, 0], samples[:, 1], &quot;.r&quot;, ms=4)
+pl.plot(dataset[:, 0], dataset[:, 1], &quot;.b&quot;, ms=4)
+pl.xlim(amn, amx)
+pl.ylim(bmn, bmx)
+pl.xlabel(r&quot;$a$&quot;)
+pl.ylabel(r&quot;$b$&quot;)
+pl.colorbar(label=r&quot;$Q(a,\,b)$&quot;);
+</code></pre>
+<p><img src="output_25_0.png" alt="png"></p>
+<p>In this figure, the blue points are objects that passed the completeness cut and made it into the catalog and the red points were missed even though they would have been detected in a complete catalog.</p>
+<p><strong>Using inverse detection efficiency</strong>  
+Now, let&rsquo;s say that we&rsquo;re only interested in the <code>$b$</code> distribution and even though we know that it should be a flat line, we&rsquo;ll model it as a histogram with a few bins.
+To start, let&rsquo;s look at the IDE result</p>
+<pre><code class="language-python"># Define the bins.
+bin_edges = np.linspace(bmn, bmx, 11)
+
+# Compute the inverse detection efficiency model.
+n, _ = np.histogram(dataset[:, 1], bin_edges)
+n_ide, _ = np.histogram(dataset[:, 1], bin_edges, weights=1.0 / q)
+
+# This function makes a histogram plot given of a set of step heights.
+def plot_hist(bin_edges, bin_heights, reluncert=None, offset=0, **kwargs):
+    x = np.array(list(zip(bin_edges[:-1], bin_edges[1:]))).flatten()
+    bh = bin_heights / np.diff(bin_edges)
+    y = np.array(list(zip(bh, bh))).flatten()
+    pl.plot(x, y, **kwargs)
+    if reluncert is not None:
+        pl.errorbar(
+            0.5 * (bin_edges[:-1] + bin_edges[1:]) + offset,
+            bh,
+            yerr=bh * reluncert,
+            fmt=&quot;+&quot;,
+            capsize=0,
+            color=kwargs.get(&quot;color&quot;, &quot;k&quot;),
+        )
+
+
+pl.gca().axhline(true_rate, lw=3, color=&quot;k&quot;, alpha=0.1)
+plot_hist(bin_edges, n_ide, reluncert=1 / np.sqrt(n), color=&quot;k&quot;)
+pl.xlabel(r&quot;$b$&quot;)
+pl.ylabel(r&quot;$\Gamma(b)$&quot;)
+pl.ylim(0, 800);
+</code></pre>
+<p><img src="output_27_0.png" alt="png"></p>
+<p>In this figure, the <em>correct</em> result (the rate that was used to generate the dataset) is shown as the thick gray line and the IDE estimate of this function is shown as the step function with error bars.
+As expected, the estimate is noisy and the error bars seem to be overly confident (especially in the regions of lower detection efficiency).</p>
+<p><strong>The maximum-likelihood</strong>  
+For comparison, let&rsquo;s use the same dataset and apply the maximum-likelihood method that we derived above.
+First, we need to integrate (numerically) the completeness function over the bins where the <code>$n$</code>-th bin is the two-dimensional area defined by</p>
+<div>$$b_n \le b < b_{n+1} \quad \mathrm{and} \quad 1 \le a < 2 \quad.$$</div>
+<pre><code class="language-python"># Loop over the bins and numerically integrate Q(a, b) over a.
+N = 50000
+bq = np.empty(len(bin_edges) - 1)
+a0 = np.random.uniform(amn, amx, N)
+for i in range(len(bq)):
+    b0 = np.random.uniform(bin_edges[i], bin_edges[i + 1], N)
+    bq[i] = np.mean(detection_efficiency(a0, b0))
+
+# Plot the integrated completeness function.
+plot_hist(bin_edges, bq, color=&quot;k&quot;)
+pl.xlabel(r&quot;$b$&quot;)
+pl.ylabel(r&quot;$Q_\mathrm{int}(b)$&quot;)
+pl.ylim(0, 1);
+</code></pre>
+<p><img src="output_30_0.png" alt="png"></p>
+<p>Using this integrated detection efficiency function, we can easily compute the ML step function given the prescription derived above and compare it to the IDE result.</p>
+<pre><code class="language-python">pl.gca().axhline(true_rate, lw=3, color=&quot;k&quot;, alpha=0.1)
+plot_hist(
+    bin_edges, n_ide, reluncert=1 / np.sqrt(n), offset=-0.05, ls=&quot;dotted&quot;, color=&quot;k&quot;
+)
+plot_hist(bin_edges, n / bq, reluncert=1 / np.sqrt(n), offset=0.05, color=&quot;k&quot;)
+pl.xlabel(r&quot;$b$&quot;)
+pl.ylabel(r&quot;$\Gamma(b)$&quot;)
+pl.ylim(0, 800);
+</code></pre>
+<p><img src="output_32_0.png" alt="png"></p>
+<p>In this figure, the IDE result is shown as a dotted line and the ML result is given by the solid black line with error bars.
+As before, the correct result is shown as the thick gray line.
+It&rsquo;s clear from this comparison that the ML result is <em>much</em> better than the IDE computation—the results are consistent with the truth!</p>
+<h2 id="summary--conclusions">Summary &amp; Conclusions<a class="anchor" href="#summary--conclusions">#</a></h2>
+<p>In this post, we&rsquo;ve derived a simple, maximum-likelihood method for making histograms of incomplete datasets.
+This method should <em>always</em> give less biased results—at minimal extra computational cost—than the standard techniques used in astronomy and in some cases the results will be <em>drastically different</em>.
+How different the results are from the two methods is going to be very problem dependent, and it&rsquo;s possible that the existing results in the literature aren&rsquo;t very wrong because of this effect.
+That being said, the &ldquo;correct&rdquo; method isn&rsquo;t really any more complicated than what we&rsquo;re doing already, so I hope that someone will read this and do The Right Thing™ next time!</p>
+<p>Another huge benefit of casting the histogram procedure as a problem in probabilistic data analysis is that it forces us to think explicitly about our assumptions.
+The result derived here is going to be the best possible result under the following assumptions:</p>
+<ol>
+<li>The data are independent samples from an inhomogeneous Poisson process where the rate function is a piecewise constant step function,</li>
+<li>the measurement uncertainties on the data are negligible, and</li>
+<li>the detection efficiency function <code>$Q(w)$</code> is known, but it doesn&rsquo;t need to be constant.</li>
+</ol>
+<p>In contrast, the IDE procedure is <em>only</em> correct if the detection efficiency is <em>constant</em> across each bin!
+These assumptions are slightly less restrictive than the standard histogram procedure but assumption (2) is still a fairly glaring simplification and it is rarely satisfied in real astronomical datasets.
+Therefore, in my next post, I&rsquo;ll relax the assumption of negligible uncertainties and demonstrate where and how this becomes a problem.</p>
+<p>Let me know if you have any comments by adding it below, <a href="https://twitter.com/exoplaneteer" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>tweeting at me</a>, and/or <a href="https://github.com/dfm-io/post--histogram1/issues" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>opening a GitHub issue</a>.</p>
+<p><strong>Acknowledgments</strong>  
+<em>I&rsquo;d like to thank <a href="http://ruthang.us" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Ruth Angus</a> and <a href="https://twitter.com/mfouesneau" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Morgan Fouesneau</a> for useful comments.</em></p>
+
+
+              
+                  
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ["script", "noscript", "style", "textarea", "pre"],
+    },
+  };
+
+  window.addEventListener("load", (event) => {
+    document.querySelectorAll("mjx-container").forEach(function (x) {
+      x.parentElement.classList += "has-jax";
+    });
+  });
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script
+  type="text/javascript"
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+></script>
+
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/python-c-extensions/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">Python modules in C</span>
+    </a>
+  
+
+  
+    <a class="pagination__item" href="https://dfm.io/posts/mixture-models/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >Mixture Models</span>
+    </a>
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:foreman.mackey@gmail.com"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="Bluesky"
+        href="https://bsky.app/profile/dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/bluesky.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>

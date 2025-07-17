@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>An astronomer&#39;s introduction to NumPyro | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.1f57f8800830abb72375a261f1dce94fd4baa8d1e1cb788d1a2c0961fe963544.css" integrity="sha256-H1f4gAgwq7cjdaJh8dzpT9S6qNHhy3iNGiwJYf6WNUQ="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/intro-to-numpyro\/",
+      "name": "An astronomer\u0027s introduction to NumPyro",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="../../"> home</a>
+      </li>
+    
+      <li>
+        <a  href="../../about">about</a>
+      </li>
+    
+      <li>
+        <a  href="../../posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">An astronomer&#39;s introduction to NumPyro</h1>
+            <time datetime="2022-07-28 00:00:00 &#43;0000 UTC" class="post__date">Jul 28 2022</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/intro-to-numpyro/">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+            
+            </i>
+          </header>
+          <article class="post__content">
+              
+<p>Over the past year or so, I&rsquo;ve been using <a href="https://jax.readthedocs.io" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>JAX</a> extensively for my research, and I&rsquo;ve also been encouraging other astronomers to give it a try.
+In particular, I&rsquo;ve been using JAX as the computation engine for probabilistic inference tasks.
+There&rsquo;s more to it, but one way that I like to think about JAX is as NumPy with just-in-time compilation and <a href="https://en.wikipedia.org/wiki/Automatic_differentiation" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>automatic differentiation</a>.
+The just-in-time compilation features of JAX can be used to speed up you NumPy computations by removing some Python overhead and by executing it on your GPU.
+Then, automatic differentiation can be used to efficiently compute the derivatives of your code with respect to its input parameters.
+These derivatives can substantially improve the performance of numerical inference methods (like maximum likelihood or Markov chain Monte Carlo) and for other tasks such as Fisher information analysis.</p>
+<p>This post isn&rsquo;t meant to be a comprehensive introduction to JAX (take a look at <a href="https://jax.readthedocs.io/en/latest/notebooks/quickstart.html" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the excellent JAX docs</a> for more of that) or to automatic differentiation (<a href="https://docs.exoplanet.codes/en/latest/tutorials/autodiff/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>I&rsquo;ve written some words</a> about that, and <a href="https://www.google.com/search?q=automatic&#43;differentiation" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>so have many others</a>), but rather an introduction to the JAX ecosystem for probabilistic inference, with some examples that will be familiar to astronomers.
+From my perspective, one benefit of the JAX ecosystem compared to other similar tools available in Python (e.g. <a href="https://www.pymc.io" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>PyMC</a>, <a href="https://mc-stan.org" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Stan</a>, etc.) is that it&rsquo;s generally more modular.
+In practice, this means that you can (relatively) easily combine different JAX libraries to develop your preferred workflow.
+For example, you can build a probabilistic model using <a href="https://num.pyro.ai" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>NumPyro</a> that uses <a href="https://tinygp.readthedocs.io" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>tinygp</a> for Gaussian Processes, and then run a Markov chain Monte Carlo (MCMC) analysis using <a href="https://github.com/blackjax-devs/blackjax" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>BlackJAX</a>.</p>
+<p>In this post, however, I&rsquo;ll focus primarily on providing an introduction to <a href="https://num.pyro.ai" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>NumPyro</a>, which is a probabilistic programming library that provides an interface for defining probabilistic models and running inference algorithms.
+At this point, NumPyro is probably the most mature JAX-based probabilistic programming library, and <a href="https://num.pyro.ai" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>its documentation page</a> has a lot of examples, but I&rsquo;ve found that these docs are not that user-friendly for my collaborators, so I wanted to provide a different perspective.
+In the following sections, I&rsquo;ll present two examples:</p>
+<ol>
+<li>
+<p>The first example is a fairly simple linear regression problem that introduces some basic NumPyro concepts. In the second half of this example, we will re-implement the model from <a href="https://dfm.io/posts/mixture-models/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>my &ldquo;Mixture Models&rdquo; post</a> to account for outliers in the simulated dataset, while also introducing some more advanced elements.</p>
+</li>
+<li>
+<p>The second example is an astronomy-specific problem that is designed to really highlight the power of these methods. In this example, we will measure the distance to the <a href="https://en.wikipedia.org/wiki/Messier_67" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>M67 open cluster</a> using a huge hierarchical model for parallaxes measured by <a href="https://sci.esa.int/web/gaia" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the Gaia Mission</a> for stars in the direction of M67. This example includes running an MCMC sampler with thousands of parameters, which would be intractable with the tools commonly used by astronomers, but only takes a few minutes to run using NumPyro.</p>
+</li>
+</ol>
+<h2 id="example-1-linear-regression-with-outliers">Example 1: Linear regression with outliers<a class="anchor" href="#example-1-linear-regression-with-outliers">#</a></h2>
+<p>In this example, we&rsquo;ll use NumPyro to fit a linear regression model to the data simulated in <a href="https://dfm.io/posts/mixture-models/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>my &ldquo;Mixture models&rdquo; post</a>.
+This simulated dataset has some outliers so, as we&rsquo;ll see below, simple linear regression isn&rsquo;t going to work very well, so we&rsquo;ll extend the model to include a mixture as presented in the aforementioned blog post.
+But, to start, let&rsquo;s simulate the dataset:</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+
+# We'll choose the parameters of our synthetic data.
+# The outlier probability will be 80%:
+true_frac = 0.8
+
+# The linear model has unit slope and zero intercept:
+true_params = [1.0, 0.0]
+
+# The outliers are drawn from a Gaussian with zero mean and unit variance:
+true_outliers = [0.0, 1.0]
+
+# For reproducibility, let's set the random number seed and generate the data:
+np.random.seed(12)
+x = np.sort(np.random.uniform(-2, 2, 15))
+yerr = 0.2 * np.ones_like(x)
+y = true_params[0] * x + true_params[1] + yerr * np.random.randn(len(x))
+
+# Those points are all drawn from the correct model so let's replace some of
+# them with outliers.
+m_bkg = np.random.rand(len(x)) &gt; true_frac
+y[m_bkg] = true_outliers[0]
+y[m_bkg] += np.sqrt(true_outliers[1] + yerr[m_bkg] ** 2) * np.random.randn(sum(m_bkg))
+
+# Then save the *true* line.
+x0 = np.linspace(-2.1, 2.1, 200)
+y0 = np.dot(np.vander(x0, 2), true_params)
+
+
+def plot_data():
+    plt.errorbar(x, y, yerr=yerr, fmt=&quot;,k&quot;, ms=0, capsize=0, lw=1, zorder=999)
+    plt.scatter(x[m_bkg], y[m_bkg], marker=&quot;s&quot;, s=22, c=&quot;w&quot;, edgecolor=&quot;k&quot;, zorder=1000)
+    plt.scatter(
+        x[~m_bkg], y[~m_bkg], marker=&quot;o&quot;, s=22, c=&quot;k&quot;, zorder=1000, label=&quot;data&quot;
+    )
+    plt.plot(x0, y0, color=&quot;k&quot;, lw=1.5)
+    plt.xlabel(&quot;$x$&quot;)
+    plt.ylabel(&quot;$y$&quot;)
+    plt.ylim(-2.5, 2.5)
+    plt.xlim(-2.1, 2.1)
+
+
+plot_data()
+</code></pre>
+<p><img src="output_1_0.png" alt="png"></p>
+<p>The line in this figure shows the true linear relation, and the unfilled points are the outliers.
+To get started, let&rsquo;s implement a basic linear regression model using NumPyro.
+We&rsquo;ll parameterize our model using the angle of the line above horizontal <code>$\theta = \arctan m$</code> (where <code>$m$</code> is the slope of the line) and the &ldquo;perpendicular&rdquo; intercept <code>$b_\perp = b\,\cos\theta$</code> (where <code>$b$</code> has the usual definition of linear intercept).
+This choice of parameterization is discussed on <a href="http://jakevdp.github.io/blog/2014/06/14/frequentism-and-bayesianism-4-bayesian-in-python/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Jake VanderPlas' blog</a>, and it&rsquo;s not terribly important for this dataset, but it will let us demonstrate how to re-parameterize models.</p>
+<p>In NumPyro, a probabilistic model is defined as a Python function that takes the dataset as input.
+In the body of the function, we start by defining the priors on our parameters using the <code>numpyro.sample</code> function and probability distributions defined in the <code>numpyro.distributions</code> module.
+Then we use these parameters to evaluate our model, making sure that we always use <code>jax.numpy</code> functions instead of <code>numpy</code> functions.
+Finally, we define the sampling distribution for the data, again using the <code>numpyro.sample</code> function and a distribution.</p>
+<p><strong>Note:</strong> This point is important! You <em>must</em> evaluate model using functions that JAX understands.
+In many cases, this isn&rsquo;t a problem since JAX implements most NumPy functions, but this gets more complicated if you need custom (e.g. physically-motivated) functions, but that&rsquo;s a conversation for a different day.</p>
+<h3 id="a-simple-model-with-no-treatment-of-outliers">A simple model with no treatment of outliers<a class="anchor" href="#a-simple-model-with-no-treatment-of-outliers">#</a></h3>
+<p>Here&rsquo;s our implementation of a linear model parameterized by <code>$\theta$</code> and <code>$b_\perp$</code> without any treatment of outliers:</p>
+<pre><code class="language-python">import jax
+import jax.numpy as jnp
+
+import numpyro
+from numpyro import distributions as dist, infer
+
+numpyro.set_host_device_count(2)
+
+
+def linear_model(x, yerr, y=None):
+    # These are the parameters that we're fitting and we're required to define explicit
+    # priors using distributions from the numpyro.distributions module.
+    theta = numpyro.sample(&quot;theta&quot;, dist.Uniform(-0.5 * jnp.pi, 0.5 * jnp.pi))
+    b_perp = numpyro.sample(&quot;b_perp&quot;, dist.Normal(0, 1))
+
+    # Transformed parameters (and other things!) can be tracked during sampling using
+    # &quot;deterministics&quot; as follows:
+    m = numpyro.deterministic(&quot;m&quot;, jnp.tan(theta))
+    b = numpyro.deterministic(&quot;b&quot;, b_perp / jnp.cos(theta))
+
+    # Then we specify the sampling distribution for the data, or the likelihood function.
+    # Here we're using a numpyro.plate to indicate that the data are independent. This
+    # isn't actually necessary here and we could have equivalently omitted the plate since
+    # the Normal distribution can already handle vector-valued inputs. But, it's good to
+    # get into the habit of using plates because some inference algorithms or distributions
+    # can take advantage of knowing this structure.
+    with numpyro.plate(&quot;data&quot;, len(x)):
+        numpyro.sample(&quot;y&quot;, dist.Normal(m * x + b, yerr), obs=y)
+</code></pre>
+<p>Using this model function, we can now use MCMC to sample from the posterior.</p>
+<pre><code class="language-python"># Using the model above, we can now sample from the posterior distribution using the No
+# U-Turn Sampler (NUTS).
+sampler = infer.MCMC(
+    infer.NUTS(linear_model),
+    num_warmup=2000,
+    num_samples=2000,
+    num_chains=2,
+    progress_bar=True,
+)
+%time sampler.run(jax.random.PRNGKey(0), x, yerr, y=y)
+</code></pre>
+<pre><code>No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+
+
+CPU times: user 2.99 s, sys: 28.1 ms, total: 3.02 s
+Wall time: 2.96 s
+</code></pre>
+<p>The published version of this post is executed on GitHub Actions with a pretty teeny CPU, but the full runtime for this model is less than 2 seconds on my laptop.
+In this case, the runtime is actually probably dominated by JIT compilation and Python overheads, but it&rsquo;s also a pretty simple model with only 2 parameters, so we&rsquo;d expect it to be fast.</p>
+<p>It&rsquo;s always a good idea to check the convergence of your MCMC sampler, and we&rsquo;ll use <a href="https://python.arviz.org" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>ArviZ</a> to do that here, looking at the Gelman–Rubin (<code>r_hat</code>) statistic, and the effective sample sizes (e.g. <code>ess_bulk</code>):</p>
+<pre><code class="language-python">import arviz as az
+
+inf_data = az.from_numpyro(sampler)
+az.summary(inf_data)
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>b</th>
+      <td>0.122</td>
+      <td>0.051</td>
+      <td>0.023</td>
+      <td>0.215</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>4040.0</td>
+      <td>2815.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>b_perp</th>
+      <td>0.097</td>
+      <td>0.041</td>
+      <td>0.021</td>
+      <td>0.174</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>4035.0</td>
+      <td>2751.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>m</th>
+      <td>0.757</td>
+      <td>0.035</td>
+      <td>0.695</td>
+      <td>0.827</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>3434.0</td>
+      <td>2598.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>theta</th>
+      <td>0.648</td>
+      <td>0.022</td>
+      <td>0.608</td>
+      <td>0.691</td>
+      <td>0.000</td>
+      <td>0.000</td>
+      <td>3434.0</td>
+      <td>2598.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Cool - the auto-correlation time of our chains is just over 1, which means that nearly every sample is effectively independent.</p>
+<p>Now we can look at <a href="https://corner.readthedocs.io" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the corner plot</a> of the results, and compare to the true values:</p>
+<pre><code class="language-python">import corner
+
+corner.corner(inf_data, var_names=[&quot;m&quot;, &quot;b&quot;], truths=true_params);
+</code></pre>
+<p><img src="output_9_0.png" alt="png"></p>
+<p>As in <a href="https://dfm.io/posts/mixture-models/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the mixture models post</a> that this example is based on, the results are <em>very wrong</em> if we don&rsquo;t take outliers into account.
+We&rsquo;ll fix this using a mixture model below, but first let&rsquo;s take a look at one other feature of NumPyro.</p>
+<p>You may have noticed in our model definition above, we passed the observed data <code>y</code> as a keyword argument instead of as a positional argument.
+This is because it lets us reuse the same model for predictive tasks.
+For example, we can use the <code>numpyro.infer.Predictive</code> interface to do posterior (or prior) predictive checks.
+This gives a way of simulating data that we would expect to see, given our posterior (or prior) constraints and sampling distribution, which we can then compare to our observed data.</p>
+<p>In this case, let&rsquo;s generate some simulated data from our posterior predictive distribution (note that we don&rsquo;t pass <code>y</code> to this function) and over-plot these simulated datasets on the observed data:</p>
+<pre><code class="language-python">post_pred_samples = infer.Predictive(linear_model, sampler.get_samples())(
+    jax.random.PRNGKey(1), x, yerr
+)
+post_pred_y = post_pred_samples[&quot;y&quot;]
+
+plot_data()
+label = &quot;posterior predictive samples&quot;
+for n in np.random.default_rng(0).integers(len(post_pred_y), size=100):
+    plt.plot(x, post_pred_y[n], &quot;.&quot;, color=&quot;C0&quot;, alpha=0.1, label=label)
+    label = None
+plt.legend();
+</code></pre>
+<p><img src="output_11_0.png" alt="png"></p>
+<p>Unsurprisingly, these simulated datasets are (qualitatively) not a good match to the observed data because of the outliers.
+Let&rsquo;s fix that now!</p>
+<h3 id="taking-outliers-into-account-using-a-mixture-model">Taking outliers into account using a mixture model<a class="anchor" href="#taking-outliers-into-account-using-a-mixture-model">#</a></h3>
+<p>Now we generalize our model from above to include a mixture distribution to account for the outliers.
+We&rsquo;ll use the same mixture model as in the <a href="https://dfm.io/posts/mixture-models/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>mixture models post</a>, and you should take a look at that post for a more detailed explanation of the model.
+But, in summary, out &ldquo;foreground&rdquo; model is the same as the one above, and the &ldquo;background&rdquo; model is a Gaussian with a floating mean and standard deviation.
+Besides <code>$\theta$</code> and <code>$b_\perp$</code>, we&rsquo;ll also fit for the mean and standard deviation of the background model, and the mixture weight (called <code>$Q$</code> in the previous blog post).</p>
+<pre><code class="language-python">def linear_mixture_model(x, yerr, y=None):
+    # Our &quot;foreground&quot; model is identical to the one we used previously: a line
+    # parameterized by &quot;theta&quot; and &quot;b_perp&quot;. Note that we don't wrap the actual
+    # sampling distribution in a `numpyro.sample` here because we're going to
+    # use it in the mixture distribution below.
+    theta = numpyro.sample(&quot;theta&quot;, dist.Uniform(-0.5 * jnp.pi, 0.5 * jnp.pi))
+    b_perp = numpyro.sample(&quot;b_perp&quot;, dist.Normal(0.0, 1.0))
+    m = numpyro.deterministic(&quot;m&quot;, jnp.tan(theta))
+    b = numpyro.deterministic(&quot;b&quot;, b_perp / jnp.cos(theta))
+    fg_dist = dist.Normal(m * x + b, yerr)
+
+    # Our outlier model is a Gaussian where we're fitting for the zero and
+    # standard deviation.
+    bg_mean = numpyro.sample(&quot;bg_mean&quot;, dist.Normal(0.0, 1.0))
+    bg_sigma = numpyro.sample(&quot;bg_sigma&quot;, dist.HalfNormal(3.0))
+    bg_dist = dist.Normal(bg_mean, jnp.sqrt(bg_sigma**2 + yerr**2))
+
+    # We use a `Catagorical` distribution to define the outlier probability. We
+    # fit for the parameter `Q` which specifies the probability that any
+    # individual point is a member of the foreground model. Therefore, the
+    # &quot;prior&quot; outlier probability is `1 - Q`.
+    Q = numpyro.sample(&quot;Q&quot;, dist.Uniform(0.0, 1.0))
+    mix = dist.Categorical(probs=jnp.array([Q, 1.0 - Q]))
+
+    # As with the previous model, the use of a `plate` here is optional, but
+    # let's do it anyways.
+    with numpyro.plate(&quot;data&quot;, len(x)):
+        # The `numpyro.distributions` module doesn't yet implement a mixture
+        # distribution that is flexible enough for our use cases, so we'll use
+        # one that I implemented in the `numpyro-ext` package. (This is sort of
+        # a lie: the `MixtureSameFamily` distribution in NumPyro _would_ work
+        # here, but not in our next example, so bear with me!)
+        numpyro.sample(&quot;obs&quot;, dist.MixtureGeneral(mix, [fg_dist, bg_dist]), obs=y)
+
+
+# Our inference procedure is identical to the one above.
+sampler = infer.MCMC(
+    infer.NUTS(linear_mixture_model),
+    num_warmup=2000,
+    num_samples=2000,
+    num_chains=2,
+    progress_bar=True,
+)
+%time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
+</code></pre>
+<pre><code>CPU times: user 4.74 s, sys: 31.3 ms, total: 4.77 s
+Wall time: 4.66 s
+</code></pre>
+<p>This model is a bit more complicated, but it still runs pretty quickly, with the runtime again dominated by just-in-time compilation (try increasing the number of samples if you don&rsquo;t believe me!).
+As before, we can check convergence and make a corner plot:</p>
+<pre><code class="language-python">inf_data = az.from_numpyro(sampler)
+corner.corner(
+    inf_data,
+    var_names=[&quot;m&quot;, &quot;b&quot;, &quot;Q&quot;],
+    truths={
+        &quot;m&quot;: true_params[0],
+        &quot;b&quot;: true_params[1],
+        &quot;Q&quot;: true_frac,
+    },
+)
+az.summary(inf_data)
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Q</th>
+      <td>0.668</td>
+      <td>0.126</td>
+      <td>0.428</td>
+      <td>0.893</td>
+      <td>0.002</td>
+      <td>0.001</td>
+      <td>3656.0</td>
+      <td>2613.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>0.053</td>
+      <td>0.083</td>
+      <td>-0.095</td>
+      <td>0.202</td>
+      <td>0.002</td>
+      <td>0.002</td>
+      <td>2636.0</td>
+      <td>2495.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>b_perp</th>
+      <td>0.038</td>
+      <td>0.061</td>
+      <td>-0.065</td>
+      <td>0.145</td>
+      <td>0.001</td>
+      <td>0.002</td>
+      <td>2608.0</td>
+      <td>2430.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>bg_mean</th>
+      <td>-0.414</td>
+      <td>0.408</td>
+      <td>-1.193</td>
+      <td>0.344</td>
+      <td>0.008</td>
+      <td>0.006</td>
+      <td>2776.0</td>
+      <td>1926.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>bg_sigma</th>
+      <td>0.773</td>
+      <td>0.524</td>
+      <td>0.041</td>
+      <td>1.647</td>
+      <td>0.011</td>
+      <td>0.007</td>
+      <td>2168.0</td>
+      <td>1581.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>m</th>
+      <td>1.007</td>
+      <td>0.059</td>
+      <td>0.902</td>
+      <td>1.117</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>2368.0</td>
+      <td>2178.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>theta</th>
+      <td>0.788</td>
+      <td>0.030</td>
+      <td>0.734</td>
+      <td>0.840</td>
+      <td>0.001</td>
+      <td>0.000</td>
+      <td>2368.0</td>
+      <td>2178.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p><img src="output_15_1.png" alt="png"></p>
+<p>This time we recover the true values of the slope, intercept, and outlier probability!</p>
+<p><em>Added 2022-08-03:</em> We can also use this model to identify which points are outliers.
+The <a href="https://dfm.io/posts/mixture-models/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>mixture models post</a> describes the math, and you should check out the <a href="https://dfm.io/posts/mixture-models/#mixture-membership-probabilities" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>mixture membership probabilities</a> section of that post for more details, but in the meantime, here&rsquo;s an example of how to implement this in NumPyro using out above model:</p>
+<pre><code class="language-python">def linear_mixture_member_prob_model(x, yerr, y=None):
+    # Most of the model is identical to the one above...
+    theta = numpyro.sample(&quot;theta&quot;, dist.Uniform(-0.5 * jnp.pi, 0.5 * jnp.pi))
+    b_perp = numpyro.sample(&quot;b_perp&quot;, dist.Normal(0.0, 1.0))
+    m = numpyro.deterministic(&quot;m&quot;, jnp.tan(theta))
+    b = numpyro.deterministic(&quot;b&quot;, b_perp / jnp.cos(theta))
+    fg_dist = dist.Normal(m * x + b, yerr)
+    bg_mean = numpyro.sample(&quot;bg_mean&quot;, dist.Normal(0.0, 1.0))
+    bg_sigma = numpyro.sample(&quot;bg_sigma&quot;, dist.HalfNormal(3.0))
+    bg_dist = dist.Normal(bg_mean, jnp.sqrt(bg_sigma**2 + yerr**2))
+    Q = numpyro.sample(&quot;Q&quot;, dist.Uniform(0.0, 1.0))
+    mixture = dist.MixtureGeneral(
+        dist.Categorical(probs=jnp.array([Q, 1.0 - Q])), [fg_dist, bg_dist]
+    )
+    with numpyro.plate(&quot;data&quot;, len(x)):
+        y_ = numpyro.sample(&quot;obs&quot;, mixture, obs=y)
+
+        # Until here, where we can track the membership probability of each sample
+        log_probs = mixture.component_log_probs(y_)
+        numpyro.deterministic(
+            &quot;p&quot;, log_probs - jax.nn.logsumexp(log_probs, axis=-1, keepdims=True)
+        )
+
+
+# Our inference procedure is identical to the one above.
+sampler = infer.MCMC(
+    infer.NUTS(linear_mixture_member_prob_model),
+    num_warmup=2000,
+    num_samples=2000,
+    num_chains=2,
+    progress_bar=True,
+)
+%time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
+</code></pre>
+<pre><code>CPU times: user 4.98 s, sys: 38.9 ms, total: 5.02 s
+Wall time: 4.88 s
+</code></pre>
+<p>As in the mixture models post, we can use the mixture membership probabilities to plot the data points colored by their probability of being an outlier:</p>
+<pre><code class="language-python">p_fg = jnp.mean(jnp.exp(sampler.get_samples()[&quot;p&quot;][..., 0]), axis=0)
+plot_data()
+plt.scatter(x, y, marker=&quot;s&quot;, s=22, c=1 - p_fg, edgecolor=&quot;k&quot;, zorder=1000, cmap=&quot;gray&quot;)
+plt.colorbar(label=&quot;outlier probability&quot;);
+</code></pre>
+<p><img src="output_19_0.png" alt="png"></p>
+<h2 id="example-2-measuring-distances-using-gaia-parallaxes">Example 2: Measuring distances using Gaia parallaxes<a class="anchor" href="#example-2-measuring-distances-using-gaia-parallaxes">#</a></h2>
+<p>In astronomy, we often want to measure distances (to stars, galaxies, etc.), but this is actually quite a difficult measurement to make in general.
+One approach for measuring distances to &ldquo;nearby&rdquo; stars is to use the <a href="https://en.wikipedia.org/wiki/Stellar_parallax" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>observed parallax</a>, the apparent shift in position of a star (relative to some reference frame) as our observing angle changes (e.g. as the Earth orbits the Sun).
+<a href="https://sci.esa.int/web/gaia" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>The Gaia Mission</a> is a European Space Agency mission that is currently measuring the parallaxes of millions of stars in our Galaxy, and we can use these measurements to infer the distances to these stars.
+In this tutorial we will look into making such measurements using NumPyro.</p>
+<p>Before diving in too deep, I should emphasize that I&rsquo;m very much not an expert in this field (I just thought it was cool example to try!), so even though I&rsquo;ve tried to do/say sensible things here, there may be details that I&rsquo;ve missed from the astrophysics perspective.
+Furthermore, the final model in this section, while pretty rad, isn&rsquo;t necessarily the best model for measuring the distance to M67 using Gaia, and if you want to use this in production, you may want to include other measurements like proper motion.
+If you do see any issues, please let me know by <a href="https://github.com/dfm-io/post--intro-to-numpyro/issues" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>opening an issue on the GitHub repo for this post</a>, or by emailing me!</p>
+<p>For the purposes of this tutorial, I downloaded a sample of measured parallaxes from <a href="https://gea.esac.esa.int/archive/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the public Gaia Data Release 3 catalog</a> for stars in the direction of the <a href="https://en.wikipedia.org/wiki/Messier_67" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>M67 star cluster</a>.
+Take a look at <a href="https://github.com/dfm-io/post--intro-to-numpyro/blob/main/data/README.md" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>here</a> for the specific query that I used.
+Let&rsquo;s load these data and take a look at what we see:</p>
+<pre><code class="language-python">from astropy.io import fits
+
+with fits.open(&quot;data/m67.fits.gz&quot;) as f:
+    data = f[1].data
+
+mask = np.isfinite(data[&quot;parallax&quot;])
+mask &amp;= np.isfinite(data[&quot;parallax_error&quot;])
+mask &amp;= data[&quot;parallax&quot;] &gt; 0.2
+mask &amp;= data[&quot;parallax&quot;] &lt; 3.0
+data = data[mask]
+
+plt.figure(figsize=(6, 6))
+plt.plot(data[&quot;ra&quot;], data[&quot;dec&quot;], &quot;.k&quot;, ms=1)
+plt.xlabel(&quot;R.A. [deg]&quot;)
+plt.ylabel(&quot;Dec. [deg]&quot;)
+plt.title(&quot;Gaia DR3 targets around M67&quot;)
+
+plt.figure()
+plt.hist(data[&quot;parallax&quot;], 120, histtype=&quot;step&quot;, color=&quot;k&quot;)
+plt.xlabel(&quot;parallax [mas]&quot;)
+plt.ylabel(&quot;count&quot;)
+plt.title(&quot;Gaia DR3 targets around M67&quot;)
+plt.xlim(0.2, 3.0);
+</code></pre>
+<p><img src="output_21_0.png" alt="png"></p>
+<p><img src="output_21_1.png" alt="png"></p>
+<p>We can see the M67 over-density of stars in both sky position, and parallax.
+By the end of this example, we will use (just) these parallax measurements to constrain the distance to M67.</p>
+<p>But to start with, we need to estimate the expected parallax zero point offsets for all of our targets.
+To do this, we can use the <a href="https://pypi.org/project/gaiadr3-zeropoint" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>gaiadr3-zeropoint</a> Python package:</p>
+<pre><code class="language-python">import warnings
+from zero_point import zpt
+
+zpt.load_tables()
+with warnings.catch_warnings():
+    warnings.filterwarnings(&quot;ignore&quot;)
+    plx_zp = zpt.get_zpt(
+        data[&quot;phot_g_mean_mag&quot;],
+        data[&quot;nu_eff_used_in_astrometry&quot;],
+        data[&quot;pseudocolour&quot;],
+        data[&quot;ecl_lat&quot;],
+        data[&quot;astrometric_params_solved&quot;],
+    )
+plx_zp[~np.isfinite(plx_zp)] = 0.0
+</code></pre>
+<p>With these in hand, we can start with a warmup.</p>
+<h3 id="warmup-measuring-the-distance-to-a-star">Warmup: Measuring the distance to a star<a class="anchor" href="#warmup-measuring-the-distance-to-a-star">#</a></h3>
+<p>Let&rsquo;s start with a simple example of measuring the distance to a single star from this sample.
+This may seem simple (&ldquo;the distance is just the inverse of parallax, right?&quot;), but as has been extensively discussed in the literature (see, for example, this seminal paper: <a href="https://arxiv.org/abs/1507.02105" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Bailer-Jones 2015</a>), things aren&rsquo;t quite so simple.
+A common practice in this field is to use a probabilistic model for the parallax measurements with a sensible prior on the distance to more robustly propagate the measurement uncertainty to the distance constraint.
+<a href="https://arxiv.org/abs/1507.02105" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Bailer-Jones (2015)</a> and other subsequent publications advocate for the following prior on the distance <code>$r$</code>:</p>
+<div>$$
+p(r) = \frac{r^2}{2\,L^3}\,e^{-r/L}
+$$</div>
+where `$L$` is a length scale parameter that will depend on the sky position of the target, and possibly other parameters.
+<p>To use this prior in NumPyro, we need to figure out how to specify it using the existing <code>Distribution</code> objects, or by implementing a custom distribution.
+When I first started writing this post I couldn&rsquo;t figure out how to sample from this prior, but then I realized that it&rsquo;s just a <a href="https://en.wikipedia.org/wiki/Chi-squared_distribution" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>chi-squared distribution</a> with 6 degrees of freedom.
+More explicitly, if some variable <code>$u$</code> is distributed as a chi-squared distribution with 6 degrees of freedom, then <code>$r = u \times L / 2$</code> is distributed following the distribution above.
+To implement this in NumPyro, we can use the <code>Chi2</code> distribution, and then scale it by the appropriate factor.
+Let&rsquo;s check to make sure that that gives the correct results:</p>
+<pre><code class="language-python">L = 370.0  # A totally arbitrary choice!
+prior = dist.TransformedDistribution(
+    dist.Chi2(6),
+    dist.transforms.AffineTransform(0.0, 0.5 * L),
+)
+r = prior.sample(jax.random.PRNGKey(0), sample_shape=(100_000,))
+
+x = np.linspace(0, 5000, 500)
+plt.hist(r, 100, range=(0, 5000), density=True, histtype=&quot;step&quot;, label=&quot;samples&quot;)
+plt.plot(x, 0.5 * x**2 * np.exp(-x / L) / L**3, &quot;--&quot;, label=&quot;exact pdf&quot;)
+plt.xlabel(&quot;distance [pc]&quot;)
+plt.yticks([])
+plt.legend();
+</code></pre>
+<p><img src="output_25_0.png" alt="png"></p>
+<p>That looks good!</p>
+<p>We have also just introduced two new NumPyro features: the <code>TransformedDistribution</code> distribution and the <code>AffineTransform</code>.
+The former allows us to specify a distribution that is a transformation of another distribution, and the latter provides an interface for linearly transforming a distribution.
+In simple cases, these features can be overkill (and we&rsquo;ll start with an example where we don&rsquo;t use them), but for more complicated problems, they can really come in handy for building expressive distributions like the one we&rsquo;ll get to eventually.</p>
+<p>Now that we&rsquo;ve got our prior sorted out, let&rsquo;s implement a simple model to estimate the parallax of one target from our sample.
+Here&rsquo;s our implementation (note that we&rsquo;re not directly using the <code>AffineTransform</code> here, but we could have):</p>
+<pre><code class="language-python">def gaia_single_model(plx_err, plx=None, plx_zp=0.0, L=370.0):
+    normed = numpyro.sample(&quot;normed&quot;, dist.Chi2(6))
+    distance = numpyro.deterministic(&quot;r&quot;, 0.5 * L * normed)
+    numpyro.sample(&quot;plx&quot;, dist.Normal(1000.0 / distance + plx_zp, plx_err), obs=plx)
+</code></pre>
+<p>In this implementation we have included input parameters for the parallax zero point offset and the prior length scale.
+For the purposes of our demonstration, we&rsquo;ll set these parameters to arbitrary values, but they should be treated with more care if you wanted to use such a model in practice.</p>
+<p>Before we run inference, let&rsquo;s look at how we can use this function to sample from our prior.
+As we did with the posterior predictive checks above, we can use the <code>Predictive</code> interface to sample from the prior:</p>
+<pre><code class="language-python">prior_samples = infer.Predictive(gaia_single_model, num_samples=100_000)(
+    jax.random.PRNGKey(4), 0.5
+)
+prior_samples = az.from_dict(prior_samples, num_chains=1)
+fig = corner.corner(
+    prior_samples,
+    var_names=[&quot;r&quot;, &quot;plx&quot;],
+    labels=[&quot;distance&quot;, &quot;observed parallax&quot;],
+    range=[(0, 4000), (0, 6)],
+)
+fig.suptitle(&quot;prior predictive distribution&quot;);
+</code></pre>
+<p><img src="output_29_0.png" alt="png"></p>
+<p>Note that in this figure the relationship between distance and parallax is not one-to-one because this distribution takes the sampling distribution for the parallax into account.
+Therefore, this shows the prior distribution over <em>mean observed parallax</em> given some parallax uncertainty, which we provided above.
+These prior predictive samples can be useful for (at least qualitatively) checking that your priors are sensible when projected into the space of the data.</p>
+<p>Now that our model is set up, we can run inference for one of the (relatively low signal-to-noise) targets in the sample.
+Note that I wouldn&rsquo;t generally advocate for using MCMC to do posterior inference in a one-dimensional model—it&rsquo;s pretty much always better to use quadrature or something in 1D—but here we go!</p>
+<pre><code class="language-python">snr = data[&quot;parallax&quot;] / data[&quot;parallax_error&quot;]
+single_ind = np.argsort(snr)[115]
+plx = data[single_ind][&quot;parallax&quot;]
+plx_err = data[single_ind][&quot;parallax_error&quot;]
+sampler = infer.MCMC(
+    infer.NUTS(gaia_single_model),
+    num_warmup=2000,
+    num_samples=4000,
+    num_chains=2,
+)
+%time sampler.run(jax.random.PRNGKey(5), plx_err, plx=plx, plx_zp=plx_zp[single_ind])
+
+samples_single = sampler.get_samples()
+plt.hist(samples_single[&quot;r&quot;], 30, histtype=&quot;step&quot;, color=&quot;k&quot;, label=&quot;posterior&quot;)
+plt.axvline(1000.0 / plx, label=&quot;inverse parallax&quot;)
+plt.xlabel(f&quot;distance to target number {single_ind} [pc]&quot;)
+plt.ylabel(&quot;posterior density&quot;)
+plt.legend(loc=1)
+plt.yticks([]);
+</code></pre>
+<pre><code>CPU times: user 2.02 s, sys: 6.68 ms, total: 2.03 s
+Wall time: 1.98 s
+</code></pre>
+<p><img src="output_31_1.png" alt="png"></p>
+<p>This is a case where the inferred distance is somewhat inconsistent with the value computed by inverting the parallax as a distance estimator.</p>
+<h3 id="inferring-the-distance-to-m67-using-a-hierarchical-model-for-parallax">Inferring the distance to M67 using a hierarchical model for parallax<a class="anchor" href="#inferring-the-distance-to-m67-using-a-hierarchical-model-for-parallax">#</a></h3>
+<p>Now that we&rsquo;ve seen how the single target model works, let&rsquo;s build a more sophisticated model that combines everything that we&rsquo;ve learned so far.
+In this section, we&rsquo;ll build a joint (hierarchical) model for all 4300 targets in the sample to simultaneously fit for:</p>
+<ol>
+<li>the individual distances to each target <code>$r_n$</code>,</li>
+<li>the fraction of targets that are cluster members <code>$Q$</code> (based only on the parallax, mind you!),</li>
+<li>the background length scale of the background (and foreground) distribution <code>$L$</code>, and</li>
+<li>the distance <code>$D$</code> and width <code>$\sigma$</code> (in log distance) of M67.</li>
+</ol>
+<p>We&rsquo;re modeling the cluster itself as a Gaussian in log distance, and the background using the Bailer-Jones distribution discussed above with the length scale as a free parameter.
+This model has 4304 parameters (4 population parameters and then one distance for each target), so this would be pretty hard to sample with most MCMC methods, but as we&rsquo;ll see below, NumPyro has no problem.</p>
+<p>Here&rsquo;s our implementation of the model:</p>
+<pre><code class="language-python">def gaia_cluster_model(plx_err, plx=None, plx_zp=0.0):
+    # We start by defining our priors on the population parameters described
+    # above. For most, of these parameters, we use wide Gaussian priors in log
+    # since our main information about these parameters is that they must be
+    # positive. We could have also used uniform priors (perhaps still in the
+    # log), but you'll often get better performance using a prior with some
+    # curvature.
+    log_L = numpyro.sample(&quot;log_L&quot;, dist.Normal(np.log(370.0), 2.0))
+    log_D = numpyro.sample(&quot;log_D&quot;, dist.Normal(np.log(920.0), 2.0))
+    log_sigma = numpyro.sample(&quot;log_sigma&quot;, dist.Normal(0.0, 2.0))
+    Q = numpyro.sample(&quot;Q&quot;, dist.Uniform(0.0, 1.0))
+
+    # We'll track some reparameterized values for plotting later.
+    L = numpyro.deterministic(&quot;L&quot;, jnp.exp(log_L))
+    numpyro.deterministic(&quot;D&quot;, jnp.exp(log_D))
+
+    # We're also going to track the approximate size of the cluster in linear
+    # space, also for plotting purposes. This is only an approximation since
+    # we're modeling the cluster in log distance, but it should be close enough
+    # for making some plots.
+    numpyro.deterministic(&quot;approx_size&quot;, jnp.exp(log_sigma + log_D))
+
+    with numpyro.plate(&quot;stars&quot;, len(plx_err)):
+
+        # The background distance distribution is the same as the one we used
+        # above, but this time we fit for the length scale L. Another difference
+        # is that we're &quot;transforming&quot; the distribution using an affine
+        # transformation, instead of sampling in the &quot;normalized distance&quot; and
+        # then multiplying by 0.5*L like we did above. These two approaches are
+        # equivalent, but we need to specify a single distribution here for use
+        # in the MixtureGeneral distribution below.
+        dist_bg = dist.TransformedDistribution(
+            dist.Chi2(6), ScaleTransform(0.5 * L)
+        )
+
+        # The foreground distribution is a Gaussian in log distance. Like with
+        # the background distribution, we use a transformation to convert from a
+        # Gaussian in log distance to a distribution in distance.
+        dist_fg = dist.TransformedDistribution(
+            dist.Normal(log_D, jnp.exp(log_sigma)),
+            dist.transforms.ExpTransform(),
+        )
+
+        # Now we &quot;mix&quot; the foreground and background distributions using the
+        # &quot;cluster membership fraction&quot; parameter to specify the mixing weights.
+        mixture = dist.MixtureGeneral(
+            dist.Categorical(probs=jnp.stack((Q, 1 - Q), axis=-1)),
+            [dist_fg, dist_bg],
+        )
+        r = numpyro.sample(&quot;r&quot;, mixture)
+
+        # As before, we'll track the probability that each star is a member of
+        # the cluster. Note that our mixture is a distribution in *distance* so
+        # we're evaluating the class probabilities using `r` instead of `plx`,
+        # which is what we would have done in the earlier example. This is the
+        # right way to do it since, at each step in the MCMC, `r` is our current
+        # belief about the &quot;true&quot; distance to each star, which sets our belief
+        # about its membership probability.
+        log_probs = mixture.component_log_probs(r)
+        numpyro.deterministic(
+            &quot;p&quot;, log_probs - jax.nn.logsumexp(log_probs, axis=-1, keepdims=True)
+        )
+
+        # Finally, we convert the distance to parallax and add the zero-point offset.
+        plx_true = numpyro.deterministic(&quot;plx_true&quot;, 1000.0 / r + plx_zp)
+        numpyro.sample(&quot;plx_obs&quot;, dist.Normal(plx_true, plx_err), obs=plx)
+
+
+# This is a custom AffineTransform class that properly propagates positive support.
+class ScaleTransform(dist.transforms.AffineTransform):
+    def __init__(self, scale):
+        super().__init__(0.0, scale, domain=dist.constraints.positive)
+    
+    @property
+    def codomain(self):
+        return dist.constraints.positive
+</code></pre>
+<p>As above, let&rsquo;s see what our prior predictive distribution looks like:</p>
+<pre><code class="language-python"># The array parallax errors is required by the model even when prior sampling.
+# In our model, the parallax errors aren't _data_, they are part of the model.
+plx = np.ascontiguousarray(data[&quot;parallax&quot;], dtype=np.float32)
+plx_err = np.ascontiguousarray(data[&quot;parallax_error&quot;], dtype=np.float32)
+
+# Generate samples from the prior...
+prior_pred = infer.Predictive(gaia_cluster_model, num_samples=50)(
+    jax.random.PRNGKey(11), plx_err, plx_zp=plx_zp
+)
+
+# ...and plot them:
+label = &quot;prior samples&quot;
+for n in range(len(prior_pred[&quot;plx_obs&quot;])):
+    plt.hist(
+        prior_pred[&quot;plx_obs&quot;][n],
+        100,
+        range=(0.2, 3.0),
+        histtype=&quot;step&quot;,
+        color=&quot;k&quot;,
+        lw=0.5,
+        alpha=0.5,
+        label=label,
+    )
+    label = None
+
+plt.hist(data[&quot;parallax&quot;], 120, histtype=&quot;step&quot;, color=&quot;C0&quot;, label=&quot;data&quot;)
+plt.legend()
+plt.xlabel(&quot;mean parallax [mas]&quot;)
+plt.ylabel(&quot;count&quot;)
+plt.xlim(0.2, 3);
+</code></pre>
+<p><img src="output_35_0.png" alt="png"></p>
+<p>Comparing the observed distribution of parallax measurements to the prior samples, this doesn&rsquo;t look like an outrageously implausible realization.
+So let&rsquo;s just bite the bullet and run the MCMC:</p>
+<pre><code class="language-python">sampler = infer.MCMC(
+    infer.NUTS(gaia_cluster_model),
+    num_warmup=2000,
+    num_samples=4000,
+    num_chains=2,
+    progress_bar=True,
+)
+%time sampler.run(jax.random.PRNGKey(7), plx_err, plx=plx, plx_zp=plx_zp)
+</code></pre>
+<pre><code>CPU times: user 11min 27s, sys: 1.95 s, total: 11min 29s
+Wall time: 7min
+</code></pre>
+<p>Again, the published version of this post was executed on GitHub Actions, so you&rsquo;ll probably find that this runs a little faster on your own machine (this takes about 5 minutes on my laptop).
+Even so, this model definitely takes a little longer to run than the earlier examples, but remember that we&rsquo;re fitting thousands of parameters here, so I&rsquo;m willing to take this hit as long as the results are sensible.
+Let&rsquo;s take a look at the results:</p>
+<pre><code class="language-python">samples = sampler.get_samples()
+inf_data = az.from_numpyro(sampler)
+corner.corner(
+    inf_data,
+    var_names=[&quot;L&quot;, &quot;D&quot;, &quot;approx_size&quot;, &quot;Q&quot;],
+    labels=[&quot;L [pc]&quot;, &quot;D [pc]&quot;, &quot;$\sigma$ [pc]&quot;, &quot;Q&quot;],
+)
+az.summary(inf_data, var_names=[&quot;L&quot;, &quot;D&quot;, &quot;approx_size&quot;, &quot;Q&quot;])
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean</th>
+      <th>sd</th>
+      <th>hdi_3%</th>
+      <th>hdi_97%</th>
+      <th>mcse_mean</th>
+      <th>mcse_sd</th>
+      <th>ess_bulk</th>
+      <th>ess_tail</th>
+      <th>r_hat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>L</th>
+      <td>469.437</td>
+      <td>7.012</td>
+      <td>457.100</td>
+      <td>483.498</td>
+      <td>0.153</td>
+      <td>0.108</td>
+      <td>2114.0</td>
+      <td>4688.0</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>D</th>
+      <td>836.899</td>
+      <td>1.000</td>
+      <td>835.069</td>
+      <td>838.822</td>
+      <td>0.019</td>
+      <td>0.014</td>
+      <td>2759.0</td>
+      <td>4851.0</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>approx_size</th>
+      <td>14.574</td>
+      <td>1.291</td>
+      <td>12.246</td>
+      <td>17.148</td>
+      <td>0.075</td>
+      <td>0.053</td>
+      <td>298.0</td>
+      <td>474.0</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>Q</th>
+      <td>0.423</td>
+      <td>0.011</td>
+      <td>0.403</td>
+      <td>0.445</td>
+      <td>0.001</td>
+      <td>0.001</td>
+      <td>165.0</td>
+      <td>705.0</td>
+      <td>1.02</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p><img src="output_39_1.png" alt="png"></p>
+<p>The sampling efficiency isn&rsquo;t quite as good as it has been for the simpler models, but the <code>$\hat{R}$</code> statistics are good and we&rsquo;ve still generated hundreds of effective samples, with thousands of effective samples for the cluster distance.
+Given these results, we estimate the distance to M67 to be:</p>
+<pre><code class="language-python">print(f&quot;D = {np.mean(samples['D']):.1f} ± {np.std(samples['D']):.1f} pc&quot;)
+</code></pre>
+<pre><code>D = 836.9 ± 1.0 pc
+</code></pre>
+<p>with an intrinsic width of:</p>
+<pre><code class="language-python">print(
+    f&quot;sigma = {np.mean(samples['approx_size']):.1f} ± {np.std(samples['approx_size']):.1f} pc&quot;
+)
+</code></pre>
+<pre><code>sigma = 14.6 ± 1.3 pc
+</code></pre>
+<p>Please note that specifics of these results should be taken with a grain of salt, since there are several subtleties that have not been carefully handled.
+This result is quite sensitive to the parallax zero point offsets, and any uncertainty in that should be taken into account.
+Similarly, I didn&rsquo;t do anything to remove binary stars from the sample, or to provide more information (e.g. proper motions) to help constrain the cluster membership probability.</p>
+<p>That being said, let&rsquo;s see what we can say about the cluster membership probability for each target.
+Since our measurement of the cluster membership is based <em>only</em> on our inferred distance, our sample of cluster members is not very clean, but if we plot the color magnitude diagram for our sample colored by the cluster membership probability, things look pretty good:</p>
+<pre><code class="language-python">p_cluster = jnp.mean(jnp.exp(samples[&quot;p&quot;][..., 0]), axis=0)
+idx = jnp.argsort(p_cluster)
+plt.figure(figsize=(12, 8))
+dm = np.median(5 * np.log10(samples[&quot;r&quot;]) - 5, axis=0)
+plt.scatter(
+    data[&quot;bp_rp&quot;][idx],
+    data[&quot;phot_g_mean_mag&quot;][idx] - dm[idx],
+    s=8,
+    c=p_cluster[idx],
+    cmap=&quot;gray_r&quot;,
+    edgecolors=&quot;k&quot;,
+    linewidths=0.5,
+    vmin=0,
+    vmax=1,
+)
+plt.ylim(10, -2)
+plt.xlim(0, 3)
+plt.colorbar(label=&quot;cluster membership probability&quot;)
+plt.xlabel(&quot;$G_{BP} - G_{RP}$ [mag]&quot;)
+plt.ylabel(&quot;$M_G$ [mag]&quot;);
+</code></pre>
+<p><img src="output_45_0.png" alt="png"></p>
+<p>Finally, let&rsquo;s wrap up by looking at the posterior predictive distribution for the parallax measurements to at least qualitatively check our modeling choices.
+As before, we generate realizations of the catalog conditioned on the posterior samples and compare that to the observed distribution of parallax measurements:</p>
+<pre><code class="language-python">pred = infer.Predictive(gaia_cluster_model, samples)(
+    jax.random.PRNGKey(10), plx_err, plx_zp=plx_zp
+)
+
+_, bins, _ = plt.hist(plx, 50, histtype=&quot;step&quot;, lw=2, label=&quot;observed&quot;)
+label = &quot;posterior predictive&quot;
+for n in np.random.default_rng(0).integers(len(pred[&quot;plx_obs&quot;]), size=100):
+    plt.hist(
+        pred[&quot;plx_obs&quot;][n],
+        bins,
+        histtype=&quot;step&quot;,
+        color=&quot;k&quot;,
+        alpha=0.1,
+        lw=0.5,
+        label=label,
+    )
+    label = None
+plt.legend()
+plt.xlabel(&quot;mean parallax [mas]&quot;)
+plt.ylabel(&quot;count&quot;)
+plt.xlim(bins[0], bins[-1]);
+</code></pre>
+<p><img src="output_47_0.png" alt="png"></p>
+<p>This looks overall pretty good.
+We see some systematic differences at small values of parallax that may have been introduced by our initial cut on the parallax measurements.
+We may also be somewhat overestimating the number of cluster members, possibly since our &ldquo;Gaussian in log distance&rdquo; model for the cluster is not quite right.
+All that being said, these results don&rsquo;t seem too bad, and I definitely think we&rsquo;ve seen an example where NumPyro&rsquo;s use really shows!</p>
+<h2 id="summary">Summary<a class="anchor" href="#summary">#</a></h2>
+<p>In this post, we&rsquo;ve gone through a couple of examples of how one might go about using NumPyro to do Bayesian inference, with a specific focus on applications in astrophysics.
+I hope that this is useful for anyone who is interested in learning about how to use these types of tools, and perhaps there are even some interesting tidbits for those who are already experts.
+If you have any comments or questions, please <a href="https://github.com/dfm-io/post--intro-to-numpyro" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>open an issue on the GitHub repository for this post</a>, <a href="https://twitter.com/exoplaneteer" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Tweet at me</a>, or (if you must :D) send an email.</p>
+<p><em>Edit 2022-08-03:</em> Incorporated some comments from Morgan Fouesneau.</p>
+
+
+              
+                  
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ["script", "noscript", "style", "textarea", "pre"],
+    },
+  };
+
+  window.addEventListener("load", (event) => {
+    document.querySelectorAll("mjx-container").forEach(function (x) {
+      x.parentElement.classList += "has-jax";
+    });
+  });
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script
+  type="text/javascript"
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+></script>
+
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/simple-python-module/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">What if I want to reuse my Python functions?</span>
+    </a>
+  
+
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:foreman.mackey@gmail.com"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="Bluesky"
+        href="https://bsky.app/profile/dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/bluesky.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>

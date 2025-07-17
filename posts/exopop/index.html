@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>An experiment in open science: exoplanet population inference | Dan Foreman-Mackey</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+
+  <link rel="shortcut icon" type="image/png" href="../../favicon.png" />
+
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="../../css/post.min.86d1effd4c412b85ac13db53a90c473a0f256f789b821e131125c9aa25cb6a6d.css" integrity="sha256-htHv/UxBK4WsE9tTqQxHOg8lb3ibgh4TESXJqiXLam0="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="../../css/custom.min.1f57f8800830abb72375a261f1dce94fd4baa8d1e1cb788d1a2c0961fe963544.css" integrity="sha256-H1f4gAgwq7cjdaJh8dzpT9S6qNHhy3iNGiwJYf6WNUQ="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    { 
+      "@context": "http://schema.org", 
+      "@type": "WebSite", 
+      "url": "https:\/\/dfm.io\/posts\/exopop\/",
+      "name": "An experiment in open science: exoplanet population inference",
+      "author": {
+        "@type": "Person",
+        "name": ""
+      },
+      "description": ""
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="../../"> home</a>
+      </li>
+    
+      <li>
+        <a  href="../../about">about</a>
+      </li>
+    
+      <li>
+        <a  href="../../posts">blog</a>
+      </li>
+    
+      <li>
+        <a  href="https://github.com/dfm/cv">cv</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">An experiment in open science: exoplanet population inference</h1>
+            <time datetime="2015-07-06 00:00:00 &#43;0000 UTC" class="post__date">Jul 6 2015</time> 
+            <i>
+            
+              <p>
+                The source for this post can be found <a href="https://github.com/dfm-io/dfm.io/tree/main/posts/exopop/">here</a>.
+                Please open an issue or pull request on that repository if you have questions, comments, or suggestions. 
+              </p>
+            
+            </i>
+          </header>
+          <article class="post__content">
+              
+<p><strong>Warning</strong> <em>this is an extremely technical blog post (even for me) but I think that it&rsquo;s an interesting experiment so I thought I would post it anyways!</em></p>
+<p>The <em>Kepler</em> Mission has been a great success story for open science. The recent data releases have been on a fast and regular schedule and the data products are sometimes made public before the science office publishes their papers. Therefore, when the most recent installment in the &ldquo;rate of Earths&rdquo; saga—a discussion <a href="http://arxiv.org/abs/1406.3020" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>close to my heart</a>—hit the ArXiv as <a href="http://arxiv.org/abs/1506.04175" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Burke et al. (2015)</a>, I decided to see if I could reproduce their results by following the steps described in their paper. Crazy, right?</p>
+<p>In this blog post, I&rsquo;ll go through the steps to reproduce most of their key results as an experiment in <em>Open Science</em>. [<em>Spoiler alert: I dont get exactly the same results but I do come to the same conclusions&hellip;</em>]</p>
+<p>It&rsquo;s also worth noting that Burke also posted code and results to supplement the paper: <a href="https://github.com/christopherburke/KeplerPORTs" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>christopherburke/KeplerPORTs</a>.</p>
+<h2 id="the-science-case">The science case<a class="anchor" href="#the-science-case">#</a></h2>
+<p>While the point of this post isn&rsquo;t to discuss the physical implications of this result, it is worth taking a moment to motivate this experiment. One of the key areas of research in exoplanets is (what I like to call) <em>population inference</em>; determining the underlying occurrence rate and distribution of exoplanets and their physical properties. This is interesting as a data science problem because we now have large catalogs of exoplanet discoveries and characterizations and it&rsquo;s interesting scientifically because it is the best shot we have of connecting exoplanet observations to theories of the formation and evolution of exoplanet systems. It also places a constraint on the frequency of planets like Earth and planetary systems like our Solar system (Are we alone? and all that&hellip;).</p>
+<p>There has been a huge amount of research in this field but <a href="http://arxiv.org/abs/1506.04175" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Burke et al. (2015)</a> present (arguably) the most careful treatment of the systematic effects based on a characterization of the official <em>Kepler</em> pipeline. Even before submission, the data products describing this characterization were all publicly available on the <a href="http://exoplanetarchive.ipac.caltech.edu/" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Exoplanet Archive</a>.</p>
+<h2 id="the-problem">The problem<a class="anchor" href="#the-problem">#</a></h2>
+<p>The basic data analysis question that we&rsquo;re trying to answer here is: given an incomplete catalog of planet parameters (smaller planets on longer periods are harder to find), what can we say about the underlying distribution of properties? For this model, we&rsquo;ll use the Poisson process likelihood to compute the probability of a set of measurements (e.g. orbital period, planet radius, etc.) <code>$w_k = (P_k,\,R_k)$</code>, given a parametric model for the underlying &ldquo;occurrence rate&rdquo; <code>$\Gamma_\theta(w)$</code></p>
+<div>$$p(\{w_k\}\,|\,\theta) = \exp \left(\int Q(w)\,\Gamma_\theta(w)\,\mathrm{d}w\right) \, \prod_{k=1}^K Q(w_k)\,\Gamma_\theta(w_k)$$</div>
+<p>where <code>$Q(w)$</code> is an estimate of the (mean) detection efficiency (or completeness) as a function of the parameters <code>$w$</code>. Then, we just need to optimize for <code>$\theta$</code> or choose a prior <code>$p(\theta)$</code> and sample using MCMC. Like Burke et al., we&rsquo;ll build our model in orbital period (in days) and planet radius (in Earth radii) and use a product of independent power laws in the two dimensions for <code>$\Gamma_\theta (w) = \Gamma_\theta (P)\,\Gamma_\theta (R)$</code>.</p>
+<h2 id="the-data">The data<a class="anchor" href="#the-data">#</a></h2>
+<p>To start, let&rsquo;s download (and cache) the dataset from the Exoplanet Archive. Don&rsquo;t worry about the details of these functions but what they do is download the csv tables (<code>q1_q16_stellar</code> and <code>q1_q16_koi</code>) and save them as a pandas block.</p>
+<p><em>Edit: for the purposes of reproducibility I&rsquo;ve saved the pre-generated tables to Zenodo and we&rsquo;ll download those first. But, the code used to create these data files is still included below if you don&rsquo;t want to use the pre-generated files.</em></p>
+<pre><code class="language-python">!mkdir -p data
+!wget -qO data/q1_q16_koi.h5 &quot;https://zenodo.org/record/6615440/files/q1_q16_koi.h5?download=1&quot;
+!wget -qO data/q1_q16_stellar.h5 &quot;https://zenodo.org/record/6615440/files/q1_q16_stellar.h5?download=1&quot;
+</code></pre>
+<pre><code class="language-python">import os
+import requests
+import pandas as pd
+from io import BytesIO
+
+
+def get_catalog(name, basepath=&quot;data&quot;, columns=&quot;*&quot;):
+    fn = os.path.join(basepath, &quot;{0}.h5&quot;.format(name))
+    if os.path.exists(fn):
+        print(&quot;Using cached data file.&quot;)
+        return pd.read_hdf(fn, name)
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+    print(&quot;Downloading {0}...&quot;.format(name))
+    url = (
+        &quot;http://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/&quot;
+        &quot;nph-nstedAPI?table={0}&amp;select={1}&quot;
+    ).format(name, columns)
+    r = requests.get(url)
+    if r.status_code != requests.codes.ok:
+        r.raise_for_status()
+    fh = BytesIO(r.content)
+    df = pd.read_csv(fh)
+    df.to_hdf(fn, name, format=&quot;t&quot;)
+    return df
+</code></pre>
+<p>Now we will make the cuts on the stellar sample to select the G and K dwarfs:</p>
+<ul>
+<li><code>$4200\,K \le T_\mathrm{eff} \le 6100\,K$</code>,</li>
+<li><code>$R_\star \le 1.15\,R_\odot$</code>,</li>
+<li><code>$T_\mathrm{obs} &gt; 2\,\mathrm{yr}$</code>,</li>
+<li><code>$f_\mathrm{duty} &gt; 0.6$</code>, and</li>
+<li><code>$\mathrm{robCDPP7.5} \le 1000\,\mathrm{ppm}$</code>.</li>
+</ul>
+<pre><code class="language-python">import numpy as np
+
+thresh = [1.5, 2.0, 2.5, 3.0, 3.5, 4.5, 5.0, 6.0, 7.5, 9.0, 10.5, 12.0, 12.5, 15.0]
+cols = [
+    &quot;mesthres{0:02.0f}p{1:.0f}&quot;.format(np.floor(t), 10 * (t - np.floor(t)))
+    for t in thresh
+]
+stlr = get_catalog(
+    &quot;q1_q16_stellar&quot;,
+    columns=&quot;kepid,teff,logg,radius,mass,dataspan,dutycycle,rrmscdpp07p5,&quot;
+    + &quot;,&quot;.join(cols),
+)
+
+# Select G and K dwarfs.
+m = (4200 &lt;= stlr.teff) &amp; (stlr.teff &lt;= 6100)
+m &amp;= stlr.radius &lt;= 1.15
+
+# Only include stars with sufficient data coverage.
+m &amp;= stlr.dataspan &gt; 365.25 * 2.0
+m &amp;= stlr.dutycycle &gt; 0.6
+m &amp;= stlr.rrmscdpp07p5 &lt;= 1000.0
+
+# Only select stars with mass estimates.
+m &amp;= np.isfinite(stlr.mass)
+
+base_stlr = pd.DataFrame(stlr)
+stlr = pd.DataFrame(stlr[m])
+
+print(&quot;Selected {0} targets after cuts&quot;.format(len(stlr)))
+</code></pre>
+<pre><code>Using cached data file.
+
+
+Selected 91446 targets after cuts
+</code></pre>
+<p>After applying these same cuts to a pre-release version of this catalog, Burke et al. found 91,567 targets.</p>
+<p>[<em>Using the machine readable version of their Table 1, I tried to work out the reason for this difference and I couldn&rsquo;t reverse engineer any cause. Some of the targets missing from our catalog are just artificially fixed at Solar values so they seem reasonable to skip. This effect explains about half the difference between the results.</em>]</p>
+<p>We can now make a plot of the HR diagram of these sources to reproduce Figure 3 from Burke et al.:</p>
+<pre><code class="language-python">import matplotlib.pyplot as pl
+
+pl.plot(base_stlr.teff, base_stlr.logg, &quot;.k&quot;, ms=3, alpha=0.5)
+pl.plot(stlr.teff, stlr.logg, &quot;.r&quot;, ms=3, alpha=0.5)
+pl.xlim(9500, 2500)
+pl.ylim(5.5, 3)
+pl.ylabel(&quot;$\log g$&quot;)
+pl.xlabel(&quot;$T_\mathrm{eff}$&quot;);
+</code></pre>
+<pre><code>&lt;&gt;:7: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:8: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:7: SyntaxWarning: invalid escape sequence '\l'
+&lt;&gt;:8: SyntaxWarning: invalid escape sequence '\m'
+/tmp/ipykernel_2139/1651322040.py:7: SyntaxWarning: invalid escape sequence '\l'
+  pl.ylabel(&quot;$\log g$&quot;)
+/tmp/ipykernel_2139/1651322040.py:8: SyntaxWarning: invalid escape sequence '\m'
+  pl.xlabel(&quot;$T_\mathrm{eff}$&quot;);
+</code></pre>
+<p><img src="output_6_1.png" alt="png"></p>
+<p>Next up, let&rsquo;s make the cuts on the KOI list:</p>
+<ul>
+<li>disposition from the Q1-Q16 pipeline run: <code>CANDIDATE</code>,</li>
+<li><code>$50\,\mathrm{day} \le P \le 300\,\mathrm{day}$</code>, and</li>
+<li><code>$0.75\,R_\oplus \le R \le 2.5\,R_\oplus$</code>.</li>
+</ul>
+<pre><code class="language-python">kois = get_catalog(
+    &quot;q1_q16_koi&quot;,
+    columns=&quot;kepid,koi_pdisposition,koi_period,koi_prad,koi_prad_err1,koi_prad_err2&quot;,
+)
+
+period_rng = (50, 300)
+rp_rng = (0.75, 2.5)
+
+# Join on the stellar list.
+kois = pd.merge(kois, stlr[[&quot;kepid&quot;]], on=&quot;kepid&quot;, how=&quot;inner&quot;)
+
+# Only select the KOIs in the relevant part of parameter space.
+m = kois.koi_pdisposition == &quot;CANDIDATE&quot;
+m &amp;= np.isfinite(kois.koi_period)
+m &amp;= np.isfinite(kois.koi_prad)
+base_kois = pd.DataFrame(kois[m])
+m &amp;= (period_rng[0] &lt;= kois.koi_period) &amp; (kois.koi_period &lt;= period_rng[1])
+m &amp;= (rp_rng[0] &lt;= kois.koi_prad) &amp; (kois.koi_prad &lt;= rp_rng[1])
+
+kois = pd.DataFrame(kois[m])
+
+print(&quot;Selected {0} KOIs after cuts&quot;.format(len(kois)))
+</code></pre>
+<pre><code>Using cached data file.
+Selected 154 KOIs after cuts
+</code></pre>
+<p>Burke et al. find 156 KOIs instead of our 154 again because of their pre-release version of the catalog and changing dispositions. As we&rsquo;ll see, this doesn&rsquo;t have a huge effect on the results even though there&rsquo;s some risk of being dominated by small number statistics.</p>
+<p>Now, let&rsquo;s plot the distribution of measured physical parameters in this catalog of KOIs. Unlike most versions of this plot, here we&rsquo;ll include the error bars on the radii as a reminder that many of the radii are very poorly constrained!</p>
+<pre><code class="language-python">yerr = np.abs(np.array(base_kois[[&quot;koi_prad_err2&quot;, &quot;koi_prad_err1&quot;]])).T
+pl.errorbar(
+    base_kois.koi_period,
+    base_kois.koi_prad,
+    yerr=yerr,
+    fmt=&quot;.k&quot;,
+    ms=4,
+    capsize=0,
+    alpha=0.3,
+)
+pl.plot(kois.koi_period, kois.koi_prad, &quot;.k&quot;, ms=6)
+pl.fill_between(
+    period_rng, [rp_rng[1], rp_rng[1]], [rp_rng[0], rp_rng[0]], color=&quot;g&quot;, alpha=0.2
+)
+pl.xlim(period_rng + 10 * np.array([-1, 1]))
+pl.ylim(rp_rng + 0.5 * np.array([-1, 1]))
+pl.xlabel(&quot;period [days]&quot;)
+pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
+</code></pre>
+<pre><code>&lt;&gt;:18: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:18: SyntaxWarning: invalid escape sequence '\,'
+/tmp/ipykernel_2139/3333329861.py:18: SyntaxWarning: invalid escape sequence '\,'
+  pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
+</code></pre>
+<p><img src="output_10_1.png" alt="png"></p>
+<h2 id="the-detection-efficiency-model">The detection efficiency model<a class="anchor" href="#the-detection-efficiency-model">#</a></h2>
+<p>For this problem of population inference, an important ingredient is a detailed model of the efficiency with which the transit search pipeline detects transit signals. Burke et al. implement an analytic model for the detection efficiency that has been calibrated using simulations in a (submitted but unavailable) paper by Jessie Christiansen. The details of this model are given in the Burke et al. paper so I&rsquo;ll just go ahead and implement it and if you&rsquo;re interested, check out <a href="http://arxiv.org/abs/1506.04175" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>the paper</a>.</p>
+<pre><code class="language-python">from scipy.stats import gamma
+
+
+def get_duration(period, aor, e):
+    &quot;&quot;&quot;
+    Equation (1) from Burke et al. This estimates the transit
+    duration in the same units as the input period. There is a
+    typo in the paper (24/4 = 6 != 4).
+
+    :param period: the period in any units of your choosing
+    :param aor:    the dimensionless semi-major axis (scaled
+                   by the stellar radius)
+    :param e:      the eccentricity of the orbit
+
+    &quot;&quot;&quot;
+    return 0.25 * period * np.sqrt(1 - e**2) / aor
+
+
+def get_a(period, mstar, Go4pi=2945.4625385377644 / (4 * np.pi * np.pi)):
+    &quot;&quot;&quot;
+    Compute the semi-major axis of an orbit in Solar radii.
+
+    :param period: the period in days
+    :param mstar:  the stellar mass in Solar masses
+
+    &quot;&quot;&quot;
+    return (Go4pi * period * period * mstar) ** (1.0 / 3)
+
+
+def get_delta(k, c=1.0874, s=1.0187):
+    &quot;&quot;&quot;
+    Estimate the approximate expected transit depth as a function
+    of radius ratio. There might be a typo here. In the paper it
+    uses c + s*k but in the public code, it is c - s*k:
+    https://github.com/christopherburke/KeplerPORTs
+
+    :param k: the dimensionless radius ratio between the planet and
+              the star
+
+    &quot;&quot;&quot;
+    delta_max = k * k * (c + s * k)
+    return 0.84 * delta_max
+
+
+cdpp_cols = [k for k in stlr.keys() if k.startswith(&quot;rrmscdpp&quot;)]
+cdpp_vals = np.array([k[-4:].replace(&quot;p&quot;, &quot;.&quot;) for k in cdpp_cols], dtype=float)
+
+
+def get_mes(star, period, rp, tau, re=0.009171):
+    &quot;&quot;&quot;
+    Estimate the multiple event statistic value for a transit.
+
+    :param star:   a pandas row giving the stellar properties
+    :param period: the period in days
+    :param rp:     the planet radius in Earth radii
+    :param tau:    the transit duration in hours
+
+    &quot;&quot;&quot;
+    # Interpolate to the correct CDPP for the duration.
+    cdpp = np.array(star[cdpp_cols], dtype=float)
+    sigma = np.interp(tau, cdpp_vals, cdpp)
+
+    # Compute the radius ratio and estimate the S/N.
+    k = rp * re / star.radius
+    snr = get_delta(k) * 1e6 / sigma
+
+    # Scale by the estimated number of transits.
+    ntrn = star.dataspan * star.dutycycle / period
+    return snr * np.sqrt(ntrn)
+
+
+# Pre-compute and freeze the gamma function from Equation (5) in
+# Burke et al.
+pgam = gamma(4.65, loc=0.0, scale=0.98)
+mesthres_cols = [k for k in stlr.keys() if k.startswith(&quot;mesthres&quot;)]
+mesthres_vals = np.array([k[-4:].replace(&quot;p&quot;, &quot;.&quot;) for k in mesthres_cols], dtype=float)
+
+
+def get_pdet(star, aor, period, rp, e):
+    &quot;&quot;&quot;
+    Equation (5) from Burke et al. Estimate the detection efficiency
+    for a transit.
+
+    :param star:   a pandas row giving the stellar properties
+    :param aor:    the dimensionless semi-major axis (scaled
+                   by the stellar radius)
+    :param period: the period in days
+    :param rp:     the planet radius in Earth radii
+    :param e:      the orbital eccentricity
+
+    &quot;&quot;&quot;
+    tau = get_duration(period, aor, e) * 24.0
+    mes = get_mes(star, period, rp, tau)
+    mest = np.interp(tau, mesthres_vals, np.array(star[mesthres_cols], dtype=float))
+    x = mes - 4.1 - (mest - 7.1)
+    return pgam.cdf(x)
+
+
+def get_pwin(star, period):
+    &quot;&quot;&quot;
+    Equation (6) from Burke et al. Estimates the window function
+    using a binomial distribution.
+
+    :param star:   a pandas row giving the stellar properties
+    :param period: the period in days
+
+    &quot;&quot;&quot;
+    M = star.dataspan / period
+    f = star.dutycycle
+    omf = 1.0 - f
+    pw = (
+        1
+        - omf**M
+        - M * f * omf ** (M - 1)
+        - 0.5 * M * (M - 1) * f * f * omf ** (M - 2)
+    )
+    msk = (pw &gt;= 0.0) * (M &gt;= 2.0)
+    return pw * msk
+
+
+def get_pgeom(aor, e):
+    &quot;&quot;&quot;
+    The geometric transit probability.
+
+    See e.g. Kipping (2014) for the eccentricity factor
+    http://arxiv.org/abs/1408.1393
+
+    :param aor: the dimensionless semi-major axis (scaled
+                by the stellar radius)
+    :param e:   the orbital eccentricity
+
+    &quot;&quot;&quot;
+    return 1.0 / (aor * (1 - e * e)) * (aor &gt; 1.0)
+
+
+def get_completeness(star, period, rp, e, with_geom=True):
+    &quot;&quot;&quot;
+    A helper function to combine all the completeness effects.
+
+    :param star:      a pandas row giving the stellar properties
+    :param period:    the period in days
+    :param rp:        the planet radius in Earth radii
+    :param e:         the orbital eccentricity
+    :param with_geom: include the geometric transit probability?
+
+    &quot;&quot;&quot;
+    aor = get_a(period, star.mass) / star.radius
+    pdet = get_pdet(star, aor, period, rp, e)
+    pwin = get_pwin(star, period)
+    if not with_geom:
+        return pdet * pwin
+    pgeom = get_pgeom(aor, e)
+    return pdet * pwin * pgeom
+</code></pre>
+<p>Using this model, lets reproduce Figure 1 from the Burke paper. If you closely compare the figures, you&rsquo;ll find that they&rsquo;re not quite the same but the one in the paper was generated with an older (incomplete) version of the code (Burke, priv. comm.) and the model used is actually the same as this one so we&rsquo;ll roll with it!</p>
+<pre><code class="language-python"># Choose the star.
+star = stlr[stlr.kepid == 10593626].iloc[0]
+
+# Compute the completeness map on a grid.
+period = np.linspace(10, 700, 500)
+rp = np.linspace(0.5, 2.5, 421)
+X, Y = np.meshgrid(period, rp, indexing=&quot;ij&quot;)
+Z = get_completeness(star, X, Y, 0.0, with_geom=False)
+
+# Plot with the same contour levels as the figure.
+c = pl.contour(X, Y, Z, [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99], colors=&quot;k&quot;)
+pl.clabel(c, fontsize=12, inline=1, fmt=&quot;%.2f&quot;)
+pl.xlabel(&quot;period [days]&quot;)
+pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;)
+pl.title(&quot;det. eff. for KIC10593626&quot;);
+</code></pre>
+<pre><code>&lt;&gt;:14: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:14: SyntaxWarning: invalid escape sequence '\,'
+/tmp/ipykernel_2139/2038380559.py:14: SyntaxWarning: invalid escape sequence '\,'
+  pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;)
+</code></pre>
+<p><img src="output_14_1.png" alt="png"></p>
+<p>In practice, the only detection efficiency function that enters our analysis is <em>integrated across the stellar sample</em>. In fact, the function <code>$Q(w)$</code> needs to be integrated (marginalized) over <em>all the parameters that affect it but aren&rsquo;t of interest</em>, for example, <a href="http://arxiv.org/abs/1408.1393" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>we should include eccentricity</a>. For now, following Burke et al., we&rsquo;ll ignore eccentricity and integrate only over the stellar parameters. This cell takes a minute or two to run because it must loop over every star in the sample and compute the completeness on a grid.</p>
+<pre><code class="language-python">period = np.linspace(period_rng[0], period_rng[1], 57)
+rp = np.linspace(rp_rng[0], rp_rng[1], 61)
+period_grid, rp_grid = np.meshgrid(period, rp, indexing=&quot;ij&quot;)
+comp = np.zeros_like(period_grid)
+for _, star in stlr.iterrows():
+    comp += get_completeness(star, period_grid, rp_grid, 0.0, with_geom=True)
+</code></pre>
+<p>In the target range, here is the completeness function (including the geometric transit probability):</p>
+<pre><code class="language-python">pl.pcolor(period_grid, rp_grid, comp, cmap=&quot;BuGn&quot;)
+c = pl.contour(period_grid, rp_grid, comp / len(stlr), colors=&quot;k&quot;, alpha=0.8)
+pl.clabel(c, fontsize=12, inline=1, fmt=&quot;%.3f&quot;)
+pl.title(&quot;mean pipeline detection efficiency&quot;)
+pl.xlabel(&quot;period [days]&quot;)
+pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
+</code></pre>
+<pre><code>&lt;&gt;:6: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:6: SyntaxWarning: invalid escape sequence '\,'
+/tmp/ipykernel_2139/993405964.py:6: SyntaxWarning: invalid escape sequence '\,'
+  pl.ylabel(&quot;$R_p \, [R_\oplus]$&quot;);
+</code></pre>
+<p><img src="output_18_1.png" alt="png"></p>
+<h2 id="population-inference">Population inference<a class="anchor" href="#population-inference">#</a></h2>
+<p>Now that we have our sample and our completeness model, we need to specify the underlying population model. Like Burke et al., I&rsquo;ve found that the data don&rsquo;t support a broken power law in planet radius so let&rsquo;s just model the population as the product of indpendent power laws in <code>$P$</code> and <code>$R_p$</code>.</p>
+<pre><code class="language-python"># A double power law model for the population.
+def population_model(theta, period, rp):
+    lnf0, beta, alpha = theta
+    v = np.exp(lnf0) * np.ones_like(period)
+    for x, rng, n in zip((period, rp), (period_rng, rp_rng), (beta, alpha)):
+        n1 = n + 1
+        v *= x**n * n1 / (rng[1] ** n1 - rng[0] ** n1)
+    return v
+
+
+# The ln-likelihood function given at the top of this post.
+koi_periods = np.array(kois.koi_period)
+koi_rps = np.array(kois.koi_prad)
+vol = np.diff(period_grid, axis=0)[:, :-1] * np.diff(rp_grid, axis=1)[:-1, :]
+
+
+def lnlike(theta):
+    pop = population_model(theta, period_grid, rp_grid) * comp
+    pop = 0.5 * (pop[:-1, :-1] + pop[1:, 1:])
+    norm = np.sum(pop * vol)
+    ll = np.sum(np.log(population_model(theta, koi_periods, koi_rps))) - norm
+    return ll if np.isfinite(ll) else -np.inf
+
+
+# The ln-probability function is just propotional to the ln-likelihood
+# since we're assuming uniform priors.
+bounds = [(-5, 5), (-5, 5), (-5, 5)]
+
+
+def lnprob(theta):
+    # Broad uniform priors.
+    for t, rng in zip(theta, bounds):
+        if not rng[0] &lt; t &lt; rng[1]:
+            return -np.inf
+    return lnlike(theta)
+
+
+# The negative ln-likelihood is useful for optimization.
+# Optimizers want to *minimize* your function.
+def nll(theta):
+    ll = lnlike(theta)
+    return -ll if np.isfinite(ll) else 1e15
+</code></pre>
+<p>To start, let&rsquo;s find the maximum likelihood solution for the population parameters by minimizing the negative log-likelihood.</p>
+<pre><code class="language-python">from scipy.optimize import minimize
+
+theta_0 = np.array([np.log(0.75), -0.53218, -1.5])
+r = minimize(nll, theta_0, method=&quot;L-BFGS-B&quot;, bounds=bounds)
+print(r)
+</code></pre>
+<pre><code>  message: CONVERGENCE: RELATIVE REDUCTION OF F &lt;= FACTR*EPSMCH
+  success: True
+   status: 0
+      fun: 1162.5264684357792
+        x: [-4.101e-01 -5.799e-01 -1.233e+00]
+      nit: 8
+      jac: [ 2.274e-05  2.274e-05  0.000e+00]
+     nfev: 44
+     njev: 11
+ hess_inv: &lt;3x3 LbfgsInvHessProduct with dtype=float64&gt;
+</code></pre>
+<p>&hellip;and plot it:</p>
+<pre><code class="language-python"># We'll reuse these functions to plot all of our results.
+def make_plot(pop_comp, x0, x, y, ax):
+    pop = 0.5 * (pop_comp[:, 1:] + pop_comp[:, :-1])
+    pop = np.sum(pop * np.diff(y)[None, :, None], axis=1)
+    a, b, c, d, e = np.percentile(pop * np.diff(x)[0], [2.5, 16, 50, 84, 97.5], axis=0)
+
+    ax.fill_between(x0, a, e, color=&quot;k&quot;, alpha=0.1, edgecolor=&quot;none&quot;)
+    ax.fill_between(x0, b, d, color=&quot;k&quot;, alpha=0.3, edgecolor=&quot;none&quot;)
+    ax.plot(x0, c, &quot;k&quot;, lw=1)
+
+
+def plot_results(samples):
+    # Loop through the samples and compute the list of population models.
+    samples = np.atleast_2d(samples)
+    pop = np.empty((len(samples), period_grid.shape[0], period_grid.shape[1]))
+    gamma_earth = np.empty((len(samples)))
+    for i, p in enumerate(samples):
+        pop[i] = population_model(p, period_grid, rp_grid)
+        gamma_earth[i] = population_model(p, 365.25, 1.0) * 365.0
+
+    fig, axes = pl.subplots(2, 2, figsize=(10, 8))
+    fig.subplots_adjust(wspace=0.4, hspace=0.4)
+
+    # Integrate over period.
+    dx = 0.25
+    x = np.arange(rp_rng[0], rp_rng[1] + dx, dx)
+    n, _ = np.histogram(koi_rps, x)
+
+    # Plot the observed radius distribution.
+    ax = axes[0, 0]
+    make_plot(pop * comp[None, :, :], rp, x, period, ax)
+    ax.errorbar(0.5 * (x[:-1] + x[1:]), n, yerr=np.sqrt(n), fmt=&quot;.k&quot;, capsize=0)
+    ax.set_xlim(rp_rng[0], rp_rng[1])
+    ax.set_xlabel(&quot;$R_p\,[R_\oplus]$&quot;)
+    ax.set_ylabel(&quot;\# of detected planets&quot;)
+
+    # Plot the true radius distribution.
+    ax = axes[0, 1]
+    make_plot(pop, rp, x, period, ax)
+    ax.set_xlim(rp_rng[0], rp_rng[1])
+    ax.set_ylim(0, 0.37)
+    ax.set_xlabel(&quot;$R_p\,[R_\oplus]$&quot;)
+    ax.set_ylabel(&quot;$\mathrm{d}N / \mathrm{d}R$; $\Delta R = 0.25\,R_\oplus$&quot;)
+
+    # Integrate over period.
+    dx = 31.25
+    x = np.arange(period_rng[0], period_rng[1] + dx, dx)
+    n, _ = np.histogram(koi_periods, x)
+
+    # Plot the observed period distribution.
+    ax = axes[1, 0]
+    make_plot(np.swapaxes(pop * comp[None, :, :], 1, 2), period, x, rp, ax)
+    ax.errorbar(0.5 * (x[:-1] + x[1:]), n, yerr=np.sqrt(n), fmt=&quot;.k&quot;, capsize=0)
+    ax.set_xlim(period_rng[0], period_rng[1])
+    ax.set_ylim(0, 79)
+    ax.set_xlabel(&quot;$P\,[\mathrm{days}]$&quot;)
+    ax.set_ylabel(&quot;\# of detected planets&quot;)
+
+    # Plot the true period distribution.
+    ax = axes[1, 1]
+    make_plot(np.swapaxes(pop, 1, 2), period, x, rp, ax)
+    ax.set_xlim(period_rng[0], period_rng[1])
+    ax.set_ylim(0, 0.27)
+    ax.set_xlabel(&quot;$P\,[\mathrm{days}]$&quot;)
+    ax.set_ylabel(&quot;$\mathrm{d}N / \mathrm{d}P$; $\Delta P = 31.25\,\mathrm{days}$&quot;)
+
+    return gamma_earth
+
+
+print(plot_results(r.x));
+</code></pre>
+<pre><code>&lt;&gt;:34: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:35: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:42: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:43: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:56: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:57: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:64: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:65: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:34: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:35: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:42: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:43: SyntaxWarning: invalid escape sequence '\m'
+&lt;&gt;:56: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:57: SyntaxWarning: invalid escape sequence '\#'
+&lt;&gt;:64: SyntaxWarning: invalid escape sequence '\,'
+&lt;&gt;:65: SyntaxWarning: invalid escape sequence '\m'
+/tmp/ipykernel_2139/627950470.py:34: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$R_p\,[R_\oplus]$&quot;)
+/tmp/ipykernel_2139/627950470.py:35: SyntaxWarning: invalid escape sequence '\#'
+  ax.set_ylabel(&quot;\# of detected planets&quot;)
+/tmp/ipykernel_2139/627950470.py:42: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$R_p\,[R_\oplus]$&quot;)
+/tmp/ipykernel_2139/627950470.py:43: SyntaxWarning: invalid escape sequence '\m'
+  ax.set_ylabel(&quot;$\mathrm{d}N / \mathrm{d}R$; $\Delta R = 0.25\,R_\oplus$&quot;)
+/tmp/ipykernel_2139/627950470.py:56: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$P\,[\mathrm{days}]$&quot;)
+/tmp/ipykernel_2139/627950470.py:57: SyntaxWarning: invalid escape sequence '\#'
+  ax.set_ylabel(&quot;\# of detected planets&quot;)
+/tmp/ipykernel_2139/627950470.py:64: SyntaxWarning: invalid escape sequence '\,'
+  ax.set_xlabel(&quot;$P\,[\mathrm{days}]$&quot;)
+/tmp/ipykernel_2139/627950470.py:65: SyntaxWarning: invalid escape sequence '\m'
+  ax.set_ylabel(&quot;$\mathrm{d}N / \mathrm{d}P$; $\Delta P = 31.25\,\mathrm{days}$&quot;)
+
+
+[0.50960663]
+</code></pre>
+<p><img src="output_24_2.png" alt="png"></p>
+<p>Finally, let&rsquo;s sample from the posterior probability for the population parameters using <a href="http://dfm.io/emcee" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>emcee</a>.</p>
+<pre><code class="language-python">import emcee
+
+ndim, nwalkers = len(r.x), 16
+pos = [r.x + 1e-5 * np.random.randn(ndim) for i in range(nwalkers)]
+sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob)
+
+# Burn in.
+pos, _, _ = sampler.run_mcmc(pos, 1000)
+sampler.reset()
+
+# Production.
+pos, _, _ = sampler.run_mcmc(pos, 4000)
+</code></pre>
+<pre><code class="language-python">import corner
+
+corner.corner(sampler.flatchain, labels=[r&quot;$\ln F$&quot;, r&quot;$\beta$&quot;, r&quot;$\alpha$&quot;]);
+</code></pre>
+<p><img src="output_27_0.png" alt="png"></p>
+<pre><code class="language-python">gamma_earth = plot_results(sampler.flatchain)
+</code></pre>
+<p><img src="output_28_0.png" alt="png"></p>
+<p>Comparing this to Figures 6&ndash;9 in Burke et al., you&rsquo;ll see that the results are more or less consistent and the predicted observations are good. For radii smaller than <code>$R_\oplus$</code>, the results start to diverge since I chose to use a single power law in radius instead of the double power law. When I tried to use a double power law, I found that the break radius was immediately pushed below <code>$0.95\,R_\oplus$</code> (the smallest radius in the dataset) and the slope of the smaller radius power law was set only by the prior so it didn&rsquo;t seem necessary to include it here. In practice the final results are still consistent.</p>
+<p>I would now claim this as a successful reproduction of the results from Burke et al. using only public datasets and their description of their method. One last interesting plot (that you might have noticed I computed in the <code>plot_results</code> function) is Figure 17 showing the rate of Earth-analogs defined (following <a href="http://arxiv.org/abs/1406.3020" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>my definition</a>) as:</p>
+<div>$$\Gamma_\oplus = \left.\frac{\mathrm{d} N}{\mathrm{d}\ln R_p\,\mathrm{d}\ln P} \right |_\oplus$$</div>
+<p>Let&rsquo;s plot the constraint on <code>$\Gamma_\oplus$</code>:</p>
+<pre><code class="language-python">pl.hist(np.log10(gamma_earth), 50, histtype=&quot;step&quot;, color=&quot;k&quot;)
+pl.gca().set_yticklabels([])
+pl.title(&quot;the rate of Earth analogs&quot;)
+pl.xlabel(
+    r&quot;$\log_{10}\Gamma_\oplus = \left. \log_{10}\mathrm{d}N / \mathrm{d}\ln P \, \mathrm{d}\ln R_p \right |_\oplus$&quot;
+);
+</code></pre>
+<p><img src="output_30_0.png" alt="png"></p>
+<p>This plot is consistent with Figure 17 from <a href="http://arxiv.org/abs/1506.04175" 
+  
+   target="_blank" rel="noreferrer noopener" 
+>Burke et al. (2015)</a> so we&rsquo;ll leave it here and call this a success for open science! Some of you might notice that this result is inconsistent with many previous estimates of this number (including my own!) but the discussion of this discrepancy is a topic for another day (or maybe a scientific publication).</p>
+<p><em>Thanks to Ruth Angus for reading through and catching some typos!</em></p>
+
+
+              
+                  
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [
+        ["$", "$"],
+        ["\\(", "\\)"],
+      ],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ["script", "noscript", "style", "textarea", "pre"],
+    },
+  };
+
+  window.addEventListener("load", (event) => {
+    document.querySelectorAll("mjx-container").forEach(function (x) {
+      x.parentElement.classList += "has-jax";
+    });
+  });
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script
+  type="text/javascript"
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+></script>
+
+              
+          </article>
+          
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="https://dfm.io/posts/aas-hack-day/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">The Hack Day at AAS 225</span>
+    </a>
+  
+
+  
+    <a class="pagination__item" href="https://dfm.io/posts/stan-c&#43;&#43;/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets</span>
+    </a>
+  
+</div>
+
+          
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="GitHub"
+        href="https://github.com/dfm"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="Email"
+        href="mailto:foreman.mackey@gmail.com"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/email.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a
+        class="social-icons__link"
+        title="Bluesky"
+        href="https://bsky.app/profile/dfm.io"
+        target="_blank"
+        rel="me noopener"
+      >
+        <div class="social-icons__icon" style="background-image: url('https://dfm.io/svg/bluesky.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p>© 2014-2025 Dan Foreman-Mackey</p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="../../js/index.min.575dda8d49ee02639942c63564273e6da972ab531dda26a08800bdcb477cbd7f.js" integrity="sha256-V13ajUnuAmOZQsY1ZCc&#43;balyq1Md2iagiAC9y0d8vX8=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>
