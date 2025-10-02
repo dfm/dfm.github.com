@@ -7,16 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>© 2014-{year} Dan Foreman-Mackey</copyright>
-    <lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>An astronomer&#39;s introduction to NumPyro</title>
-      <link>https://dfm.io/posts/intro-to-numpyro/</link>
-      <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/intro-to-numpyro/</guid>
-      <description>Over the past year or so, I&amp;rsquo;ve been using JAX extensively for my research, and I&amp;rsquo;ve also been encouraging other astronomers to give it a try. In particular, I&amp;rsquo;ve been using JAX as the computation engine for probabilistic inference tasks. There&amp;rsquo;s more to it, but one way that I like to think about JAX is as NumPy with just-in-time compilation and automatic differentiation. The just-in-time compilation features of JAX can be used to speed up you NumPy computations by removing some Python overhead and by executing it on your GPU.</description>
-    </item>
-    
+    <lastBuildDate>Thu, 18 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://dfm.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>What if I want to reuse my Python functions?</title>
       <link>https://dfm.io/posts/simple-python-module/</link>
@@ -37,49 +28,12 @@
     </item>
     
     <item>
-      <title>PyMC3 &#43; PyTorch</title>
-      <link>https://dfm.io/posts/pymc-pytorch/</link>
-      <pubDate>Tue, 15 Oct 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/pymc-pytorch/</guid>
-      <description>This post is a small extension to my previous post where I demonstrated that it was possible to combine TensorFlow with PyMC3 to take advantage of the modeling capabilities of TensorFlow while still using the powerful inference engine provided by PyMC3. The basic procedure involved writing a custom Theano operation that understood how to evaluate a TensorFlow tensor. In this post, I provide a similar snippet that can be used to combine PyTorch and PyMC3 to a similar end.</description>
-    </item>
-    
-    <item>
-      <title>Dense mass matrices for PyMC3</title>
-      <link>https://dfm.io/posts/pymc3-mass-matrix/</link>
-      <pubDate>Thu, 11 Oct 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/pymc3-mass-matrix/</guid>
-      <description>In my work I often come across probabilistic models where there are strong correlations between parameters. This certainly isn&amp;rsquo;t a special feature of the problems that I work on, and the general advice from MCMC practitioners is that we should reparameterize our models in some form that removes the covariances, but this isn&amp;rsquo;t always practical. One of the reasons why emcee has been popular in astrophysics (I think) is that it uses an &amp;ldquo;affine invariant&amp;rdquo; algorithm.</description>
-    </item>
-    
-    <item>
-      <title>emcee &#43; PyMC3</title>
-      <link>https://dfm.io/posts/emcee-pymc3/</link>
-      <pubDate>Tue, 21 Aug 2018 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/emcee-pymc3/</guid>
-      <description>In this post, I will demonstrate how you can use emcee to sample models defined using PyMC3. Thomas Wiecki wrote about how to do this this with an earlier version of PyMC, but I needed an update since I wanted to do a comparison and PyMC&amp;rsquo;s interface has changed a lot since he wrote his post. This isn&amp;rsquo;t necessarily something that you&amp;rsquo;ll want to do (and I definitely don&amp;rsquo;t recommend it in general), but I figured that I would post it here for posterity.</description>
-    </item>
-    
-    <item>
       <title>PyMC3 &#43; TensorFlow</title>
       <link>https://dfm.io/posts/pymc-tensorflow/</link>
       <pubDate>Thu, 02 Aug 2018 00:00:00 +0000</pubDate>
       
       <guid>https://dfm.io/posts/pymc-tensorflow/</guid>
       <description>the most ambitious crossover event in history</description>
-    </item>
-    
-    <item>
-      <title>Autocorrelation time estimation</title>
-      <link>https://dfm.io/posts/autocorr/</link>
-      <pubDate>Mon, 16 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/autocorr/</guid>
-      <description>This is a cross post from the new emcee documentation.
-In this tutorial, we will discuss a method for convincing yourself that your chains are sufficiently converged. This can be a difficult subject to discuss because it isn&amp;rsquo;t formally possible to guarantee convergence for any but the simplest models, and therefore any argument that you make will be circular and heuristic. However, some discussion of autocorrelation analysis is (or should be!</description>
     </item>
     
     <item>
@@ -92,15 +46,6 @@ In this tutorial, we will discuss a method for convincing yourself that your cha
     </item>
     
     <item>
-      <title>Fitting a plane to data</title>
-      <link>https://dfm.io/posts/fitting-a-plane/</link>
-      <pubDate>Thu, 01 Jun 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/fitting-a-plane/</guid>
-      <description>Who knew that it was possible to say more about how to fit a line to data? Recently, Megan Bedell asked about how to generalize the method described in section 7 of the bible for fitting a line to data with 2-dimensional error elipses to higher dimensional problems, and how to include intrinsic scatter in that relation. While the correct generalization might be obvious to some of you, I wanted to go through the full derivation to make sure that I knew what was going on.</description>
-    </item>
-    
-    <item>
       <title>Using external C&#43;&#43; functions with PyStan &amp; radial velocity exoplanets</title>
       <link>https://dfm.io/posts/stan-c&#43;&#43;/</link>
       <pubDate>Thu, 04 May 2017 00:00:00 +0000</pubDate>
@@ -110,42 +55,12 @@ In this tutorial, we will discuss a method for convincing yourself that your cha
     </item>
     
     <item>
-      <title>An experiment in open science: exoplanet population inference</title>
-      <link>https://dfm.io/posts/exopop/</link>
-      <pubDate>Mon, 06 Jul 2015 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/exopop/</guid>
-      <description>Warning this is an extremely technical blog post (even for me) but I think that it&amp;rsquo;s an interesting experiment so I thought I would post it anyways!
-The Kepler Mission has been a great success story for open science. The recent data releases have been on a fast and regular schedule and the data products are sometimes made public before the science office publishes their papers. Therefore, when the most recent installment in the &amp;ldquo;rate of Earths&amp;rdquo; saga—a discussion close to my heart—hit the ArXiv as Burke et al.</description>
-    </item>
-    
-    <item>
       <title>The Hack Day at AAS 225</title>
       <link>https://dfm.io/posts/aas-hack-day/</link>
       <pubDate>Sun, 18 Jan 2015 00:00:00 +0000</pubDate>
       
       <guid>https://dfm.io/posts/aas-hack-day/</guid>
       <description>The wrap-up post from the hack day at the 225th AAS meeting</description>
-    </item>
-    
-    <item>
-      <title>Mixture Models</title>
-      <link>https://dfm.io/posts/mixture-models/</link>
-      <pubDate>Fri, 12 Dec 2014 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/mixture-models/</guid>
-      <description>This post can be cited with the DOI: 10.5281/zenodo.15856
- There are a lot of reasons why you might use a mixture model and there is a huge related literature. That being said, there are a few questions that I regularly get so I thought that I would write up the answers.
-In astronomy, the most common reason for using a mixture model is to fit data with outliers so that&amp;rsquo;s the language I&amp;rsquo;ll use but the results are applicable to any other mixture model.</description>
-    </item>
-    
-    <item>
-      <title>The Histogram (Part 1)</title>
-      <link>https://dfm.io/posts/histogram1/</link>
-      <pubDate>Tue, 29 Jul 2014 00:00:00 +0000</pubDate>
-      
-      <guid>https://dfm.io/posts/histogram1/</guid>
-      <description>When I was writing my recent paper where I infer the population of exoplanets from an incomplete catalog of noisy measurements, I spent a lot of time thinking about histograms and I came across a few cute results that I wanted to share. Histograms are commonly used as simple &amp;ldquo;non-parametric&amp;rdquo; estimates of probability distributions but they get something of a bad rap (binning is sinning) because it&amp;rsquo;s easy to use them inappropriately!</description>
     </item>
     
     <item>
