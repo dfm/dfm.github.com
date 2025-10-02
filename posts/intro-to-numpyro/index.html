@@ -289,8 +289,8 @@ sampler = infer.MCMC(
 <pre><code>No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
 
 
-CPU times: user 2.99 s, sys: 28.1 ms, total: 3.02 s
-Wall time: 2.96 s
+CPU times: user 2.87 s, sys: 25.1 ms, total: 2.9 s
+Wall time: 2.83 s
 </code></pre>
 <p>The published version of this post is executed on GitHub Actions with a pretty teeny CPU, but the full runtime for this model is less than 2 seconds on my laptop.
 In this case, the runtime is actually probably dominated by JIT compilation and Python overheads, but it&rsquo;s also a pretty simple model with only 2 parameters, so we&rsquo;d expect it to be fast.</p>
@@ -336,49 +336,49 @@ az.summary(inf_data)
     <tr>
       <th>b</th>
       <td>0.122</td>
-      <td>0.051</td>
-      <td>0.023</td>
-      <td>0.215</td>
+      <td>0.052</td>
+      <td>0.019</td>
+      <td>0.214</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>4040.0</td>
-      <td>2815.0</td>
+      <td>3809.0</td>
+      <td>2843.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b_perp</th>
       <td>0.097</td>
-      <td>0.041</td>
-      <td>0.021</td>
-      <td>0.174</td>
+      <td>0.042</td>
+      <td>0.018</td>
+      <td>0.173</td>
       <td>0.001</td>
       <td>0.000</td>
-      <td>4035.0</td>
-      <td>2751.0</td>
+      <td>3809.0</td>
+      <td>2977.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>m</th>
       <td>0.757</td>
       <td>0.035</td>
-      <td>0.695</td>
-      <td>0.827</td>
+      <td>0.692</td>
+      <td>0.825</td>
       <td>0.001</td>
       <td>0.000</td>
-      <td>3434.0</td>
-      <td>2598.0</td>
+      <td>2784.0</td>
+      <td>2333.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>theta</th>
       <td>0.648</td>
       <td>0.022</td>
-      <td>0.608</td>
+      <td>0.607</td>
       <td>0.691</td>
       <td>0.000</td>
       <td>0.000</td>
-      <td>3434.0</td>
-      <td>2598.0</td>
+      <td>2784.0</td>
+      <td>2333.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
@@ -472,8 +472,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 4.74 s, sys: 31.3 ms, total: 4.77 s
-Wall time: 4.66 s
+<pre><code>CPU times: user 4.56 s, sys: 27.3 ms, total: 4.59 s
+Wall time: 4.48 s
 </code></pre>
 <p>This model is a bit more complicated, but it still runs pretty quickly, with the runtime again dominated by just-in-time compilation (try increasing the number of samples if you don&rsquo;t believe me!).
 As before, we can check convergence and make a corner plot:</p>
@@ -521,86 +521,86 @@ az.summary(inf_data)
   <tbody>
     <tr>
       <th>Q</th>
-      <td>0.668</td>
-      <td>0.126</td>
-      <td>0.428</td>
-      <td>0.893</td>
+      <td>0.665</td>
+      <td>0.128</td>
+      <td>0.431</td>
+      <td>0.899</td>
       <td>0.002</td>
       <td>0.001</td>
-      <td>3656.0</td>
-      <td>2613.0</td>
+      <td>3638.0</td>
+      <td>2725.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>0.053</td>
-      <td>0.083</td>
-      <td>-0.095</td>
-      <td>0.202</td>
+      <td>0.050</td>
+      <td>0.079</td>
+      <td>-0.101</td>
+      <td>0.200</td>
       <td>0.002</td>
-      <td>0.002</td>
-      <td>2636.0</td>
-      <td>2495.0</td>
+      <td>0.001</td>
+      <td>2782.0</td>
+      <td>2376.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b_perp</th>
-      <td>0.038</td>
-      <td>0.061</td>
-      <td>-0.065</td>
-      <td>0.145</td>
+      <td>0.036</td>
+      <td>0.056</td>
+      <td>-0.076</td>
+      <td>0.137</td>
       <td>0.001</td>
-      <td>0.002</td>
-      <td>2608.0</td>
-      <td>2430.0</td>
+      <td>0.001</td>
+      <td>2747.0</td>
+      <td>2366.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>bg_mean</th>
-      <td>-0.414</td>
-      <td>0.408</td>
-      <td>-1.193</td>
-      <td>0.344</td>
-      <td>0.008</td>
+      <td>-0.412</td>
+      <td>0.413</td>
+      <td>-1.181</td>
+      <td>0.389</td>
+      <td>0.009</td>
       <td>0.006</td>
-      <td>2776.0</td>
-      <td>1926.0</td>
+      <td>2465.0</td>
+      <td>1880.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>bg_sigma</th>
-      <td>0.773</td>
-      <td>0.524</td>
-      <td>0.041</td>
-      <td>1.647</td>
-      <td>0.011</td>
+      <td>0.782</td>
+      <td>0.502</td>
+      <td>0.026</td>
+      <td>1.658</td>
+      <td>0.010</td>
       <td>0.007</td>
-      <td>2168.0</td>
-      <td>1581.0</td>
+      <td>2346.0</td>
+      <td>1649.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>m</th>
-      <td>1.007</td>
-      <td>0.059</td>
-      <td>0.902</td>
-      <td>1.117</td>
+      <td>1.008</td>
+      <td>0.057</td>
+      <td>0.903</td>
+      <td>1.118</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>2368.0</td>
-      <td>2178.0</td>
+      <td>2538.0</td>
+      <td>2495.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>theta</th>
-      <td>0.788</td>
-      <td>0.030</td>
+      <td>0.789</td>
+      <td>0.028</td>
       <td>0.734</td>
-      <td>0.840</td>
+      <td>0.841</td>
       <td>0.001</td>
       <td>0.000</td>
-      <td>2368.0</td>
-      <td>2178.0</td>
+      <td>2538.0</td>
+      <td>2495.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
@@ -650,8 +650,8 @@ sampler = infer.MCMC(
 )
 %time sampler.run(jax.random.PRNGKey(3), x, yerr, y=y)
 </code></pre>
-<pre><code>CPU times: user 4.98 s, sys: 38.9 ms, total: 5.02 s
-Wall time: 4.88 s
+<pre><code>CPU times: user 4.81 s, sys: 30.2 ms, total: 4.84 s
+Wall time: 4.71 s
 </code></pre>
 <p>As in the mixture models post, we can use the mixture membership probabilities to plot the data points colored by their probability of being an outlier:</p>
 <pre><code class="language-python">p_fg = jnp.mean(jnp.exp(sampler.get_samples()[&quot;p&quot;][..., 0]), axis=0)
@@ -829,8 +829,8 @@ plt.ylabel(&quot;posterior density&quot;)
 plt.legend(loc=1)
 plt.yticks([]);
 </code></pre>
-<pre><code>CPU times: user 2.02 s, sys: 6.68 ms, total: 2.03 s
-Wall time: 1.98 s
+<pre><code>CPU times: user 1.99 s, sys: 1.28 ms, total: 1.99 s
+Wall time: 1.94 s
 </code></pre>
 <p><img src="output_31_1.png" alt="png"></p>
 <p>This is a case where the inferred distance is somewhat inconsistent with the value computed by inverting the parallax as a distance estimator.</p>
@@ -967,8 +967,8 @@ So let&rsquo;s just bite the bullet and run the MCMC:</p>
 )
 %time sampler.run(jax.random.PRNGKey(7), plx_err, plx=plx, plx_zp=plx_zp)
 </code></pre>
-<pre><code>CPU times: user 11min 27s, sys: 1.95 s, total: 11min 29s
-Wall time: 7min
+<pre><code>CPU times: user 16min 25s, sys: 1.78 s, total: 16min 27s
+Wall time: 8min 16s
 </code></pre>
 <p>Again, the published version of this post was executed on GitHub Actions, so you&rsquo;ll probably find that this runs a little faster on your own machine (this takes about 5 minutes on my laptop).
 Even so, this model definitely takes a little longer to run than the earlier examples, but remember that we&rsquo;re fitting thousands of parameters here, so I&rsquo;m willing to take this hit as long as the results are sensible.
@@ -1014,50 +1014,50 @@ az.summary(inf_data, var_names=[&quot;L&quot;, &quot;D&quot;, &quot;approx_size&
   <tbody>
     <tr>
       <th>L</th>
-      <td>469.437</td>
-      <td>7.012</td>
-      <td>457.100</td>
-      <td>483.498</td>
-      <td>0.153</td>
-      <td>0.108</td>
-      <td>2114.0</td>
-      <td>4688.0</td>
+      <td>469.369</td>
+      <td>7.033</td>
+      <td>455.593</td>
+      <td>482.037</td>
+      <td>0.150</td>
+      <td>0.106</td>
+      <td>2187.0</td>
+      <td>5946.0</td>
       <td>1.00</td>
     </tr>
     <tr>
       <th>D</th>
-      <td>836.899</td>
-      <td>1.000</td>
-      <td>835.069</td>
-      <td>838.822</td>
-      <td>0.019</td>
-      <td>0.014</td>
-      <td>2759.0</td>
-      <td>4851.0</td>
+      <td>836.912</td>
+      <td>1.004</td>
+      <td>835.114</td>
+      <td>838.840</td>
+      <td>0.018</td>
+      <td>0.013</td>
+      <td>3223.0</td>
+      <td>5218.0</td>
       <td>1.00</td>
     </tr>
     <tr>
       <th>approx_size</th>
-      <td>14.574</td>
-      <td>1.291</td>
-      <td>12.246</td>
-      <td>17.148</td>
-      <td>0.075</td>
-      <td>0.053</td>
-      <td>298.0</td>
-      <td>474.0</td>
+      <td>14.566</td>
+      <td>1.281</td>
+      <td>12.286</td>
+      <td>17.075</td>
+      <td>0.086</td>
+      <td>0.061</td>
+      <td>221.0</td>
+      <td>500.0</td>
       <td>1.01</td>
     </tr>
     <tr>
       <th>Q</th>
-      <td>0.423</td>
+      <td>0.425</td>
       <td>0.011</td>
       <td>0.403</td>
       <td>0.445</td>
       <td>0.001</td>
-      <td>0.001</td>
-      <td>165.0</td>
-      <td>705.0</td>
+      <td>0.000</td>
+      <td>343.0</td>
+      <td>892.0</td>
       <td>1.02</td>
     </tr>
   </tbody>
