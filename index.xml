@@ -163,9 +163,8 @@ In astronomy, the most common reason for using a mixture model is to fit data wi
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://dfm.io/about/</guid>
-      <description>Hi, I&amp;rsquo;m Dan Foreman-Mackey I&amp;rsquo;m a Research Engineer at Google Deepmind in New York City. I&amp;rsquo;m currently working on JAX. I used to be an astrophysicist who developed some open source scientific software.
-Code I write a lot of code for work and in my spare time. All my projects live in public repositories on GitHub. Here are some of my most popular research codes:
-{{#codes}}  {{name}} &amp;mdash; {{description}}  {{/codes}} {{^codes}} Unable to load of software.</description>
+      <description>Hi, I&amp;rsquo;m Dan Foreman-Mackey I&amp;rsquo;m a Research Engineer at Anthropic in New York City, working on AI Interpretability. Previously, I worked on JAX at Google DeepMind, and before that I was an astrophysicist who developed open source scientific software.
+Code I write a lot of code for work and in my spare time. All my projects live in public repositories on GitHub. Here are some of my most popular research codes:</description>
     </item>
     
   </channel>

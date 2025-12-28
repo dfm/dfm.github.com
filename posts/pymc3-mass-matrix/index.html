@@ -202,7 +202,7 @@ NUTS: [x]
 <pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 3 seconds.
 
 
-time per effective sample: 1.11114 ms
+time per effective sample: 1.03199 ms
 </code></pre>
 <p>On my laptop with two CPUs, I find that the computational cost per effective sample is a fraction of a millisecond.
 That&rsquo;s how things should be!</p>
@@ -267,15 +267,16 @@ NUTS: [x]
 </style>
 <div>
   <progress value='12000' class='' max='12000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [12000/12000 07:41&lt;00:00 Sampling 2 chains, 0 divergences]
+  100.00% [12000/12000 06:40&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 462 seconds.
+<pre><code>Sampling 2 chains for 3_000 tune and 3_000 draw iterations (6_000 + 6_000 draws total) took 400 seconds.
+The acceptance probability does not match the target. It is 0.8914101254030794, but should be close to 0.8. Try to increase the number of tuning steps.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The chain reached the maximum tree depth. Increase max_treedepth, increase target_accept or reparameterize.
 The number of effective samples is smaller than 10% for some parameters.
 
 
-time per effective sample: 788.55662 ms
+time per effective sample: 755.08933 ms
 </code></pre>
 <p>Yes, the units here are the same and the computational efficiency is orders of magnitude worse than the isotropic case.
 The standard recommendation would be to re-parameterize (we can see that that&rsquo;s what PyMC3 is telling us to do here too), but I&rsquo;m not really clever or patient enough to do that in every case.
@@ -557,7 +558,7 @@ NUTS: [x]
 </style>
 <div>
   <progress value='2654' class='' max='2654' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [2654/2654 00:01&lt;00:00 Sampling 2 chains, 0 divergences]
+  100.00% [2654/2654 00:00&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
 <pre><code>Sampling 2 chains for 1_325 tune and 2 draw iterations (2_650 + 4 draws total) took 1 seconds.
 Multiprocess sampling (2 chains in 2 jobs)
@@ -582,10 +583,10 @@ NUTS: [x]
   <progress value='11000' class='' max='11000' style='width:300px; height:20px; vertical-align: middle;'></progress>
   100.00% [11000/11000 00:03&lt;00:00 Sampling 2 chains, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 500 tune and 5_000 draw iterations (1_000 + 10_000 draws total) took 4 seconds.
+<pre><code>Sampling 2 chains for 500 tune and 5_000 draw iterations (1_000 + 10_000 draws total) took 3 seconds.
 
 
-time per effective sample: 0.30195 ms
+time per effective sample: 0.27798 ms
 </code></pre>
 <p>The computational efficiency of this method is similar to PyMC3&rsquo;s default performance on an isotropic Gaussian (within a factor of a few) and corresponds to an improvement of more than <em>three orders of magnitude</em> over the default PyMC3 performance on a correlated Gaussian.</p>
 <p>While I&rsquo;ve found that this procedure can substantially improve the sampling efficiency in many real world scenarios (especially during exploratory phases of a project), you shouldn&rsquo;t forget about reparameterization because that can provide even better performance and help identify problems with your model specification.
