@@ -2,11 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://dfm.io/posts/intro-to-numpyro/</loc>
+    <lastmod>2022-07-28T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://dfm.io/</loc>
-    <lastmod>2021-03-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-07-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://dfm.io/posts/</loc>
-    <lastmod>2021-03-18T00:00:00+00:00</lastmod>
+    <lastmod>2022-07-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://dfm.io/posts/simple-python-module/</loc>
     <lastmod>2021-03-18T00:00:00+00:00</lastmod>
@@ -14,17 +17,41 @@
     <loc>https://dfm.io/posts/extending-jax/</loc>
     <lastmod>2021-01-11T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://dfm.io/posts/pymc-pytorch/</loc>
+    <lastmod>2019-10-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://dfm.io/posts/pymc3-mass-matrix/</loc>
+    <lastmod>2018-10-11T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://dfm.io/posts/emcee-pymc3/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://dfm.io/posts/pymc-tensorflow/</loc>
     <lastmod>2018-08-02T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://dfm.io/posts/autocorr/</loc>
+    <lastmod>2017-10-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://dfm.io/posts/travis-latex/</loc>
     <lastmod>2017-07-12T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://dfm.io/posts/fitting-a-plane/</loc>
+    <lastmod>2017-06-01T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://dfm.io/posts/stan-c&#43;&#43;/</loc>
     <lastmod>2017-05-04T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://dfm.io/posts/exopop/</loc>
+    <lastmod>2015-07-06T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://dfm.io/posts/aas-hack-day/</loc>
     <lastmod>2015-01-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://dfm.io/posts/mixture-models/</loc>
+    <lastmod>2014-12-12T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://dfm.io/posts/histogram1/</loc>
+    <lastmod>2014-07-29T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://dfm.io/posts/python-c-extensions/</loc>
     <lastmod>2012-08-03T00:00:00+00:00</lastmod>
