@@ -299,7 +299,7 @@ NUTS: [logs, b, m]
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
   100.00% [6000/6000 00:14&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 30 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 31 seconds.
 </code></pre>
 <p>Note that unlike the TensorFlow implementation, there&rsquo;s no problem using multiple cores with this model and we actually get more than a factor of two increase in efficiency (probably because PyTorch has less Python overhead per call).</p>
 <p>For comparison, we can reimplement the same model directly in PyMC3:</p>
@@ -338,7 +338,7 @@ NUTS: [logs, b, m]
 </style>
 <div>
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:04&lt;00:00 Sampling chain 0, 0 divergences]
+  100.00% [6000/6000 00:05&lt;00:00 Sampling chain 0, 0 divergences]
 </div>
 <style>
     /* Turns off some styling */
@@ -357,9 +357,9 @@ NUTS: [logs, b, m]
 </style>
 <div>
   <progress value='6000' class='' max='6000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [6000/6000 00:03&lt;00:00 Sampling chain 1, 0 divergences]
+  100.00% [6000/6000 00:04&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 8 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 1_000 draw iterations (10_000 + 2_000 draws total) took 10 seconds.
 </code></pre>
 <p>In this case, the PyMC3 model is about a factor of 2 faster than the PyTorch model, but this is a simple enough model that it&rsquo;s not really a fair comparison.
 I expect that this gap would close for more expensive models where the overhead is less important.
@@ -401,38 +401,38 @@ az.summary(torch_trace)
   <tbody>
     <tr>
       <th>m</th>
-      <td>0.483</td>
+      <td>0.484</td>
       <td>0.037</td>
-      <td>0.415</td>
+      <td>0.416</td>
       <td>0.550</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>912.0</td>
-      <td>941.0</td>
+      <td>806.0</td>
+      <td>1075.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>-2.226</td>
-      <td>0.197</td>
-      <td>-2.570</td>
-      <td>-1.832</td>
+      <td>-2.230</td>
+      <td>0.195</td>
+      <td>-2.624</td>
+      <td>-1.887</td>
       <td>0.007</td>
       <td>0.005</td>
-      <td>891.0</td>
-      <td>964.0</td>
+      <td>746.0</td>
+      <td>967.0</td>
       <td>1.0</td>
     </tr>
     <tr>
       <th>logs</th>
-      <td>-0.299</td>
-      <td>0.101</td>
-      <td>-0.500</td>
-      <td>-0.118</td>
+      <td>-0.301</td>
+      <td>0.102</td>
+      <td>-0.484</td>
+      <td>-0.104</td>
       <td>0.003</td>
       <td>0.002</td>
-      <td>1054.0</td>
-      <td>1131.0</td>
+      <td>1050.0</td>
+      <td>1143.0</td>
       <td>1.0</td>
     </tr>
   </tbody>
@@ -473,38 +473,38 @@ az.summary(torch_trace)
     <tr>
       <th>m</th>
       <td>0.483</td>
-      <td>0.037</td>
-      <td>0.413</td>
-      <td>0.548</td>
+      <td>0.036</td>
+      <td>0.418</td>
+      <td>0.553</td>
       <td>0.001</td>
       <td>0.001</td>
-      <td>954.0</td>
-      <td>1140.0</td>
-      <td>1.0</td>
+      <td>880.0</td>
+      <td>1026.0</td>
+      <td>1.00</td>
     </tr>
     <tr>
       <th>b</th>
-      <td>-2.232</td>
-      <td>0.195</td>
-      <td>-2.590</td>
-      <td>-1.863</td>
-      <td>0.006</td>
+      <td>-2.224</td>
+      <td>0.194</td>
+      <td>-2.575</td>
+      <td>-1.849</td>
+      <td>0.007</td>
       <td>0.005</td>
-      <td>918.0</td>
-      <td>1071.0</td>
-      <td>1.0</td>
+      <td>839.0</td>
+      <td>1031.0</td>
+      <td>1.00</td>
     </tr>
     <tr>
       <th>logs</th>
-      <td>-0.303</td>
-      <td>0.102</td>
-      <td>-0.493</td>
-      <td>-0.110</td>
+      <td>-0.302</td>
+      <td>0.098</td>
+      <td>-0.472</td>
+      <td>-0.112</td>
       <td>0.003</td>
       <td>0.002</td>
-      <td>1037.0</td>
-      <td>1101.0</td>
-      <td>1.0</td>
+      <td>1219.0</td>
+      <td>1168.0</td>
+      <td>1.01</td>
     </tr>
   </tbody>
 </table>
