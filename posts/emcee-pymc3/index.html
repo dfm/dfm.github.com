@@ -204,7 +204,7 @@ NUTS: [theta, alphaperp, logs]
 </style>
 <div>
   <progress value='7000' class='' max='7000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [7000/7000 00:04&lt;00:00 Sampling chain 0, 0 divergences]
+  100.00% [7000/7000 00:03&lt;00:00 Sampling chain 0, 0 divergences]
 </div>
 <style>
     /* Turns off some styling */
@@ -223,9 +223,9 @@ NUTS: [theta, alphaperp, logs]
 </style>
 <div>
   <progress value='7000' class='' max='7000' style='width:300px; height:20px; vertical-align: middle;'></progress>
-  100.00% [7000/7000 00:04&lt;00:00 Sampling chain 1, 0 divergences]
+  100.00% [7000/7000 00:03&lt;00:00 Sampling chain 1, 0 divergences]
 </div>
-<pre><code>Sampling 2 chains for 5_000 tune and 2_000 draw iterations (10_000 + 4_000 draws total) took 9 seconds.
+<pre><code>Sampling 2 chains for 5_000 tune and 2_000 draw iterations (10_000 + 4_000 draws total) took 7 seconds.
 </code></pre>
 <p>And we can take a look at the <a href="https://corner.readthedocs.io/en/latest/" 
   
@@ -323,12 +323,12 @@ First, as expected, the autocorrelation for PyMC3 is very short (about 1 step):<
     for var in [&quot;logs&quot;, &quot;alphaperp&quot;, &quot;theta&quot;]
 ]
 </code></pre>
-<pre><code>[1.334548254067617, 1.3190172164161442, 1.19597488084929]
+<pre><code>[1.396051753169024, 1.3779154396065416, 1.2019097466488469]
 </code></pre>
 <p>And, the autocorrelation for emcee is about 40 steps:</p>
 <pre><code class="language-python">sampler.get_autocorr_time(discard=100)
 </code></pre>
-<pre><code>array([35.01199991, 34.21983345, 37.38879886])
+<pre><code>array([39.14057372, 41.86586057, 38.85580024])
 </code></pre>
 <p>If you want to compare these results in detail, you&rsquo;ll want to make sure that you take into account the fact that each step of NUTS is significantly more expensive than one step with emcee, but that&rsquo;s way beyond the scope of this post&hellip;</p>
 <p><em>11/22/18: This post has been updated with suggestions from Thomas Wiecki. The <code>find_MAP</code> call has been removed from the PyMC sampling, and <code>model.bijection</code> is now used to map between arrays and dicts of parameters.</em></p>
